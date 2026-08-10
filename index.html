@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🏫 SchoolNet (Сделано ИИ по запросу WinoGrad)</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #00ffcc;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        #app {
+            max-width: 500px;
+            width: 100%;
+            background: #111;
+            border: 1px solid #00ffcc;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 0 30px #00ffcc33;
+        }
+        h1 {
+            text-align: center;
+            text-shadow: 0 0 10px #00ffcc;
+        }
+        input,
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 6px 0;
+            border-radius: 8px;
+            border: none;
+            font-size: 16px;
+        }
+        input {
+            background: #222;
+            border: 1px solid #00ffcc55;
+            color: #00ffcc;
+        }
+        button {
+            background: #00ffcc;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover:not(:disabled) {
+            background: #00ddbb;
+            box-shadow: 0 0 15px #00ffcc;
+        }
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .flex {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .flex input {
+            width: auto;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1a1a1a;
+            border: 1px solid #00ffcc;
+            padding: 15px 25px;
+            border-radius: 12px;
+            color: #00ffcc;
+            z-index: 999;
+            box-shadow: 0 0 30px #00ffcc33;
+        }
+        .card {
+            background: #1a1a1a;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 8px 0;
+            border-left: 4px solid #00ffcc;
+        }
+        a {
+            color: #00ffcc;
+            cursor: pointer;
+        }
+        .status {
+            margin-top: 10px;
+            color: #ff5555;
+            font-size: 14px;
+        }
+        .status.success {
+            color: #00ff88;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>🏫 SchoolNet</h1>
+
+        <!-- АВТОРИЗАЦИЯ -->
+        <div id="authBlock">
+            <input type="text" id="username" placeholder="Логин (@winogradik)" />
+            <input type="password" id="password" placeholder="Пароль" />
+
+            <div class="flex">
+                <input type="checkbox" id="rulesCheck" />
+                <span>Я согласен с <a onclick="alert('Правила SchoolNet')">правилами</a></span>
+            </div>
+
+            <button id="registerBtn" onclick="signUp()" disabled>📝 Регистрация</button>
+            <button onclick="signIn()">🔑 Войти</button>
+            <div id="status" class="status"></div>
+        </div>
+
+        <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
+        <div id="mainUI" class="hidden">
+            <button onclick="signOut()" style="background:#ff3333;color:#fff;">🚪 Выйти</button>
+            <div id="feed"></div>
+        </div>
+
+        <div id="toast" class="toast hidden"></div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 1. SUPABASE
+        // ============================================================
+        const SUPABASE_URL = "https://woc.dgbeffdyydvafbbwd.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_9zLs2SW7TKk7nE5nc2SlrQ_p338-6dB";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ============================================================
+        // 2. ПЕРЕМЕННЫЕ
+        // ============================================================
+        let currentUser = null;
+
+        // ============================================================
+        // 3. ГАЛОЧКА → КНОПКА
+        // ============================================================
+        const rulesCheck = document.getElementById('rulesCheck');
+        const registerBtn = document.getElementById('registerBtn');
+
+        rulesCheck.addEventListener('change', function() {
+            registerBtn.disabled = !this.checked;
+        });
+
+        // ============================================================
+        // 4. РЕГИСТРАЦИЯ
+        // ============================================================
+        async function signUp() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const rulesChecked = document.getElementById('rulesCheck').checked;
+
+            if (!rulesChecked) {
+                setStatus('❌ Поставьте галочку "Я согласен с правилами"', false);
+                return;
+            }
+
+            if (!username || !password) {
+                setStatus('❌ Заполните логин и пароль', false);
+                return;
+            }
+
+            if (!username.startsWith('@')) {
+                setStatus('❌ Логин должен начинаться с @', false);
+                return;
+            }
+
+            if (password.length < 6) {
+                setStatus('❌ Пароль минимум 6 символов', false);
+                return;
+            }
+
+            const { data: existing } = await supabase
+                .from('users')
+                .select('username')
+                .eq('username', username)
+                .maybeSingle();
+
+            if (existing) {
+                setStatus('❌ Этот логин уже занят', false);
+                return;
+            }
+
+            const { count } = await supabase.from('users').select('*', { count: 'exact' });
+            const userId = 'U-' + String(count + 1).padStart(5, '0');
+
+            const newUser = {
+                id: userId,
+                username: username,
+                password: password,
+                nickname: username,
+                commission: 20,
+                violations: 0,
+                completed: 0,
+                rating: 0,
+                rating_count: 0,
+                role: count === 0 ? 'admin' : 'user',
+                is_moderator: false,
+                is_admin: count === 0,
+                balance: 0,
+                city: 'Одинцово',
+                school: 'Школа №2'
+            };
+
+            const { error } = await supabase.from('users').insert(newUser);
+
+            if (error) {
+                setStatus('❌ Ошибка: ' + error.message, false);
+                return;
+            }
+
+            setStatus('✅ Регистрация успешна! Теперь войдите.', true);
+        }
+
+        // ============================================================
+        // 5. ВХОД
+        // ============================================================
+        async function signIn() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!username || !password) {
+                setStatus('❌ Заполните логин и пароль', false);
+                return;
+            }
+
+            const { data: user, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('username', username)
+                .eq('password', password)
+                .maybeSingle();
+
+            if (error || !user) {
+                setStatus('❌ Неверный логин или пароль', false);
+                return;
+            }
+
+            currentUser = user;
+            document.getElementById('authBlock').classList.add('hidden');
+            document.getElementById('mainUI').classList.remove('hidden');
+            document.getElementById('feed').innerHTML = '<p>✅ Добро пожаловать, ' + user.username + '!</p>';
+            setStatus('', true);
+        }
+
+        // ============================================================
+        // 6. ВЫХОД
+        // ============================================================
+        function signOut() {
+            currentUser = null;
+            document.getElementById('authBlock').classList.remove('hidden');
+            document.getElementById('mainUI').classList.add('hidden');
+            setStatus('👋 Вы вышли', false);
+        }
+
+        // ============================================================
+        // 7. СТАТУС
+        // ============================================================
+        function setStatus(msg, isSuccess) {
+            const el = document.getElementById('status');
+            el.textContent = msg;
+            el.className = 'status' + (isSuccess ? ' success' : '');
+        }
+    </script>
+</body>
+</html>
