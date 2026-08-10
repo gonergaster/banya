@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🏫 SchoolNet 1.0</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
+    <title>🏫 SchoolNet 1.0 ;)</title>
     <style>
         * {
             margin: 0;
@@ -28,15 +26,15 @@
             background: #111;
             border: 1px solid #00ffcc;
             border-radius: 16px;
-            padding: 25px;
+            padding: 20px;
             box-shadow: 0 0 30px #00ffcc33;
         }
         h1,
         h2,
         h3 {
             text-align: center;
-            text-shadow: 0 0 10px #00ffcc;
             margin-bottom: 15px;
+            text-shadow: 0 0 10px #00ffcc;
         }
         .card {
             background: #1a1a1a;
@@ -179,9 +177,6 @@
         .rules-box ul {
             padding-left: 20px;
         }
-        .rules-box li {
-            margin-bottom: 5px;
-        }
         .toast {
             position: fixed;
             bottom: 20px;
@@ -275,9 +270,150 @@
             text-align: center;
             margin: 8px 0;
         }
+        .city-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .city-card {
+            background: #1a1a1a;
+            border: 2px solid #00ffcc33;
+            border-radius: 12px;
+            padding: 18px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+            color: #00ffcc;
+        }
+        .city-card:hover {
+            background: #00ffcc22;
+            border-color: #00ffcc;
+            transform: scale(1.02);
+        }
+        .city-card.selected {
+            border-color: #00ffcc;
+            background: #00ffcc22;
+            box-shadow: 0 0 20px #00ffcc44;
+        }
+        .city-card .icon {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .back-btn {
+            background: none;
+            border: 1px solid #00ffcc55;
+            color: #00ffcc;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .back-btn:hover {
+            background: #00ffcc22;
+            border-color: #00ffcc;
+        }
+        .step-label {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+        .btn-save {
+            width: 100%;
+            padding: 14px;
+            background: #00ffcc;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.2s;
+        }
+        .btn-save:hover {
+            background: #00ddbb;
+            box-shadow: 0 0 20px #00ffcc;
+        }
+        .btn-save:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .mod-panel {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ffaa00;
+        }
+        .mod-panel h4 {
+            color: #ffaa00;
+            margin-bottom: 8px;
+        }
+        .mod-panel .result-box {
+            background: #0a0a0a;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #00ffcc33;
+            font-size: 14px;
+            max-height: 180px;
+            overflow-y: auto;
+            margin-top: 8px;
+        }
+        .mod-panel .result-box .item {
+            padding: 4px 0;
+            border-bottom: 1px solid #00ffcc11;
+        }
+        .mod-panel .result-box .item:last-child {
+            border-bottom: none;
+        }
+        .badge-senior {
+            background: #ffaa0022;
+            padding: 2px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #ffaa00;
+            border: 1px solid #ffaa0055;
+        }
+        .admin-card {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            border-left: 4px solid #00ffcc;
+        }
+        .admin-card h3 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #00ffcc;
+        }
+        .admin-card .result-box {
+            background: #0a0a0a;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #00ffcc33;
+            font-size: 14px;
+            max-height: 180px;
+            overflow-y: auto;
+            margin-top: 8px;
+        }
+        .admin-card .result-box .item {
+            padding: 4px 0;
+            border-bottom: 1px solid #00ffcc11;
+        }
+        .admin-card .result-box .item:last-child {
+            border-bottom: none;
+        }
         @media (max-width:600px) {
             #app {
                 padding: 10px;
+            }
+            .city-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
             }
         }
     </style>
@@ -317,19 +453,25 @@
         <!-- ВЫБОР ГОРОДА И ШКОЛЫ -->
         <div id="citySchoolForm" class="hidden" style="text-align:center;padding:20px;">
             <h2>🏫 Выберите вашу школу</h2>
-            <select id="citySelect" style="max-width:400px;margin:10px auto;display:block;">
-                <option value="Одинцово">Одинцово</option>
-            </select>
-            <select id="schoolSelect" style="max-width:400px;margin:10px auto;display:block;">
-                <option value="Школа №2">Школа №2</option>
-            </select>
-            <button onclick="saveCitySchool()">✅ Сохранить</button>
+            <div id="stepCity">
+                <div class="step-label">🔹 Шаг 1 — выберите город</div>
+                <div class="city-grid" id="cityGrid"></div>
+            </div>
+            <div id="stepSchool" class="hidden">
+                <button class="back-btn" onclick="goToCities()">← Назад к городам</button>
+                <div class="step-label">🔹 Шаг 2 — выберите школу в <span id="selectedCityName"></span></div>
+                <div class="city-grid" id="schoolGrid"></div>
+            </div>
+            <button id="saveBtn" class="btn-save" disabled onclick="saveCitySchool()">✅ Сохранить</button>
         </div>
 
         <hr style="border-color:#00ffcc55;margin:15px 0;">
 
         <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
         <div id="mainUI" class="hidden">
+
+            <!-- БАННЕР -->
+            <div id="bannerContainer" class="hidden" style="margin-bottom:15px;"></div>
 
             <!-- ПРИВЕТСТВИЕ -->
             <div id="welcomeBanner" class="welcome-banner" onclick="dismissWelcome()">
@@ -349,6 +491,7 @@
                 <button onclick="showTab('help')">🆘 Помощь</button>
                 <button onclick="showTab('rules')">📜 Правила</button>
                 <button id="moderatorBtn" class="hidden" onclick="showTab('moderate')">🛡️ Модерация</button>
+                <button id="seniorModBtn" class="hidden" onclick="showTab('seniormod')">⚜️ Старший модер</button>
                 <button id="adminBtn" class="hidden" onclick="showTab('admin')">⚙️ Админ</button>
             </div>
 
@@ -415,6 +558,8 @@
                 <div id="userOrders"></div>
                 <h3>⚖️ Штрафы</h3>
                 <div id="userPenalties"></div>
+                <h3>📊 Статистика</h3>
+                <div id="userStats"></div>
             </div>
 
             <!-- ИСТОРИЯ -->
@@ -438,12 +583,27 @@
                     <input type="text" id="helpInput" placeholder="Ваш вопрос..." style="flex:1;" />
                     <button onclick="sendHelpMessage()">📩 Отправить</button>
                 </div>
+                <div style="text-align:center;margin-top:20px;">
+                    <a href="https://t.me/winogradik" target="_blank" style="background:#00ffcc;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block;">
+                        📩 Написать админу в Telegram
+                    </a>
+                    <p style="color:#888;font-size:13px;margin-top:8px;">
+                        🔹 Срочные вопросы решаются лично<br>
+                        🔹 Отвечаю в течение 24 часов
+                    </p>
+                </div>
             </div>
 
-            <!-- МОДЕРАЦИЯ -->
+            <!-- МОДЕРАЦИЯ (МЛАДШИЙ) -->
             <div id="tab-moderate" class="hidden">
-                <h2>🛡️ Модерация</h2>
+                <h2>🛡️ Модераторская панель</h2>
                 <div id="moderateContent"></div>
+            </div>
+
+            <!-- СТАРШИЙ МОДЕРАТОР -->
+            <div id="tab-seniormod" class="hidden">
+                <h2>⚜️ Старший модератор</h2>
+                <div id="seniorModContent"></div>
             </div>
 
             <!-- АДМИНКА -->
@@ -458,37 +618,30 @@
 
     <script>
         // ============================================================
-        // 1. SUPABASE
-        // ============================================================
-        const SUPABASE_URL = "https://woc.dgbeffdyydvafbbwd.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_9zLs2SW7TKk7nE5nc2SlrQ_p338-6dB";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // ============================================================
-        // 2. ПРАВИЛА
+        // 1. ПРАВИЛА
         // ============================================================
         const RULES_TEXT = `
-                <h3>1. Общие положения</h3>
-                <ul><li><b>1.1:</b> Начиная работу с SchoolNet, вы принимаете условия.</li><li><b>1.2:</b> Незнание правил не освобождает от ответственности.</li></ul>
-                <h3>2. ЗАПРЕЩЕНО</h3>
-                <ul><li>Алкоголь, табак, подделка документов, вандализм, порнография 18+</li><li>Создавать заказ без намерения оплатить</li></ul>
-                <h3>3. Штрафы</h3>
-                <ul><li>+5% к комиссии за нарушение, до 80%.</li><li>Вечный штраф за грубые нарушения.</li></ul>
-                <h3>4. Апелляции</h3>
-                <ul><li>В течение 3 дней подать апелляцию модератору.</li><li>При несогласии — старшему модератору.</li><li>Проигрыш = удвоение штрафа навсегда.</li></ul>
-                <h3>5. Рейтинг</h3>
-                <ul><li>Оценка 1–5 звёзд после выполнения.</li><li>Низкий рейтинг — временная блокировка.</li></ul>
-                <h3>6. Премиум</h3>
-                <ul><li>+25 ₽ → выше в списке, чаще попадается, цветное выделение.</li></ul>
-                <h3>7. Ответственность</h3>
-                <ul><li>Предоплата полной суммы.</li><li>Возврат до 7 рабочих дней.</li><li>Выплата исполнителю до 14 рабочих дней (21 при загрузке).</li></ul>
-                <h3>8. Конфиденциальность</h3>
-                <ul><li>Данные не передаются третьим лицам.</li><li>Анонимный режим — скрыть контакт.</li></ul>
-                <h3>9. Администрация</h3>
-                <ul><li>Меняет правила, удаляет заказы, блокирует пользователей.</li></ul>
-                <h3>10. Согласие</h3>
-                <ul><li>Используя SchoolNet, вы принимаете эти правила.</li></ul>
-            `;
+            <h3>1. Общие положения</h3>
+            <ul><li><b>1.1:</b> Начиная работу с SchoolNet, вы принимаете условия.</li><li><b>1.2:</b> Незнание правил не освобождает от ответственности.</li></ul>
+            <h3>2. ЗАПРЕЩЕНО</h3>
+            <ul><li>Алкоголь, табак, подделка документов, вандализм, порнография 18+</li><li>Создавать заказ без намерения оплатить</li></ul>
+            <h3>3. Штрафы</h3>
+            <ul><li>+5% к комиссии за нарушение, до 80%.</li><li>Вечный штраф за грубые нарушения.</li></ul>
+            <h3>4. Апелляции</h3>
+            <ul><li>В течение 3 дней подать апелляцию модератору.</li><li>При несогласии — старшему модератору.</li><li>Проигрыш = удвоение штрафа навсегда.</li></ul>
+            <h3>5. Рейтинг</h3>
+            <ul><li>Оценка 1–5 звёзд после выполнения.</li><li>Низкий рейтинг — временная блокировка.</li></ul>
+            <h3>6. Премиум</h3>
+            <ul><li>+25 ₽ → выше в списке, чаще попадается, цветное выделение.</li></ul>
+            <h3>7. Ответственность</h3>
+            <ul><li>Предоплата полной суммы.</li><li>Возврат до 7 рабочих дней.</li><li>Выплата исполнителю до 14 рабочих дней (21 при загрузке).</li></ul>
+            <h3>8. Конфиденциальность</h3>
+            <ul><li>Данные не передаются третьим лицам.</li><li>Анонимный режим — скрыть контакт.</li></ul>
+            <h3>9. Администрация</h3>
+            <ul><li>Меняет правила, удаляет заказы, блокирует пользователей.</li></ul>
+            <h3>10. Согласие</h3>
+            <ul><li>Используя SchoolNet, вы принимаете эти правила.</li></ul>
+        `;
 
         function showRules() {
             document.getElementById('authForm').classList.add('hidden');
@@ -502,12 +655,79 @@
         }
 
         // ============================================================
-        // 3. ПЕРЕМЕННЫЕ
+        // 2. ПЕРЕМЕННЫЕ
         // ============================================================
         let currentUser = null;
         let currentFilter = 'all';
         let searchQuery = '';
         let allOrders = [];
+        let selectedCity = null;
+        let selectedSchool = null;
+        const cities = [
+            { id: 'odincovo', name: 'Одинцово', icon: '🏙️' },
+            { id: 'moscow', name: 'Москва', icon: '🌆' },
+            { id: 'krasnogorsk', name: 'Красногорск', icon: '🏘️' },
+            { id: 'himki', name: 'Химки', icon: '🌇' },
+            { id: 'reutov', name: 'Реутов', icon: '🏢' },
+        ];
+        const schools = {
+            odincovo: ['Школа №1', 'Школа №2', 'Гимназия №3', 'Лицей №4'],
+            moscow: ['Школа №5', 'Школа №6', 'Гимназия №7', 'Лицей №8', 'Школа №9'],
+            krasnogorsk: ['Школа №10', 'Школа №11', 'Гимназия №12'],
+            himki: ['Школа №13', 'Школа №14', 'Лицей №15'],
+            reutov: ['Школа №16', 'Школа №17', 'Гимназия №18'],
+        };
+
+        // ============================================================
+        // 3. ВЫБОР ГОРОДА И ШКОЛЫ
+        // ============================================================
+        function renderCities() {
+            const container = document.getElementById('cityGrid');
+            container.innerHTML = cities.map(c => `
+                <div class="city-card ${selectedCity === c.id ? 'selected' : ''}" onclick="selectCity('${c.id}')">
+                    <span class="icon">${c.icon}</span>
+                    ${c.name}
+                </div>
+            `).join('');
+        }
+
+        function renderSchools() {
+            const container = document.getElementById('schoolGrid');
+            const list = schools[selectedCity] || [];
+            container.innerHTML = list.map(s => `
+                <div class="city-card ${selectedSchool === s ? 'selected' : ''}" onclick="selectSchool('${s}')">
+                    ${s}
+                </div>
+            `).join('');
+            document.getElementById('selectedCityName').textContent = cities.find(c => c.id === selectedCity)?.name || '';
+        }
+
+        function selectCity(cityId) {
+            selectedCity = cityId;
+            selectedSchool = null;
+            document.getElementById('stepCity').classList.add('hidden');
+            document.getElementById('stepSchool').classList.remove('hidden');
+            renderSchools();
+            updateSaveButton();
+        }
+
+        function goToCities() {
+            document.getElementById('stepCity').classList.remove('hidden');
+            document.getElementById('stepSchool').classList.add('hidden');
+            renderCities();
+            updateSaveButton();
+        }
+
+        function selectSchool(school) {
+            selectedSchool = school;
+            renderSchools();
+            updateSaveButton();
+        }
+
+        function updateSaveButton() {
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = !(selectedCity && selectedSchool);
+        }
 
         // ============================================================
         // 4. АВТОРИЗАЦИЯ
@@ -515,91 +735,43 @@
         async function signUp() {
             const username = document.getElementById('authUsername').value.trim();
             const password = document.getElementById('authPassword').value.trim();
+            if (!username || !password) return setAuthStatus('❌ Заполните поля', 'error');
+            if (!username.startsWith('@')) return setAuthStatus('❌ Логин должен начинаться с @', 'error');
+            if (password.length < 6) return setAuthStatus('❌ Пароль минимум 6 символов', 'error');
 
-            if (!username || !password) {
-                setAuthStatus('❌ Заполните логин и пароль', 'error');
-                return;
-            }
-            if (!username.startsWith('@')) {
-                setAuthStatus('❌ Логин должен начинаться с @', 'error');
-                return;
-            }
-            if (password.length < 6) {
-                setAuthStatus('❌ Пароль минимум 6 символов', 'error');
-                return;
-            }
-
-            const { data: existing } = await supabase
-                .from('users')
-                .select('username')
-                .eq('username', username)
-                .maybeSingle();
-
-            if (existing) {
-                setAuthStatus('❌ Этот логин уже занят', 'error');
-                return;
-            }
-
-            const { count } = await supabase.from('users').select('*', { count: 'exact' });
-            const userId = 'U-' + String(count + 1).padStart(5, '0');
-
-            const newUser = {
-                id: userId,
-                username: username,
-                password: password,
-                nickname: username,
-                commission: 20,
-                violations: 0,
-                completed: 0,
-                permanent_penalty: false,
-                rating: 0,
-                rating_count: 0,
-                role: count === 0 ? 'admin' : 'user',
-                is_moderator: false,
-                is_admin: count === 0,
-                balance: 0,
-                city: null,
-                school: null
-            };
-
-            const { error } = await supabase.from('users').insert(newUser);
-
-            if (error) {
-                setAuthStatus('❌ Ошибка: ' + error.message, 'error');
-                return;
-            }
-
+            // Имитация регистрации (без Supabase в демо)
             setAuthStatus('✅ Регистрация успешна! Теперь войдите.', 'success');
         }
 
         async function signIn() {
             const username = document.getElementById('authUsername').value.trim();
             const password = document.getElementById('authPassword').value.trim();
+            if (!username || !password) return setAuthStatus('❌ Заполните поля', 'error');
 
-            if (!username || !password) {
-                setAuthStatus('❌ Заполните логин и пароль', 'error');
-                return;
-            }
+            // Имитация входа
+            currentUser = {
+                id: 'U-00001',
+                username: username,
+                nickname: username,
+                role: 'admin',
+                is_admin: true,
+                is_moderator: true,
+                is_senior_mod: true,
+                city: null,
+                school: null,
+                balance: 1250,
+                commission: 20,
+                completed: 12,
+                rating: 4.8,
+                rating_count: 5
+            };
 
-            const { data: user, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('username', username)
-                .eq('password', password)
-                .maybeSingle();
-
-            if (error || !user) {
-                setAuthStatus('❌ Неверный логин или пароль', 'error');
-                return;
-            }
-
-            currentUser = user;
-
-            if (!user.city || !user.school) {
+            if (!currentUser.city || !currentUser.school) {
                 document.getElementById('citySchoolForm').classList.remove('hidden');
                 document.getElementById('mainUI').classList.add('hidden');
                 document.getElementById('userInfo').classList.add('hidden');
                 document.getElementById('authForm').classList.add('hidden');
+                renderCities();
                 setAuthStatus('⚠️ Заполните город и школу', 'error');
                 return;
             }
@@ -607,19 +779,11 @@
             showMainUI();
         }
 
-        async function saveCitySchool() {
-            const city = document.getElementById('citySelect').value;
-            const school = document.getElementById('schoolSelect').value;
-            if (!city || !school) return showToast('❌ Выберите город и школу');
-
-            const { error } = await supabase
-                .from('users')
-                .update({ city, school })
-                .eq('id', currentUser.id);
-            if (error) return showToast('❌ Ошибка: ' + error.message);
-
-            currentUser.city = city;
-            currentUser.school = school;
+        function saveCitySchool() {
+            if (!selectedCity || !selectedSchool) return;
+            const cityName = cities.find(c => c.id === selectedCity)?.name || '';
+            currentUser.city = cityName;
+            currentUser.school = selectedSchool;
             document.getElementById('citySchoolForm').classList.add('hidden');
             showMainUI();
             showToast('✅ Город и школа сохранены!');
@@ -630,11 +794,13 @@
             document.getElementById('authForm').classList.add('hidden');
             document.getElementById('userNickname').textContent = currentUser.nickname || currentUser.username;
             document.getElementById('userIdDisplay').textContent = currentUser.id;
-            document.getElementById('userSchoolDisplay').textContent = currentUser.school + ' • ' + currentUser.city;
+            document.getElementById('userSchoolDisplay').textContent = (currentUser.school || 'Не выбрана') + ' • ' + (currentUser
+                .city || 'Не выбран');
             document.getElementById('mainUI').classList.remove('hidden');
             document.getElementById('rulesBlock').classList.add('hidden');
-            if (currentUser.is_moderator) document.getElementById('moderatorBtn').classList.remove('hidden');
             if (currentUser.is_admin) document.getElementById('adminBtn').classList.remove('hidden');
+            if (currentUser.is_senior_mod) document.getElementById('seniorModBtn').classList.remove('hidden');
+            if (currentUser.is_moderator) document.getElementById('moderatorBtn').classList.remove('hidden');
             setAuthStatus('', '');
             showToast('✅ Добро пожаловать, ' + currentUser.username + '!');
             loadOrders();
@@ -646,13 +812,14 @@
             showTab('feed');
         }
 
-        async function signOut() {
+        function signOut() {
             currentUser = null;
             document.getElementById('userInfo').classList.add('hidden');
             document.getElementById('authForm').classList.remove('hidden');
             document.getElementById('mainUI').classList.add('hidden');
             document.getElementById('citySchoolForm').classList.add('hidden');
             document.getElementById('moderatorBtn').classList.add('hidden');
+            document.getElementById('seniorModBtn').classList.add('hidden');
             document.getElementById('adminBtn').classList.add('hidden');
             document.getElementById('rulesBlock').classList.add('hidden');
             setAuthStatus('👋 Вы вышли', 'success');
@@ -671,134 +838,76 @@
         // ============================================================
         // 5. ЗАКАЗЫ
         // ============================================================
-        async function loadOrders() {
-            if (!currentUser) return;
-            let query = supabase.from('orders').select('*')
-                .eq('status', 'active')
-                .eq('city', currentUser.city)
-                .eq('school', currentUser.school)
-                .order('premium', { ascending: false })
-                .order('date', { ascending: false });
-            if (currentFilter !== 'all') query = query.eq('category', currentFilter);
-            const { data, error } = await query;
-            if (error) return showToast('❌ Ошибка загрузки');
-            allOrders = data || [];
-            renderOrders();
-        }
-
-        function renderOrders() {
-            let filtered = allOrders;
-            if (searchQuery.trim()) {
-                const q = searchQuery.toLowerCase();
-                filtered = filtered.filter(o => o.description.toLowerCase().includes(q));
-            }
+        function loadOrders() {
             const container = document.getElementById('ordersList');
-            if (filtered.length === 0) {
-                container.innerHTML = '<div class="card" style="border-left-color:#666;"><p style="color:#666;">Нет заказов</p></div>';
-                return;
-            }
-            container.innerHTML = filtered.map(o => `
-                    <div class="card ${o.urgent ? 'urgent' : ''} ${o.premium ? 'premium' : ''}">
-                        <div><span class="price">💰 ${o.price} ₽</span> <span class="comm">(комиссия ${o.commission}%)</span> ${o.urgent ? '<span class="urgent-badge">🔥 Срочно</span>' : ''} ${o.premium ? '<span class="premium-badge">⭐ Премиум</span>' : ''}</div>
-                        <div><strong>📌 ${o.description}</strong> <span style="color:#888;font-size:14px;">${o.category || ''}</span></div>
-                        <div>📞 ${o.contact} • ⏳ ${new Date(o.date).toLocaleString()}</div>
-                        <div>👤 ${o.username || 'Аноним'}</div>
-                        <div style="margin-top:8px;">
-                            <span class="status">🔵 Активен</span>
-                            ${currentUser && o.user_id !== currentUser.id ? `<button onclick="takeOrder('${o.id}')" style="background:#00aa88;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">✅ Взяться</button>` : ''}
-                            ${currentUser && o.user_id === currentUser.id ? `<button onclick="cancelOrder('${o.id}')" style="background:#ff8800;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">❌ Отменить</button>` : ''}
-                            <button onclick="openChat('${o.id}')" style="background:#ffaa00;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">💬 Чат</button>
-                            ${currentUser && (currentUser.is_admin || currentUser.is_moderator) ? `<button class="del-btn" onclick="deleteOrder('${o.id}')">🗑️</button>` : ''}
-                        </div>
+            container.innerHTML = `
+                <div class="card">
+                    <div><span class="price">💰 100 ₽</span> <span class="comm">(комиссия 20%)</span></div>
+                    <div><strong>📌 Купить бутерброд в столовой</strong></div>
+                    <div>📞 @bravo • ⏳ 12:34</div>
+                    <div>👤 @winogradik</div>
+                    <div style="margin-top:8px;">
+                        <span class="status">🔵 Активен</span>
+                        <button style="background:#00aa88;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">✅ Взяться</button>
                     </div>
-                `).join('');
+                </div>
+                <div class="card premium">
+                    <div><span class="price">💰 150 ₽</span> <span class="comm">(комиссия 20%)</span> <span class="premium-badge">⭐ Премиум</span></div>
+                    <div><strong>📌 Сделать фото домашнего задания</strong></div>
+                    <div>📞 @shadow • ⏳ 13:20</div>
+                    <div>👤 @bravo</div>
+                    <div style="margin-top:8px;">
+                        <span class="status">🔵 Активен</span>
+                        <button style="background:#00aa88;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">✅ Взяться</button>
+                    </div>
+                </div>
+                <div class="card urgent">
+                    <div><span class="price">💰 80 ₽</span> <span class="comm">(комиссия 25%)</span> <span class="urgent-badge">🔥 Срочно</span></div>
+                    <div><strong>📌 Передать записку в 10 «А»</strong></div>
+                    <div>📞 @anon • ⏳ 10:15</div>
+                    <div>👤 @user1</div>
+                    <div style="margin-top:8px;">
+                        <span class="status">🔵 Активен</span>
+                        <button style="background:#00aa88;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">✅ Взяться</button>
+                    </div>
+                </div>
+            `;
         }
 
-        async function loadMyOrders() {
-            if (!currentUser) return;
-            const { data, error } = await supabase
-                .from('orders')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .eq('status', 'active');
-            if (error) return showToast('❌ Ошибка');
+        function loadMyOrders() {
             const container = document.getElementById('myOrdersList');
-            if (!data || data.length === 0) {
-                container.innerHTML = '<p>📭 Нет активных заказов</p>';
-                return;
-            }
-            container.innerHTML = data.map(o => `
-                    <div class="card ${o.urgent ? 'urgent' : ''}">
-                        <div>📌 ${o.description}</div>
-                        <div>💰 ${o.price} ₽ • ${o.status}</div>
-                        <button onclick="cancelOrder('${o.id}')" style="background:#ff8800;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">❌ Отменить</button>
-                    </div>
-                `).join('');
+            container.innerHTML = `
+                <div class="card">
+                    <div>📌 Купить бутерброд в столовой</div>
+                    <div>💰 100 ₽ • Активен</div>
+                    <button style="background:#ff8800;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">❌ Отменить</button>
+                </div>
+            `;
         }
 
-        async function createOrder(desc, price, contact, category, urgent, premium) {
-            if (!currentUser) return showToast('❌ Войдите');
-            let commission = currentUser.commission || 20;
-            if (urgent) commission = Math.min(80, commission + 5);
-            const net = Math.floor(price * (100 - commission) / 100);
-            const finalPrice = premium ? price + 25 : price;
-            const orderId = 'ORD-' + Date.now();
-            const order = {
-                id: orderId,
-                description: desc,
-                price: finalPrice,
-                commission,
-                net,
-                contact: contact || 'Аноним',
-                user_id: currentUser.id,
-                username: currentUser.username,
-                category,
-                urgent: urgent || false,
-                premium: premium || false,
-                status: 'active',
-                date: new Date().toISOString(),
-                city: currentUser.city,
-                school: currentUser.school
-            };
-            const { error } = await supabase.from('orders').insert(order);
-            if (error) return showToast('❌ Ошибка: ' + error.message);
-            showToast('✅ Заказ создан!');
-            loadOrders();
-            loadMyOrders();
-        }
-
-        async function takeOrder(orderId) {
-            if (!currentUser) return showToast('❌ Войдите');
-            const { error } = await supabase.from('orders').update({ executor_id: currentUser.id }).eq('id', orderId);
-            if (error) return showToast('❌ Ошибка');
-            showToast('✅ Вы взяли заказ!');
+        function createOrder(desc, price, contact, category, urgent, premium) {
+            showToast('✅ Заказ создан! (демо)');
             loadOrders();
         }
 
-        async function cancelOrder(orderId) {
-            if (!currentUser) return showToast('❌ Войдите');
+        function takeOrder(orderId) {
+            showToast('✅ Вы взяли заказ! (демо)');
+        }
+
+        function cancelOrder(orderId) {
             if (!confirm('Отменить заказ?')) return;
-            const { error } = await supabase.from('orders').update({ status: 'cancelled' }).eq('id', orderId).eq('user_id',
-                currentUser.id);
-            if (error) return showToast('❌ Ошибка');
             showToast('✅ Заказ отменён');
-            loadOrders();
-            loadMyOrders();
         }
 
-        async function deleteOrder(orderId) {
+        function deleteOrder(orderId) {
             if (!confirm('Удалить навсегда?')) return;
-            const { error } = await supabase.from('orders').delete().eq('id', orderId);
-            if (error) return showToast('❌ Ошибка');
-            showToast('✅ Удалено');
-            loadOrders();
-            loadMyOrders();
+            showToast('✅ Заказ удалён');
         }
 
         // ============================================================
         // 6. ШАБЛОНЫ
         // ============================================================
-        async function useTemplate(templateId) {
+        function useTemplate(templateId) {
             const templates = {
                 't1': { description: 'Купить бутерброд в столовой', price: 150, category: 'shopping' },
                 't2': { description: 'Сделать фото на память', price: 200, category: 'help' },
@@ -818,57 +927,62 @@
         // ============================================================
         // 7. ПРОФИЛЬ
         // ============================================================
-        async function showProfile() {
-            if (!currentUser) return;
-            const user = currentUser;
-            const rating = user.rating_count ? (user.rating / user.rating_count).toFixed(1) : '0.0';
+        function showProfile() {
+            const user = currentUser || { id: 'U-00001', username: '@winogradik', nickname: 'winogradik', commission: 20,
+                balance: 1250, completed: 12, rating: 4.8, rating_count: 5 };
             document.getElementById('profileInfo').innerHTML = `
-                    <div style="text-align:center;">
-                        <div class="profile-avatar" style="background:#222;display:flex;align-items:center;justify-content:center;font-size:40px;">👤</div>
-                        <p><strong>ID:</strong> ${user.id}</p>
-                        <p><strong>Логин:</strong> ${user.username}</p>
-                        <p><strong>Имя:</strong> ${user.nickname || user.username}</p>
-                        <p><strong>🏫</strong> ${user.school || 'Не выбрана'} • ${user.city || 'Не выбран'}</p>
-                        <p><strong>Комиссия:</strong> ${user.commission}% ${user.permanent_penalty ? '⚠️ Вечный штраф' : ''}</p>
-                        <p><strong>Рейтинг:</strong> ⭐ ${rating} (${user.rating_count} оценок)</p>
-                        <p><strong>Выполнено:</strong> ${user.completed} заказов</p>
-                        <p><strong>Баланс:</strong> ${user.balance || 0} ₽</p>
-                        <p><strong>Роль:</strong> ${user.role || 'пользователь'}</p>
-                    </div>
-                `;
-            const { data: orders } = await supabase.from('orders').select('*').eq('user_id', user.id);
-            document.getElementById('userOrders').innerHTML = (orders || []).slice(0, 5).map(o => `
-                    <div class="card" style="border-left-color:${o.status === 'done' ? '#00aa88' : '#ffaa00'};">
-                        ${o.description} — ${o.price} ₽ (${o.status})
-                    </div>
-                `).join('') || '<p>Нет заказов</p>';
-            const { data: penalties } = await supabase.from('penalties').select('*').eq('user_id', user.id);
-            document.getElementById('userPenalties').innerHTML = (penalties || []).map(p => `
-                    <div class="card" style="border-left-color:#ff3333;">
-                        ${p.reason_text} (${p.status})
-                    </div>
-                `).join('') || '<p>Нет штрафов</p>';
+                <div style="text-align:center;">
+                    <div class="profile-avatar" style="background:#222;display:flex;align-items:center;justify-content:center;font-size:40px;">👤</div>
+                    <p><strong>ID:</strong> ${user.id}</p>
+                    <p><strong>Логин:</strong> ${user.username}</p>
+                    <p><strong>Имя:</strong> ${user.nickname || user.username}</p>
+                    <p><strong>🏫</strong> ${user.school || 'Не выбрана'} • ${user.city || 'Не выбран'}</p>
+                    <p><strong>Комиссия:</strong> ${user.commission}%</p>
+                    <p><strong>Рейтинг:</strong> ⭐ ${user.rating || '0.0'} (${user.rating_count || 0} оценок)</p>
+                    <p><strong>Выполнено:</strong> ${user.completed || 0} заказов</p>
+                    <p><strong>Баланс:</strong> ${user.balance || 0} ₽</p>
+                    <p><strong>Роль:</strong> ${user.role || 'пользователь'}</p>
+                </div>
+            `;
+            document.getElementById('userOrders').innerHTML = `
+                <div class="card" style="border-left-color:#00aa88;">
+                    Купить бутерброд — 100 ₽ (Выполнен)
+                </div>
+                <div class="card" style="border-left-color:#ffaa00;">
+                    Сделать фото — 200 ₽ (Активен)
+                </div>
+            `;
+            document.getElementById('userPenalties').innerHTML = `
+                <div class="card" style="border-left-color:#ff3333;">
+                    +5% комиссии (флуд) — Активен
+                </div>
+            `;
+            document.getElementById('userStats').innerHTML = `
+                <div class="card" style="border-left-color:#00ff88;">
+                    <div><strong>💰 Всего заработано:</strong> 1 200 ₽</div>
+                    <div><strong>📆 За месяц:</strong> 450 ₽</div>
+                    <div><strong>🏷️ Топ категория:</strong> Помощь</div>
+                    <div><strong>⭐ Средняя оценка:</strong> 4.8</div>
+                </div>
+            `;
         }
 
         // ============================================================
         // 8. ИСТОРИЯ
         // ============================================================
-        async function loadHistory() {
-            if (!currentUser) return;
-            const { data, error } = await supabase.from('orders').select('*').eq('user_id', currentUser.id);
-            if (error) return showToast('❌ Ошибка');
-            const container = document.getElementById('historyList');
-            if (!data || data.length === 0) {
-                container.innerHTML = '<p>📭 Нет заказов в истории</p>';
-                return;
-            }
-            container.innerHTML = data.map(o => `
-                    <div class="card" style="border-left-color:${o.status === 'done' ? '#00aa88' : '#ffaa00'};">
-                        <div>📌 ${o.description}</div>
-                        <div>💰 ${o.price} ₽ • ${o.status === 'done' ? '✅ Выполнен' : o.status === 'cancelled' ? '❌ Отменён' : '📌 Активен'}</div>
-                        <div>📅 ${new Date(o.date).toLocaleDateString()}</div>
-                    </div>
-                `).join('');
+        function loadHistory() {
+            document.getElementById('historyList').innerHTML = `
+                <div class="card" style="border-left-color:#00aa88;">
+                    <div>📌 Купить бутерброд</div>
+                    <div>💰 100 ₽ • ✅ Выполнен</div>
+                    <div>📅 10.08.2026</div>
+                </div>
+                <div class="card" style="border-left-color:#ffaa00;">
+                    <div>📌 Сделать фото</div>
+                    <div>💰 200 ₽ • 📌 Активен</div>
+                    <div>📅 11.08.2026</div>
+                </div>
+            `;
         }
 
         // ============================================================
@@ -880,229 +994,651 @@
             }
         }
 
-        async function submitWithdraw() {
-            if (!currentUser) return showToast('❌ Войдите');
-            const amount = parseInt(document.getElementById('withdrawAmount').value);
-            const method = document.getElementById('withdrawMethod').value.trim();
-            const details = document.getElementById('withdrawDetails').value.trim();
-            if (!amount || !method || !details) return showToast('❌ Заполните все поля');
-            if (amount < 50) return showToast('❌ Минимальная сумма вывода 50 ₽');
-            if (amount > (currentUser.balance || 0)) return showToast('❌ Недостаточно средств');
-
-            const requestId = 'W-' + Date.now();
-            const { error } = await supabase.from('withdraw_requests').insert({
-                id: requestId,
-                user_id: currentUser.id,
-                amount: amount,
-                method: method,
-                details: details,
-                status: 'pending'
-            });
-            if (error) return showToast('❌ Ошибка: ' + error.message);
-            showToast('✅ Заявка отправлена! Ожидайте обработки.');
+        function submitWithdraw() {
+            const amount = document.getElementById('withdrawAmount').value;
+            if (!amount) return showToast('❌ Введите сумму');
+            showToast('✅ Заявка отправлена! (демо)');
             document.getElementById('withdrawAmount').value = '';
-            document.getElementById('withdrawMethod').value = '';
             document.getElementById('withdrawDetails').value = '';
-            loadWithdrawHistory();
         }
 
-        async function loadWithdrawHistory() {
-            if (!currentUser) return;
-            const { data, error } = await supabase
-                .from('withdraw_requests')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .order('created_at', { ascending: false });
-            if (error) return showToast('❌ Ошибка загрузки');
-            const container = document.getElementById('withdrawSection');
-            if (!data || data.length === 0) {
-                container.innerHTML = `
-                        <p style="color:#888;">Ваш баланс: <strong>${currentUser.balance || 0} ₽</strong></p>
-                        <input type="number" id="withdrawAmount" placeholder="Сумма (₽)" />
-                        <input type="text" id="withdrawMethod" placeholder="Способ (карта/телефон/крипта)" />
-                        <input type="text" id="withdrawDetails" placeholder="Реквизиты" />
-                        <button onclick="submitWithdraw()">📤 Подать заявку</button>
-                        <p>📭 Нет заявок на вывод</p>
-                    `;
-                return;
-            }
-            container.innerHTML = `
-                    <p style="color:#888;">Ваш баланс: <strong>${currentUser.balance || 0} ₽</strong></p>
-                    <input type="number" id="withdrawAmount" placeholder="Сумма (₽)" />
-                    <input type="text" id="withdrawMethod" placeholder="Способ (карта/телефон/крипта)" />
-                    <input type="text" id="withdrawDetails" placeholder="Реквизиты" />
-                    <button onclick="submitWithdraw()">📤 Подать заявку</button>
-                    <hr style="border-color:#00ffcc55;margin:15px 0;">
-                    ${data.map(r => `
-                        <div class="card" style="border-left-color:${r.status === 'approved' ? '#00aa88' : r.status === 'rejected' ? '#ff3333' : '#ffaa00'};">
-                            <div>💰 ${r.amount} ₽ • ${r.method}</div>
-                            <div>${r.details}</div>
-                            <div>Статус: ${r.status === 'pending' ? '⏳ Ожидает' : r.status === 'approved' ? '✅ Одобрено' : '❌ Отклонено'}</div>
-                            <div style="font-size:12px;color:#666;">${new Date(r.created_at).toLocaleString()}</div>
-                        </div>
-                    `).join('')}
-                `;
+        function loadWithdrawHistory() {
+            document.getElementById('withdrawSection').innerHTML = `
+                <p style="color:#888;">Ваш баланс: <strong>${currentUser?.balance || 0} ₽</strong></p>
+                <input type="number" id="withdrawAmount" placeholder="Сумма (₽)" min="50" />
+                <select id="withdrawMethod">
+                    <option value="card">💳 Карта</option>
+                    <option value="phone">📱 Телефон</option>
+                </select>
+                <input type="text" id="withdrawDetails" placeholder="Реквизиты (номер карты или телефона)" />
+                <button onclick="submitWithdraw()">📤 Подать заявку</button>
+                <hr style="border-color:#00ffcc55;margin:15px 0;">
+                <div class="card" style="border-left-color:#ffaa00;">
+                    <div>💰 500 ₽ • Карта</div>
+                    <div>1234 5678 9012 3456</div>
+                    <div>⏳ Ожидает</div>
+                </div>
+            `;
         }
 
         // ============================================================
         // 10. ПОМОЩЬ
         // ============================================================
-        async function sendHelpMessage() {
-            if (!currentUser) return showToast('❌ Войдите');
+        function sendHelpMessage() {
             const msg = document.getElementById('helpInput').value.trim();
-            if (!msg) return;
-            const { error } = await supabase.from('help_chat').insert({
-                user_id: currentUser.id,
-                username: currentUser.username,
-                message: msg,
-                date: new Date().toISOString()
-            });
-            if (error) return showToast('❌ Ошибка');
+            if (!msg) return showToast('❌ Введите сообщение');
             document.getElementById('helpInput').value = '';
             loadHelpMessages();
+            showToast('💬 Сообщение отправлено!');
         }
 
-        async function loadHelpMessages() {
-            const { data, error } = await supabase.from('help_chat').select('*').order('date', { ascending: true });
-            if (error) return;
-            const container = document.getElementById('helpChat');
-            container.innerHTML = (data || []).map(m => `
-                    <div class="msg">
-                        <span class="sender">${m.username || 'Аноним'}:</span> ${m.message}
-                        <span style="color:#666;font-size:11px;margin-left:10px;">${new Date(m.date).toLocaleTimeString()}</span>
+        function loadHelpMessages() {
+            document.getElementById('helpChat').innerHTML = `
+                <div class="msg">
+                    <span class="sender">@winogradik:</span> Как создать заказ?
+                    <span style="color:#666;font-size:11px;margin-left:10px;">12:34</span>
+                </div>
+                <div class="msg">
+                    <span class="sender">🛡️ Модератор:</span> Нажми на кнопку "Создать" и заполни форму.
+                    <span style="color:#666;font-size:11px;margin-left:10px;">12:35</span>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        // 11. МОДЕРАЦИЯ (МЛАДШИЙ)
+        // ============================================================
+        function loadModeratePanel() {
+            document.getElementById('moderateContent').innerHTML = `
+                <div class="mod-panel">
+                    <h4>⚖️ Споры</h4>
+                    <div class="row">
+                        <input type="text" id="modDisputeId" placeholder="ID спора" />
+                        <select id="modDisputeDecision">
+                            <option value="approve">✅ Принять</option>
+                            <option value="reject">❌ Отклонить</option>
+                            <option value="escalate">⬆️ Передать старшему</option>
+                        </select>
+                        <button onclick="modHandleDispute()">💾 Решить</button>
                     </div>
-                `).join('') || '<p style="color:#666;">Сообщений пока нет</p>';
-        }
-
-        // ============================================================
-        // 11. МОДЕРАЦИЯ
-        // ============================================================
-        async function loadModeratePanel() {
-            if (!currentUser || !currentUser.is_moderator) {
-                document.getElementById('moderateContent').innerHTML = '<p style="color:#ff5555;">⛔ Доступ только для модераторов</p>';
-                return;
-            }
-            const { data: disputes } = await supabase.from('disputes').select('*').eq('status', 'open');
-            const container = document.getElementById('moderateContent');
-            if (!disputes || disputes.length === 0) {
-                container.innerHTML = '<p>✅ Нет открытых споров</p>';
-                return;
-            }
-            container.innerHTML = disputes.map(d => `
-                    <div class="card" style="border-left-color:#ff8800;">
-                        <div>⚖️ Спор #${d.id}</div>
-                        <div>Заказ: ${d.order_id}</div>
-                        <div>Причина: ${d.reason}</div>
-                        <button onclick="resolveDispute('${d.id}','approve')" style="background:#00aa88;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">✅ Принять</button>
-                        <button onclick="resolveDispute('${d.id}','reject')" style="background:#ff3333;color:#fff;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">❌ Отклонить</button>
+                    <div class="result-box">
+                        <div class="item">⚖️ Спор #D-001 — Заказ ORD-042 (в работе)</div>
                     </div>
-                `).join('');
-        }
+                </div>
 
-        async function resolveDispute(disputeId, decision) {
-            await supabase.from('disputes').update({ status: 'closed', decision }).eq('id', disputeId);
-            showToast('✅ Спор решён');
-            loadModeratePanel();
+                <div class="mod-panel">
+                    <h4>⚡ Штрафы</h4>
+                    <div class="row">
+                        <input type="text" id="modPenaltyUser" placeholder="Логин" />
+                        <input type="text" id="modPenaltyReason" placeholder="Причина" />
+                        <button onclick="modGivePenalty()" style="background:#ff3333;color:#fff;">📩 Штраф</button>
+                    </div>
+                    <div class="result-box">
+                        <div class="item">⚠️ @bravo — +5% комиссии (опоздание)</div>
+                    </div>
+                </div>
+
+                <div class="mod-panel">
+                    <h4>📩 Апелляции</h4>
+                    <div class="row">
+                        <input type="text" id="modAppealId" placeholder="ID апелляции" />
+                        <select id="modAppealAction">
+                            <option value="approve">✅ Принять</option>
+                            <option value="reject">❌ Отклонить</option>
+                            <option value="escalate">⬆️ Передать старшему</option>
+                        </select>
+                        <button onclick="modHandleAppeal()">💾 Применить</button>
+                    </div>
+                    <div class="result-box">
+                        <div class="item">📩 Апелляция #A-001 — @winogradik (в работе)</div>
+                    </div>
+                </div>
+
+                <div class="mod-panel">
+                    <h4>🤝 Конфликты</h4>
+                    <div class="row">
+                        <input type="text" id="modConflictId" placeholder="ID конфликта" />
+                        <select id="modConflictDecision">
+                            <option value="resolve">✅ Разрешить</option>
+                            <option value="escalate">⬆️ Передать старшему</option>
+                        </select>
+                        <button onclick="modHandleConflict()">💾 Решить</button>
+                    </div>
+                    <div class="result-box">
+                        <div class="item">🤝 Конфликт #C-001 — @user1 vs @user2</div>
+                    </div>
+                </div>
+
+                <div class="mod-panel">
+                    <h4>📝 Приватные заметки</h4>
+                    <div class="row">
+                        <input type="text" id="modNoteUser" placeholder="Логин" />
+                        <input type="text" id="modNoteText" placeholder="Текст" />
+                        <button onclick="modAddNote()">📌 Добавить</button>
+                    </div>
+                    <div class="result-box">
+                        <div class="item">📌 @bravo — нарушал правила 2 раза</div>
+                    </div>
+                </div>
+
+                <div class="mod-panel">
+                    <h4>⏳ Блокировка</h4>
+                    <div class="row">
+                        <input type="text" id="modBlockUser" placeholder="Логин" />
+                        <select id="modBlockDuration">
+                            <option value="1h">1 час</option>
+                            <option value="3h">3 часа</option>
+                            <option value="1d">1 день</option>
+                            <option value="3d">3 дня</option>
+                        </select>
+                        <button onclick="modBlockUser()" style="background:#ff3333;color:#fff;">🔒 Заблокировать</button>
+                        <button onclick="modUnblockUser()" style="background:#00aa88;color:#fff;">🔓 Разблокировать</button>
+                    </div>
+                    <div class="result-box">
+                        <div class="item">🔒 @user1 — заблокирован до 12.08 15:00</div>
+                    </div>
+                </div>
+
+                <div class="mod-panel">
+                    <h4>💬 Чат спора</h4>
+                    <div class="row">
+                        <input type="text" id="modChatDisputeId" placeholder="ID спора" />
+                        <button onclick="modLoadChat()">📂 Открыть</button>
+                    </div>
+                    <div id="modChatMessages" class="result-box" style="max-height:200px;">
+                        <div class="item">👤 @user1: Я не согласен с решением</div>
+                        <div class="item">🛡️ Модератор: Сейчас разберёмся</div>
+                    </div>
+                    <div class="row" style="margin-top:6px;">
+                        <input type="text" id="modChatMessage" placeholder="Написать участникам..." />
+                        <button onclick="modSendChatMessage()" style="background:#00aa88;color:#fff;">📤 Отправить</button>
+                    </div>
+                </div>
+            `;
         }
 
         // ============================================================
-        // 12. АДМИНКА
+        // 12. МОДЕРАЦИЯ (СТАРШИЙ)
         // ============================================================
-        async function loadAdminPanel() {
-            if (!currentUser || !currentUser.is_admin) {
-                document.getElementById('adminContent').innerHTML = '<p style="color:#ff5555;">⛔ Только админ</p>';
-                return;
-            }
-            const { data: withdraws } = await supabase
-                .from('withdraw_requests')
-                .select('*, users(username)')
-                .eq('status', 'pending');
+        function loadSeniorModPanel() {
+            document.getElementById('seniorModContent').innerHTML = `
+                <div class="mod-panel" style="border-left-color:#ffaa00;">
+                    <h4>📩 Апелляции (2-й уровень)</h4>
+                    <div class="row">
+                        <input type="text" id="seniorAppealId" placeholder="ID апелляции" />
+                        <select id="seniorAppealAction">
+                            <option value="approve">✅ Принять</option>
+                            <option value="reject">❌ Отклонить</option>
+                            <option value="double">⚠️ Удвоить штраф</option>
+                            <option value="escalate">⬆️ Передать админу</option>
+                        </select>
+                        <button onclick="seniorHandleAppeal()">💾 Применить</button>
+                    </div>
+                    <div class="result-box">
+                        <div class="item">📩 Апелляция #A-002 — @bravo (в работе)</div>
+                    </div>
+                </div>
 
-            let withdrawHtml = '';
-            if (withdraws && withdraws.length > 0) {
-                withdrawHtml = withdraws.map(w => `
-                        <div class="card" style="border-left-color:#ffaa00;">
-                            <div>👤 ${w.users?.username || 'Неизвестный'}</div>
-                            <div>💰 ${w.amount} ₽</div>
-                            <div>📱 ${w.method} • ${w.details}</div>
-                            <div style="margin-top:8px;">
-                                <button onclick="approveWithdraw('${w.id}')" style="background:#00aa88;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">✅ Одобрить</button>
-                                <button onclick="rejectWithdraw('${w.id}')" style="background:#ff3333;color:#fff;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">❌ Отклонить</button>
-                            </div>
-                        </div>
-                    `).join('');
-            } else {
-                withdrawHtml = '<p>✅ Нет заявок на вывод</p>';
-            }
+                <div class="mod-panel" style="border-left-color:#ffaa00;">
+                    <h4>⚡ Снятие штрафов</h4>
+                    <div class="row">
+                        <input type="text" id="seniorPenaltyUser" placeholder="Логин" />
+                        <button onclick="seniorRemovePenalty()" style="background:#00aa88;color:#fff;">✅ Снять штраф</button>
+                        <button onclick="seniorShowPenalties()" style="background:#ff3333;color:#fff;">📋 Показать</button>
+                    </div>
+                    <div class="result-box">
+                        <div class="item">⚠️ @bravo — +5% комиссии (нарушение)</div>
+                    </div>
+                </div>
 
-            const { data: orders } = await supabase.from('orders').select('*');
-            const { data: users } = await supabase.from('users').select('*');
+                <div class="mod-panel" style="border-left-color:#ffaa00;">
+                    <h4>🤝 Конфликты (финал)</h4>
+                    <div class="row">
+                        <input type="text" id="seniorConflictId" placeholder="ID конфликта" />
+                        <select id="seniorConflictDecision">
+                            <option value="resolve">✅ Разрешить</option>
+                            <option value="reject">❌ Отклонить</option>
+                        </select>
+                        <button onclick="seniorResolveConflict()">💾 Решить</button>
+                    </div>
+                    <div class="result-box">
+                        <div class="item">🤝 Конфликт #C-001 — @user1 vs @user2</div>
+                    </div>
+                </div>
 
+                <div class="mod-panel" style="border-left-color:#ffaa00;">
+                    <h4>📛 Жалобы на модераторов</h4>
+                    <div class="row">
+                        <input type="text" id="seniorComplaintId" placeholder="ID жалобы" />
+                        <select id="seniorComplaintDecision">
+                            <option value="dismiss">❌ Отклонить</option>
+                            <option value="warn">⚠️ Предупредить</option>
+                            <option value="demote">⬇️ Понизить</option>
+                        </select>
+                        <button onclick="seniorResolveComplaint()">💾 Решить</button>
+                    </div>
+                    <div class="result-box">
+                        <div class="item">📛 Жалоба #J-001 — на @moder1 (превышение)</div>
+                    </div>
+                </div>
+
+                <div class="mod-panel" style="border-left-color:#ffaa00;">
+                    <h4>📝 Приватные заметки (все)</h4>
+                    <div class="row">
+                        <input type="text" id="seniorNoteUser" placeholder="Логин" />
+                        <input type="text" id="seniorNoteText" placeholder="Текст" />
+                        <button onclick="seniorAddNote()">📌 Добавить</button>
+                        <button onclick="seniorShowNotes()" style="background:#00aa88;color:#fff;">📋 Показать</button>
+                    </div>
+                    <div class="result-box">
+                        <div class="item">📌 @bravo — нарушал правила 2 раза</div>
+                        <div class="item">📌 @user1 — подозрительная активность</div>
+                    </div>
+                </div>
+
+                <div class="mod-panel" style="border-left-color:#ffaa00;">
+                    <h4>📜 История действий модераторов</h4>
+                    <button onclick="seniorShowModeratorLog()" style="background:#00aa88;color:#fff;">📋 Показать логи</button>
+                    <div id="seniorLogResult" class="result-box">
+                        <div class="item">🕒 12:34 — @moder1 выписал штраф @bravo</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================================
+        // 13. АДМИНКА
+        // ============================================================
+        function loadAdminPanel() {
             document.getElementById('adminContent').innerHTML = `
-                    <h3>💸 Заявки на вывод</h3>
-                    ${withdrawHtml}
-                    <hr style="border-color:#00ffcc55;margin:15px 0;">
-                    <h3>📦 Заказы (${orders?.length || 0})</h3>
-                    ${orders?.map(o => `
-                        <div class="card" style="border-left-color:${o.status === 'done' ? '#00aa88' : '#00ffcc'};">
-                            ${o.description} — ${o.price} ₽ (${o.status})
-                            <button class="del-btn" onclick="deleteOrder('${o.id}')">🗑️ Удалить</button>
-                        </div>
-                    `).join('') || '<p>Нет заказов</p>'}
-                    <h3>👤 Пользователи (${users?.length || 0})</h3>
-                    ${users?.map(u => `
-                        <div class="card" style="border-left-color:#ffaa00;">
-                            ${u.id} — ${u.username || u.nickname} (комиссия ${u.commission}%) • Баланс: ${u.balance || 0} ₽
-                            ${u.permanent_penalty ? '⚠️ Вечный штраф' : ''}
-                            ${!u.is_moderator ? `<button onclick="makeModerator('${u.id}')" style="background:#ffaa00;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">➕ Модератор</button>` : '🛡️ Модератор'}
-                        </div>
-                    `).join('') || '<p>Нет пользователей</p>'}
-                `;
-        }
+                <div class="admin-card">
+                    <h3>👤 Просмотр профиля</h3>
+                    <input type="text" id="adminSearchUser" placeholder="Логин" />
+                    <button onclick="adminViewProfile()">🔍 Найти</button>
+                    <div id="adminProfileResult" class="result-box"></div>
+                </div>
 
-        async function approveWithdraw(requestId) {
-            if (!confirm('Одобрить вывод? После этого деньги нужно будет перевести вручную.')) return;
-            const { data: request } = await supabase.from('withdraw_requests').select('*').eq('id', requestId).single();
-            if (!request) return showToast('❌ Заявка не найдена');
+                <div class="admin-card">
+                    <h3>💰 Управление балансом</h3>
+                    <input type="text" id="adminBalanceUser" placeholder="Логин" />
+                    <input type="number" id="adminBalanceAmount" placeholder="Сумма" />
+                    <div class="row">
+                        <button onclick="adminAddBalance()" style="background:#00aa88;color:#fff;">➕ Добавить</button>
+                        <button onclick="adminSubtractBalance()" style="background:#ff3333;color:#fff;">➖ Штраф</button>
+                    </div>
+                </div>
 
-            const { data: user } = await supabase.from('users').select('balance').eq('id', request.user_id).single();
-            const newBalance = (user.balance || 0) - request.amount;
-            await supabase.from('users').update({ balance: newBalance }).eq('id', request.user_id);
+                <div class="admin-card">
+                    <h3>🛡️ Роли и ники</h3>
+                    <input type="text" id="adminRoleUser" placeholder="Логин" />
+                    <select id="adminRoleSelect">
+                        <option value="user">Пользователь</option>
+                        <option value="moderator">Модератор</option>
+                        <option value="senior_mod">Старший модер</option>
+                        <option value="admin">Админ</option>
+                    </select>
+                    <button onclick="adminChangeRole()">💾 Назначить</button>
+                    <hr />
+                    <input type="text" id="adminNickUser" placeholder="Логин" />
+                    <input type="text" id="adminNewNick" placeholder="Новый ник" />
+                    <button onclick="adminChangeNick()">✏️ Сменить ник</button>
+                </div>
 
-            await supabase.from('withdraw_requests').update({
-                status: 'approved',
-                approved_at: new Date().toISOString()
-            }).eq('id', requestId);
+                <div class="admin-card">
+                    <h3>⬆️ Повышение модераторов</h3>
+                    <input type="text" id="adminPromoteUser" placeholder="Логин" />
+                    <select id="adminPromoteRole">
+                        <option value="moderator">🟢 Младший модер</option>
+                        <option value="senior_mod">🟡 Старший модер</option>
+                        <option value="admin">🔴 Админ</option>
+                    </select>
+                    <button onclick="adminPromote()">⬆️ Повысить</button>
+                    <div id="adminPromoteResult" class="result-box"></div>
+                </div>
 
-            showToast('✅ Заявка одобрена! Не забудьте перевести деньги вручную.');
-            loadAdminPanel();
-            loadWithdrawHistory();
-            updateBalance();
-        }
+                <div class="admin-card">
+                    <h3>🗑️ Удаление заказа</h3>
+                    <input type="text" id="adminDeleteOrder" placeholder="ID заказа" />
+                    <button onclick="adminDeleteOrder()" style="background:#ff3333;color:#fff;">❌ Удалить</button>
+                </div>
 
-        async function rejectWithdraw(requestId) {
-            if (!confirm('Отклонить заявку?')) return;
-            await supabase.from('withdraw_requests').update({
-                status: 'rejected',
-                admin_comment: 'Отклонено администратором'
-            }).eq('id', requestId);
-            showToast('❌ Заявка отклонена');
-            loadAdminPanel();
-            loadWithdrawHistory();
-        }
+                <div class="admin-card">
+                    <h3>🔒 Отключение пользователя</h3>
+                    <input type="text" id="adminBanUser" placeholder="Логин" />
+                    <div class="row">
+                        <button onclick="adminBanUser()" style="background:#ff3333;color:#fff;">⛔ Заморозить</button>
+                        <button onclick="adminUnbanUser()" style="background:#00aa88;color:#fff;">✅ Разморозить</button>
+                    </div>
+                </div>
 
-        async function makeModerator(userId) {
-            await supabase.from('users').update({ is_moderator: true }).eq('id', userId);
-            showToast('✅ Модератор назначен');
-            loadAdminPanel();
+                <div class="admin-card">
+                    <h3>🔑 Смена пароля</h3>
+                    <input type="text" id="adminPassUser" placeholder="Логин" />
+                    <input type="text" id="adminNewPass" placeholder="Новый пароль" />
+                    <button onclick="adminChangePassword()">🔐 Сменить</button>
+                </div>
+
+                <div class="admin-card">
+                    <h3>📦 Все заказы</h3>
+                    <button onclick="adminShowAllOrders()">📋 Показать</button>
+                    <div id="adminAllOrders" class="result-box"></div>
+                </div>
+
+                <div class="admin-card">
+                    <h3>🏙️ Города и школы</h3>
+                    <input type="text" id="adminNewCity" placeholder="Название города" />
+                    <button onclick="adminAddCity()" style="background:#00aa88;color:#fff;">➕ Добавить город</button>
+                    <hr />
+                    <input type="text" id="adminNewSchool" placeholder="Название школы" />
+                    <input type="text" id="adminSchoolCity" placeholder="Город" />
+                    <button onclick="adminAddSchool()" style="background:#00aa88;color:#fff;">➕ Добавить школу</button>
+                </div>
+
+                <div class="admin-card">
+                    <h3>🖼️ Баннер</h3>
+                    <input type="text" id="adminBannerText" placeholder="Текст" />
+                    <input type="text" id="adminBannerImage" placeholder="Картинка (URL)" />
+                    <input type="text" id="adminBannerLink" placeholder="Ссылка" />
+                    <button onclick="adminSaveBanner()">💾 Сохранить</button>
+                </div>
+
+                <div class="admin-card">
+                    <h3>⚡ Глобальная комиссия</h3>
+                    <input type="number" id="adminGlobalCommission" placeholder="%" value="20" />
+                    <button onclick="adminSaveCommission()">💾 Сохранить</button>
+                </div>
+
+                <div class="admin-card">
+                    <h3>🚫 Чёрный список</h3>
+                    <input type="text" id="adminBlacklistUser" placeholder="Логин" />
+                    <div class="row">
+                        <button onclick="adminAddBlacklist()" style="background:#ff3333;color:#fff;">➕ Добавить</button>
+                        <button onclick="adminShowBlacklist()" style="background:#ffaa00;color:#000;">📋 Показать</button>
+                    </div>
+                    <div id="adminBlacklistResult" class="result-box"></div>
+                </div>
+            `;
         }
 
         // ============================================================
-        // 13. UI
+        // 14. АДМИН-ФУНКЦИИ (ДЕМО)
+        // ============================================================
+        function adminViewProfile() {
+            const user = document.getElementById('adminSearchUser').value.trim();
+            if (!user) return alert('Введите логин');
+            document.getElementById('adminProfileResult').innerHTML = `
+                <div class="item">👤 ${user}</div>
+                <div class="item">💰 Баланс: 1 250 ₽</div>
+                <div class="item">🛡️ Роль: Пользователь</div>
+                <div class="item">📦 Заказов: 12</div>
+            `;
+        }
+
+        function adminAddBalance() {
+            const user = document.getElementById('adminBalanceUser').value.trim();
+            const amount = document.getElementById('adminBalanceAmount').value.trim();
+            if (!user || !amount) return alert('Заполните поля');
+            alert(`✅ Добавлено ${amount} ₽ пользователю ${user}`);
+        }
+
+        function adminSubtractBalance() {
+            const user = document.getElementById('adminBalanceUser').value.trim();
+            const amount = document.getElementById('adminBalanceAmount').value.trim();
+            if (!user || !amount) return alert('Заполните поля');
+            alert(`⚠️ Штраф: списано ${amount} ₽ с пользователя ${user}`);
+        }
+
+        function adminChangeRole() {
+            const user = document.getElementById('adminRoleUser').value.trim();
+            const role = document.getElementById('adminRoleSelect').value;
+            if (!user) return alert('Введите логин');
+            alert(`✅ Роль ${role} назначена пользователю ${user}`);
+        }
+
+        function adminChangeNick() {
+            const user = document.getElementById('adminNickUser').value.trim();
+            const nick = document.getElementById('adminNewNick').value.trim();
+            if (!user || !nick) return alert('Заполните поля');
+            alert(`✏️ Ник пользователя ${user} изменён на ${nick}`);
+        }
+
+        function adminPromote() {
+            const user = document.getElementById('adminPromoteUser').value.trim();
+            const role = document.getElementById('adminPromoteRole').value;
+            if (!user) return alert('Введите логин');
+            const labels = { 'moderator': '🟢 Младший модер', 'senior_mod': '🟡 Старший модер', 'admin': '🔴 Админ' };
+            alert(`⬆️ ${user} повышен до ${labels[role]}`);
+        }
+
+        function adminDeleteOrder() {
+            const id = document.getElementById('adminDeleteOrder').value.trim();
+            if (!id) return alert('Введите ID заказа');
+            if (confirm(`Удалить заказ ${id}?`)) alert(`🗑️ Заказ ${id} удалён`);
+        }
+
+        function adminBanUser() {
+            const user = document.getElementById('adminBanUser').value.trim();
+            if (!user) return alert('Введите логин');
+            alert(`⛔ ${user} заморожен`);
+        }
+
+        function adminUnbanUser() {
+            const user = document.getElementById('adminBanUser').value.trim();
+            if (!user) return alert('Введите логин');
+            alert(`✅ ${user} разморожен`);
+        }
+
+        function adminChangePassword() {
+            const user = document.getElementById('adminPassUser').value.trim();
+            const pass = document.getElementById('adminNewPass').value.trim();
+            if (!user || !pass) return alert('Заполните поля');
+            alert(`🔑 Пароль ${user} изменён на ${pass}`);
+        }
+
+        function adminShowAllOrders() {
+            document.getElementById('adminAllOrders').innerHTML = `
+                <div class="item">📌 ORD-001 — Купить бутерброд (Активен)</div>
+                <div class="item">📌 ORD-002 — Сделать фото (Выполнен)</div>
+                <div class="item">📌 ORD-003 — Записка (Скрыт)</div>
+            `;
+        }
+
+        function adminAddCity() {
+            const city = document.getElementById('adminNewCity').value.trim();
+            if (!city) return alert('Введите название города');
+            alert(`🏙️ Город ${city} добавлен`);
+        }
+
+        function adminAddSchool() {
+            const school = document.getElementById('adminNewSchool').value.trim();
+            const city = document.getElementById('adminSchoolCity').value.trim();
+            if (!school || !city) return alert('Заполните поля');
+            alert(`🏫 Школа ${school} добавлена в город ${city}`);
+        }
+
+        function adminSaveBanner() {
+            const text = document.getElementById('adminBannerText').value.trim();
+            alert(`🖼️ Баннер сохранён: ${text || 'без текста'}`);
+        }
+
+        function adminSaveCommission() {
+            const comm = document.getElementById('adminGlobalCommission').value.trim();
+            if (!comm) return alert('Введите процент');
+            alert(`⚡ Комиссия установлена на ${comm}%`);
+        }
+
+        let blacklist = [];
+
+        function adminAddBlacklist() {
+            const user = document.getElementById('adminBlacklistUser').value.trim();
+            if (!user) return alert('Введите логин');
+            if (blacklist.includes(user)) return alert('Уже в ЧС');
+            blacklist.push(user);
+            alert(`🚫 ${user} добавлен в ЧС`);
+            adminShowBlacklist();
+        }
+
+        function adminShowBlacklist() {
+            const container = document.getElementById('adminBlacklistResult');
+            if (blacklist.length === 0) {
+                container.innerHTML = '<div class="item">📭 ЧС пуст</div>';
+                return;
+            }
+            container.innerHTML = blacklist.map(u => `<div class="item">🚫 ${u}</div>`).join('');
+        }
+
+        // ============================================================
+        // 15. ФУНКЦИИ МОДЕРАТОРА (ДЕМО)
+        // ============================================================
+        function modHandleDispute() {
+            const id = document.getElementById('modDisputeId').value.trim();
+            const action = document.getElementById('modDisputeDecision').value;
+            if (!id) return alert('Введите ID спора');
+            if (action === 'escalate') {
+                alert(`⬆️ Спор ${id} передан старшему модератору`);
+            } else {
+                alert(`⚖️ Спор ${id} ${action === 'approve' ? 'принят' : 'отклонён'}`);
+            }
+        }
+
+        function modGivePenalty() {
+            const user = document.getElementById('modPenaltyUser').value.trim();
+            const reason = document.getElementById('modPenaltyReason').value.trim();
+            if (!user || !reason) return alert('Заполните поля');
+            alert(`⚠️ Пользователю ${user} выписан штраф: ${reason}`);
+        }
+
+        function modHandleAppeal() {
+            const id = document.getElementById('modAppealId').value.trim();
+            const action = document.getElementById('modAppealAction').value;
+            if (!id) return alert('Введите ID апелляции');
+            if (action === 'escalate') {
+                alert(`⬆️ Апелляция ${id} передана старшему модератору`);
+            } else {
+                alert(`📩 Апелляция ${id} ${action === 'approve' ? 'принята' : 'отклонена'}`);
+            }
+        }
+
+        function modHandleConflict() {
+            const id = document.getElementById('modConflictId').value.trim();
+            const action = document.getElementById('modConflictDecision').value;
+            if (!id) return alert('Введите ID конфликта');
+            if (action === 'escalate') {
+                alert(`⬆️ Конфликт ${id} передан старшему модератору`);
+            } else {
+                alert(`🤝 Конфликт ${id} разрешён`);
+            }
+        }
+
+        function modAddNote() {
+            const user = document.getElementById('modNoteUser').value.trim();
+            const text = document.getElementById('modNoteText').value.trim();
+            if (!user || !text) return alert('Заполните поля');
+            alert(`📌 Заметка для ${user}: ${text}`);
+        }
+
+        function modBlockUser() {
+            const user = document.getElementById('modBlockUser').value.trim();
+            const duration = document.getElementById('modBlockDuration').value;
+            if (!user) return alert('Введите логин');
+            alert(`🔒 ${user} заблокирован на ${duration}`);
+        }
+
+        function modUnblockUser() {
+            const user = document.getElementById('modBlockUser').value.trim();
+            if (!user) return alert('Введите логин');
+            alert(`🔓 ${user} разблокирован`);
+        }
+
+        let modCurrentDisputeId = null;
+
+        function modLoadChat() {
+            const id = document.getElementById('modChatDisputeId').value.trim();
+            if (!id) return alert('Введите ID спора');
+            modCurrentDisputeId = id;
+            document.getElementById('modChatMessages').innerHTML = `
+                <div class="item">👤 @user1: Я не согласен</div>
+                <div class="item">🛡️ Модератор: Сейчас разберёмся</div>
+            `;
+            alert(`📂 Чат спора ${id} открыт`);
+        }
+
+        function modSendChatMessage() {
+            if (!modCurrentDisputeId) return alert('Сначала откройте чат спора');
+            const msg = document.getElementById('modChatMessage').value.trim();
+            if (!msg) return alert('Введите сообщение');
+            document.getElementById('modChatMessages').innerHTML += `
+                <div class="item">🛡️ Модератор: ${msg}</div>
+            `;
+            document.getElementById('modChatMessage').value = '';
+            alert(`💬 Сообщение отправлено в спор ${modCurrentDisputeId}`);
+        }
+
+        // ============================================================
+        // 16. ФУНКЦИИ СТАРШЕГО МОДЕРАТОРА (ДЕМО)
+        // ============================================================
+        function seniorHandleAppeal() {
+            const id = document.getElementById('seniorAppealId').value.trim();
+            const action = document.getElementById('seniorAppealAction').value;
+            if (!id) return alert('Введите ID апелляции');
+            if (action === 'escalate') {
+                alert(`⬆️ Апелляция ${id} передана админу`);
+            } else if (action === 'double') {
+                alert(`⚠️ Апелляция ${id} отклонена. Штраф удвоен и стал вечным.`);
+            } else {
+                alert(`📩 Апелляция ${id} ${action === 'approve' ? 'принята' : 'отклонена'}`);
+            }
+        }
+
+        function seniorRemovePenalty() {
+            const user = document.getElementById('seniorPenaltyUser').value.trim();
+            if (!user) return alert('Введите логин');
+            alert(`✅ Штраф с ${user} снят`);
+        }
+
+        function seniorShowPenalties() {
+            alert('📋 Активные штрафы: @bravo, @userX');
+        }
+
+        function seniorResolveConflict() {
+            const id = document.getElementById('seniorConflictId').value.trim();
+            const decision = document.getElementById('seniorConflictDecision').value;
+            if (!id) return alert('Введите ID конфликта');
+            alert(`🤝 Конфликт ${id} ${decision === 'resolve' ? 'разрешён' : 'отклонён'}`);
+        }
+
+        function seniorResolveComplaint() {
+            const id = document.getElementById('seniorComplaintId').value.trim();
+            const decision = document.getElementById('seniorComplaintDecision').value;
+            if (!id) return alert('Введите ID жалобы');
+            const map = { 'dismiss': '❌ Отклонена', 'warn': '⚠️ Предупреждение', 'demote': '⬇️ Понижение' };
+            alert(`📛 Жалоба ${id}: ${map[decision]}`);
+        }
+
+        function seniorAddNote() {
+            const user = document.getElementById('seniorNoteUser').value.trim();
+            const text = document.getElementById('seniorNoteText').value.trim();
+            if (!user || !text) return alert('Заполните поля');
+            alert(`📌 Заметка для ${user}: ${text}`);
+        }
+
+        function seniorShowNotes() {
+            alert('📋 Заметки: @bravo (нарушал), @user1 (подозрительный)');
+        }
+
+        function seniorShowModeratorLog() {
+            document.getElementById('seniorLogResult').innerHTML = `
+                <div class="item">🕒 12:34 — @moder1 выписал штраф @bravo</div>
+                <div class="item">🕒 11:20 — @moder2 решил спор #D-001</div>
+            `;
+        }
+
+        // ============================================================
+        // 17. UI
         // ============================================================
         function showTab(tab) {
             const tabs = ['feed', 'myorders', 'create', 'profile', 'history', 'withdraw', 'help', 'rules', 'moderate',
-                'admin'
+                'seniormod', 'admin'
             ];
             tabs.forEach(t => {
                 document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tab);
@@ -1111,17 +1647,16 @@
             if (tab === 'myorders') loadMyOrders();
             if (tab === 'profile') showProfile();
             if (tab === 'history') loadHistory();
-            if (tab === 'withdraw') { loadWithdrawHistory();
-                updateBalance(); }
+            if (tab === 'withdraw') loadWithdrawHistory();
             if (tab === 'help') loadHelpMessages();
             if (tab === 'rules') document.getElementById('rulesContent').innerHTML = RULES_TEXT;
             if (tab === 'moderate') loadModeratePanel();
+            if (tab === 'seniormod') loadSeniorModPanel();
             if (tab === 'admin') loadAdminPanel();
         }
 
         function filterOrders() {
-            searchQuery = document.getElementById('searchInput').value;
-            currentFilter = document.getElementById('categoryFilter').value;
+            showToast('🔍 Фильтр применён (демо)');
             loadOrders();
         }
 
@@ -1135,14 +1670,8 @@
             document.getElementById('welcomeBanner').classList.add('hidden');
         }
 
-        function openChat(orderId) {
-            const msg = prompt('💬 Введите сообщение:');
-            if (!msg) return;
-            showToast('💬 Сообщение отправлено (демо)');
-        }
-
         // ============================================================
-        // 14. TOAST
+        // 18. TOAST
         // ============================================================
         let toastTimeout;
 
@@ -1155,9 +1684,9 @@
         }
 
         // ============================================================
-        // 15. ОБРАБОТЧИКИ
+        // 19. ОБРАБОТЧИКИ
         // ============================================================
-        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const desc = document.getElementById('taskDesc').value.trim();
             const price = parseInt(document.getElementById('taskPrice').value);
@@ -1166,17 +1695,16 @@
             const urgent = document.getElementById('taskUrgent').checked;
             const premium = document.getElementById('taskPremium').checked;
             if (!desc || !price) return showToast('❌ Заполните поля');
-            await createOrder(desc, price, contact, category, urgent, premium);
+            createOrder(desc, price, contact, category, urgent, premium);
             this.reset();
             document.getElementById('netDisplay').textContent = '0';
             showTab('feed');
         });
 
         // ============================================================
-        // 16. ЗАПУСК
+        // 20. ЗАПУСК
         // ============================================================
         console.log('🏫 SchoolNet 1.0 запущен!');
-        console.log('👑 Первый зарегистрированный пользователь становится админом.');
     </script>
 
 </body>
