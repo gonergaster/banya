@@ -1,929 +1,697 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>SchoolNet GASTER</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        :root {
-            --blue: #2563eb;
-            --blue-dark: #1d4ed8;
-            --bg: #f4f7fb;
-            --card: #ffffff;
-            --text: #172033;
-            --muted: #718096;
-            --border: #e5e7eb;
-            --danger: #dc2626;
-        }
-
-        body {
-            margin: 0;
-            min-height: 100vh;
-            background: var(--bg);
-            color: var(--text);
-            font-family:
-                Inter,
-                system-ui,
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Arial,
-                sans-serif;
-        }
-
-        button,
-        input {
-            font: inherit;
-        }
-
-        button {
-            border: 0;
-            cursor: pointer;
-        }
-
-        input {
-            outline: none;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* =========================
-           HEADER
-        ========================= */
-
-        .header {
-            height: 66px;
-            background: white;
-            border-bottom: 1px solid var(--border);
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            padding: 0 24px;
-
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            font-size: 23px;
-            font-weight: 900;
-            color: var(--blue);
-            letter-spacing: -0.5px;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .header-name {
-            font-weight: 700;
-        }
-
-        /* =========================
-           BUTTONS
-        ========================= */
-
-        .button {
-            padding: 11px 16px;
-            border-radius: 10px;
-            font-weight: 700;
-            transition: .15s;
-        }
-
-        .button-primary {
-            background: var(--blue);
-            color: white;
-        }
-
-        .button-primary:hover {
-            background: var(--blue-dark);
-        }
-
-        .button-secondary {
-            background: #eef2f7;
-            color: #263247;
-        }
-
-        .button-secondary:hover {
-            background: #e2e8f0;
-        }
-
-        .button-danger {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .button-danger:hover {
-            background: #fecaca;
-        }
-
-        /* =========================
-           AUTH
-        ========================= */
-
-        .auth-container {
-            width: 100%;
-            max-width: 440px;
-
-            margin: 70px auto;
-            padding: 0 20px;
-        }
-
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 26px;
-
-            box-shadow:
-                0 10px 35px rgba(15, 23, 42, .06);
-        }
-
-        .auth-card h1 {
-            margin: 0 0 8px;
-            font-size: 28px;
-        }
-
-        .subtitle {
-            color: var(--muted);
-            margin: 0 0 25px;
-            line-height: 1.5;
-        }
-
-        .field {
-            margin-bottom: 16px;
-        }
-
-        .field label {
-            display: block;
-            margin-bottom: 7px;
-
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .field input {
-            width: 100%;
-
-            padding: 13px 14px;
-
-            border: 1px solid #d4dae3;
-            border-radius: 11px;
-
-            background: white;
-            color: var(--text);
-
-            transition: .15s;
-        }
-
-        .field input:focus {
-            border-color: var(--blue);
-
-            box-shadow:
-                0 0 0 3px rgba(37, 99, 235, .10);
-        }
-
-        .auth-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-
-            margin-top: 20px;
-        }
-
-        .message {
-            display: none;
-
-            padding: 12px 14px;
-
-            border-radius: 11px;
-
-            margin-bottom: 15px;
-
-            font-size: 14px;
-            line-height: 1.4;
-        }
-
-        .message-error {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .message-success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        /* =========================
-           APPLICATION
-        ========================= */
-
-        .container {
-            max-width: 1150px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
-
-        .layout {
-            display: grid;
-            grid-template-columns: 230px 1fr;
-            gap: 22px;
-        }
-
-        .sidebar {
-            height: max-content;
-        }
-
-        .sidebar-title {
-            font-size: 18px;
-            font-weight: 900;
-            margin-bottom: 15px;
-        }
-
-        .nav-button {
-            width: 100%;
-
-            background: transparent;
-
-            padding: 12px 13px;
-
-            border-radius: 10px;
-
-            text-align: left;
-
-            font-weight: 700;
-            color: #344054;
-
-            margin-bottom: 4px;
-        }
-
-        .nav-button:hover {
-            background: #f1f5f9;
-        }
-
-        .nav-button-danger {
-            color: #b42318;
-        }
-
-        .page {
-            min-height: 300px;
-        }
-
-        .page h1 {
-            margin-top: 0;
-            font-size: 29px;
-        }
-
-        /* =========================
-           PROFILE
-        ========================= */
-
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-
-            margin-bottom: 28px;
-        }
-
-        .avatar {
-            width: 78px;
-            height: 78px;
-
-            border-radius: 50%;
-
-            background: var(--blue);
-            color: white;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            font-size: 30px;
-            font-weight: 900;
-        }
-
-        .profile-name {
-            font-size: 26px;
-            font-weight: 900;
-        }
-
-        .profile-username {
-            margin-top: 4px;
-            color: var(--muted);
-        }
-
-        .profile-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-
-            gap: 13px;
-        }
-
-        .profile-info {
-            background: #f8fafc;
-
-            border-radius: 13px;
-
-            padding: 16px;
-        }
-
-        .profile-info-label {
-            color: var(--muted);
-            font-size: 12px;
-
-            margin-bottom: 5px;
-        }
-
-        .profile-info-value {
-            font-weight: 700;
-
-            overflow-wrap: anywhere;
-        }
-
-        /* =========================
-           HOME
-        ========================= */
-
-        .welcome-box {
-            background: linear-gradient(
-                135deg,
-                #eff6ff,
-                #f8fafc
-            );
-
-            border-radius: 15px;
-
-            padding: 22px;
-
-            margin-top: 20px;
-        }
-
-        .welcome-box h3 {
-            margin-top: 0;
-        }
-
-        /* =========================
-           SETTINGS
-        ========================= */
-
-        .settings-actions {
-            margin-top: 20px;
-        }
-
-        /* =========================
-           RESPONSIVE
-        ========================= */
-
-        @media (max-width: 760px) {
-
-            .header {
-                padding: 0 15px;
-            }
-
-            .header-name {
-                display: none;
-            }
-
-            .layout {
-                grid-template-columns: 1fr;
-            }
-
-            .profile-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .auth-container {
-                margin-top: 35px;
-            }
-
-            .auth-actions {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SchoolNet 1.0</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #0b0f12;
+    color: #fff;
+    min-height: 100vh;
+}
+
+button,
+input,
+select {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* =========================
+   AUTH
+========================= */
+
+#authScreen {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.auth-box {
+    width: 100%;
+    max-width: 430px;
+    background: #11181d;
+    border: 1px solid #26343b;
+    border-radius: 22px;
+    padding: 28px;
+    box-shadow: 0 0 40px rgba(0,255,204,.08);
+}
+
+.logo {
+    text-align: center;
+    font-size: 30px;
+    font-weight: 900;
+    color: #00ffcc;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    text-align: center;
+    color: #87969e;
+    margin-bottom: 25px;
+}
+
+.tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #2b3940;
+    border-radius: 12px;
+    background: #151d22;
+    color: #9caab0;
+}
+
+.tab-btn.active {
+    background: #00ffcc;
+    color: #07100e;
+    border-color: #00ffcc;
+    font-weight: 800;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    color: #aebbc0;
+    margin-bottom: 7px;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 13px;
+    border-radius: 11px;
+    border: 1px solid #2c3b42;
+    background: #0c1216;
+    color: white;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #00ffcc;
+}
+
+.primary-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: #00ffcc;
+    color: #06100d;
+    font-weight: 900;
+    margin-top: 5px;
+}
+
+.primary-btn:hover {
+    filter: brightness(1.08);
+}
+
+.error {
+    background: rgba(255,70,70,.1);
+    border: 1px solid rgba(255,70,70,.3);
+    color: #ff7d7d;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.success {
+    background: rgba(0,255,170,.08);
+    border: 1px solid rgba(0,255,170,.25);
+    color: #00ffcc;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+/* =========================
+   APP
+========================= */
+
+#app {
+    min-height: 100vh;
+}
+
+.header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(11,15,18,.96);
+    border-bottom: 1px solid #253238;
+    backdrop-filter: blur(10px);
+}
+
+.header-inner {
+    max-width: 1200px;
+    margin: auto;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.header-logo {
+    color: #00ffcc;
+    font-weight: 900;
+    font-size: 22px;
+}
+
+.balance {
+    background: #151d21;
+    border: 1px solid #29383f;
+    border-radius: 10px;
+    padding: 9px 13px;
+    color: #00ffcc;
+    font-weight: 800;
+}
+
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+}
+
+.banner {
+    background: linear-gradient(120deg, #12251f, #15191d);
+    border: 1px solid #21443b;
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 20px;
+}
+
+.banner h2 {
+    color: #00ffcc;
+    margin-bottom: 7px;
+}
+
+.banner p {
+    color: #aeb9bd;
+}
+
+.nav {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-bottom: 20px;
+    padding-bottom: 4px;
+}
+
+.nav button {
+    white-space: nowrap;
+    padding: 10px 14px;
+    background: #12191d;
+    border: 1px solid #29373d;
+    color: #aeb9bd;
+    border-radius: 10px;
+}
+
+.nav button.active {
+    color: #00100b;
+    background: #00ffcc;
+    border-color: #00ffcc;
+    font-weight: 800;
+}
+
+.card {
+    background: #11181d;
+    border: 1px solid #26343a;
+    border-radius: 17px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.card h2 {
+    margin-bottom: 8px;
+}
+
+.muted {
+    color: #849299;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.stat {
+    background: #0c1216;
+    border: 1px solid #26343a;
+    padding: 16px;
+    border-radius: 13px;
+}
+
+.stat-title {
+    color: #849299;
+    font-size: 13px;
+}
+
+.stat-value {
+    color: #00ffcc;
+    font-size: 22px;
+    font-weight: 900;
+    margin-top: 5px;
+}
+
+.admin {
+    border-color: #805e1b;
+    background: linear-gradient(135deg,#17150d,#11181d);
+}
+
+.admin-title {
+    color: #ffaa00;
+    font-weight: 900;
+}
+
+.danger {
+    background: #351519;
+    color: #ff7777;
+    border: 1px solid #633038;
+    border-radius: 10px;
+    padding: 10px 14px;
+}
+
+.logout {
+    margin-top: 10px;
+}
+
+@media(max-width:650px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header-inner {
+        flex-wrap: wrap;
+    }
+}
+</style>
 </head>
 
 <body>
 
-<!-- ======================================================
-     HEADER
-====================================================== -->
-
-<header class="header">
-
-    <div class="logo">
-        SchoolNet
-    </div>
-
-    <div
-        id="headerUser"
-        class="header-right hidden"
-    >
-
-        <span
-            id="headerName"
-            class="header-name"
-        >
-        </span>
-
-        <button
-            id="headerLogout"
-            class="button button-danger"
-        >
-            Выйти
-        </button>
-
-    </div>
-
-</header>
-
-
-<!-- ======================================================
+<!-- =========================
      AUTH SCREEN
-====================================================== -->
+========================= -->
 
 <section id="authScreen">
 
-    <div class="auth-container">
+    <div class="auth-box">
 
-        <div class="card auth-card">
+        <div class="logo">🏫 SchoolNet 1.0</div>
+        <div class="subtitle">Школьная система заданий</div>
 
-            <h1 id="authTitle">
-                Вход в SchoolNet
-            </h1>
+        <div class="tabs">
+            <button id="loginTab" class="tab-btn active">
+                Вход
+            </button>
 
-            <p
-                id="authSubtitle"
-                class="subtitle"
-            >
-                Войди в свой аккаунт.
-            </p>
+            <button id="registerTab" class="tab-btn">
+                Регистрация
+            </button>
+        </div>
 
+        <div id="authMessage"></div>
 
-            <div
-                id="authError"
-                class="message message-error"
-            ></div>
+        <!-- LOGIN -->
 
-            <div
-                id="authSuccess"
-                class="message message-success"
-            ></div>
+        <form id="loginForm">
 
-
-            <!-- REGISTRATION FIELDS -->
-
-            <div
-                id="registrationFields"
-                class="hidden"
-            >
-
-                <div class="field">
-
-                    <label for="username">
-                        Имя пользователя
-                    </label>
-
-                    <input
-                        id="username"
-                        type="text"
-                        autocomplete="username"
-                        placeholder="например, vinograd"
-                    >
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="nickname">
-                        Никнейм
-                    </label>
-
-                    <input
-                        id="nickname"
-                        type="text"
-                        placeholder="Твой ник"
-                    >
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="city">
-                        Город
-                    </label>
-
-                    <input
-                        id="city"
-                        type="text"
-                        placeholder="Город"
-                    >
-
-                </div>
-
-
-                <div class="field">
-
-                    <label for="school">
-                        Школа
-                    </label>
-
-                    <input
-                        id="school"
-                        type="text"
-                        placeholder="Школа"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <!-- EMAIL -->
-
-            <div class="field">
-
-                <label for="email">
-                    Email
-                </label>
-
+            <div class="form-group">
+                <label>Логин</label>
                 <input
-                    id="email"
-                    type="email"
-                    autocomplete="email"
-                    placeholder="you@example.com"
+                    id="loginUsername"
+                    type="text"
+                    autocomplete="username"
+                    required
                 >
-
             </div>
 
-
-            <!-- PASSWORD -->
-
-            <div class="field">
-
-                <label for="password">
-                    Пароль
-                </label>
-
+            <div class="form-group">
+                <label>Пароль</label>
                 <input
-                    id="password"
+                    id="loginPassword"
                     type="password"
                     autocomplete="current-password"
-                    placeholder="Минимум 6 символов"
+                    required
                 >
-
             </div>
 
+            <button class="primary-btn" type="submit">
+                Войти
+            </button>
 
-            <div class="auth-actions">
+        </form>
 
-                <button
-                    id="authButton"
-                    class="button button-primary"
+        <!-- REGISTER -->
+
+        <form id="registerForm" class="hidden">
+
+            <div class="form-group">
+                <label>Логин</label>
+                <input
+                    id="registerUsername"
+                    type="text"
+                    minlength="3"
+                    required
                 >
-                    Войти
-                </button>
-
-                <button
-                    id="modeButton"
-                    class="button button-secondary"
-                >
-                    Регистрация
-                </button>
-
             </div>
 
-        </div>
+            <div class="form-group">
+                <label>Пароль</label>
+                <input
+                    id="registerPassword"
+                    type="password"
+                    minlength="6"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Никнейм</label>
+                <input
+                    id="registerNickname"
+                    type="text"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>Город</label>
+
+                <select id="registerCity" required>
+                    <option value="Одинцово">Одинцово</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Школа</label>
+
+                <select id="registerSchool" required>
+                    <option value="Лицей №2">Лицей №2</option>
+                </select>
+            </div>
+
+            <button class="primary-btn" type="submit">
+                Создать аккаунт
+            </button>
+
+        </form>
 
     </div>
 
 </section>
 
 
-<!-- ======================================================
-     MAIN APPLICATION
-====================================================== -->
+<!-- =========================
+     MAIN APP
+========================= -->
 
-<section
-    id="appScreen"
-    class="hidden"
->
+<section id="app" class="hidden">
+
+    <header class="header">
+
+        <div class="header-inner">
+
+            <div class="header-logo">
+                🏫 SchoolNet
+            </div>
+
+            <div id="balanceBox" class="balance">
+                0 ₽
+            </div>
+
+        </div>
+
+    </header>
+
 
     <main class="container">
 
-        <div class="layout">
+        <div class="banner">
 
+            <h2>Добро пожаловать в SchoolNet</h2>
 
-            <!-- SIDEBAR -->
-
-            <aside class="card sidebar">
-
-                <div class="sidebar-title">
-                    SchoolNet
-                </div>
-
-
-                <button
-                    class="nav-button"
-                    data-page="home"
-                >
-                    🏠 Главная
-                </button>
-
-
-                <button
-                    class="nav-button"
-                    data-page="profile"
-                >
-                    👤 Профиль
-                </button>
-
-
-                <button
-                    class="nav-button"
-                    data-page="settings"
-                >
-                    ⚙️ Настройки
-                </button>
-
-
-                <button
-                    id="sidebarLogout"
-                    class="nav-button nav-button-danger"
-                >
-                    🚪 Выйти
-                </button>
-
-            </aside>
-
-
-            <!-- CONTENT -->
-
-            <section>
-
-
-                <!-- HOME -->
-
-                <div
-                    id="homePage"
-                    class="card page"
-                >
-
-                    <h1 id="welcomeTitle">
-                        Добро пожаловать 👋
-                    </h1>
-
-                    <p class="subtitle">
-                        Добро пожаловать в SchoolNet.
-                    </p>
-
-
-                    <div class="welcome-box">
-
-                        <h3>
-                            Твой аккаунт защищён
-                        </h3>
-
-                        <p class="muted">
-                            Вход выполняется через Supabase Auth,
-                            а профиль загружается только для
-                            авторизованного пользователя.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- PROFILE -->
-
-                <div
-                    id="profilePage"
-                    class="card page hidden"
-                >
-
-                    <div class="profile-header">
-
-                        <div
-                            id="avatar"
-                            class="avatar"
-                        >
-                            ?
-                        </div>
-
-
-                        <div>
-
-                            <div
-                                id="profileName"
-                                class="profile-name"
-                            >
-                                Загрузка...
-                            </div>
-
-
-                            <div
-                                id="profileUsername"
-                                class="profile-username"
-                            >
-                                @user
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="profile-grid">
-
-
-                        <div class="profile-info">
-
-                            <div class="profile-info-label">
-                                Email
-                            </div>
-
-                            <div
-                                id="profileEmail"
-                                class="profile-info-value"
-                            >
-                                —
-                            </div>
-
-                        </div>
-
-
-                        <div class="profile-info">
-
-                            <div class="profile-info-label">
-                                Никнейм
-                            </div>
-
-                            <div
-                                id="profileNickname"
-                                class="profile-info-value"
-                            >
-                                —
-                            </div>
-
-                        </div>
-
-
-                        <div class="profile-info">
-
-                            <div class="profile-info-label">
-                                Город
-                            </div>
-
-                            <div
-                                id="profileCity"
-                                class="profile-info-value"
-                            >
-                                —
-                            </div>
-
-                        </div>
-
-
-                        <div class="profile-info">
-
-                            <div class="profile-info-label">
-                                Школа
-                            </div>
-
-                            <div
-                                id="profileSchool"
-                                class="profile-info-value"
-                            >
-                                —
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- SETTINGS -->
-
-                <div
-                    id="settingsPage"
-                    class="card page hidden"
-                >
-
-                    <h2>
-                        Настройки профиля
-                    </h2>
-
-                    <p class="subtitle">
-                        Здесь можно изменить данные профиля.
-                    </p>
-
-
-                    <div
-                        id="settingsError"
-                        class="message message-error"
-                    ></div>
-
-
-                    <div
-                        id="settingsSuccess"
-                        class="message message-success"
-                    ></div>
-
-
-                    <div class="field">
-
-                        <label for="editUsername">
-                            Имя пользователя
-                        </label>
-
-                        <input
-                            id="editUsername"
-                            type="text"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="editNickname">
-                            Никнейм
-                        </label>
-
-                        <input
-                            id="editNickname"
-                            type="text"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="editCity">
-                            Город
-                        </label>
-
-                        <input
-                            id="editCity"
-                            type="text"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="editSchool">
-                            Школа
-                        </label>
-
-                        <input
-                            id="editSchool"
-                            type="text"
-                        >
-
-                    </div>
-
-
-                    <div class="settings-actions">
-
-                        <button
-                            id="saveProfile"
-                            class="button button-primary"
-                        >
-                            Сохранить профиль
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-            </section>
+            <p>
+                Выполняй задания, создавай заказы и получай деньги.
+            </p>
 
         </div>
+
+
+        <nav class="nav">
+
+            <button class="nav-btn active" data-page="home">
+                🏠 Главная
+            </button>
+
+            <button class="nav-btn" data-page="orders">
+                📋 Заказы
+            </button>
+
+            <button class="nav-btn" data-page="create">
+                ➕ Создать
+            </button>
+
+            <button class="nav-btn" data-page="profile">
+                👤 Профиль
+            </button>
+
+            <button
+                id="adminNav"
+                class="nav-btn hidden"
+                data-page="admin"
+            >
+                🛡️ Панель Scratch
+            </button>
+
+            <button id="logoutBtn" class="danger">
+                Выйти
+            </button>
+
+        </nav>
+
+
+        <!-- HOME -->
+
+        <section id="page-home" class="page">
+
+            <div class="card">
+
+                <h2>
+                    👋 Привет, <span id="homeNickname"></span>
+                </h2>
+
+                <p class="muted">
+                    Здесь будут отображаться доступные задания.
+                </p>
+
+            </div>
+
+            <div class="profile-grid">
+
+                <div class="stat">
+                    <div class="stat-title">Баланс</div>
+                    <div id="homeBalance" class="stat-value">
+                        0 ₽
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-title">Выполнено</div>
+                    <div id="homeCompleted" class="stat-value">
+                        0
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-title">Рейтинг</div>
+                    <div id="homeRating" class="stat-value">
+                        0
+                    </div>
+                </div>
+
+                <div class="stat">
+                    <div class="stat-title">Нарушения</div>
+                    <div id="homeViolations" class="stat-value">
+                        0
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ORDERS -->
+
+        <section id="page-orders" class="page hidden">
+
+            <div class="card">
+
+                <h2>📋 Заказы</h2>
+
+                <p class="muted">
+                    Система заказов будет подключена следующим этапом.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- CREATE -->
+
+        <section id="page-create" class="page hidden">
+
+            <div class="card">
+
+                <h2>➕ Создать заказ</h2>
+
+                <p class="muted">
+                    Здесь появится форма создания задания.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- PROFILE -->
+
+        <section id="page-profile" class="page hidden">
+
+            <div class="card">
+
+                <h2>👤 Профиль</h2>
+
+                <div class="profile-grid">
+
+                    <div class="stat">
+                        <div class="stat-title">Логин</div>
+                        <div id="profileUsername" class="stat-value">
+                            —
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-title">Никнейм</div>
+                        <div id="profileNickname" class="stat-value">
+                            —
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-title">Город</div>
+                        <div id="profileCity" class="stat-value">
+                            —
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-title">Школа</div>
+                        <div id="profileSchool" class="stat-value">
+                            —
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-title">Роль</div>
+                        <div id="profileRole" class="stat-value">
+                            —
+                        </div>
+                    </div>
+
+                    <div class="stat">
+                        <div class="stat-title">Баланс</div>
+                        <div id="profileBalance" class="stat-value">
+                            0 ₽
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ADMIN -->
+
+        <section id="page-admin" class="page hidden">
+
+            <div class="card admin">
+
+                <div class="admin-title">
+                    🛡️ ПАНЕЛЬ SCRATCH
+                </div>
+
+                <h2>
+                    Superadmin
+                </h2>
+
+                <p class="muted">
+                    Эта панель доступна только аккаунту с ролью
+                    <b>superadmin</b>.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <h2>⚙️ Управление</h2>
+
+                <p class="muted">
+                    Здесь следующим этапом подключим:
+                </p>
+
+                <br>
+
+                <p>• управление пользователями</p>
+                <p>• блокировку и разморозку</p>
+                <p>• выдачу и снятие нарушений</p>
+                <p>• управление ролями</p>
+                <p>• изменение баланса</p>
+                <p>• управление городами и школами</p>
+                <p>• модерацию заказов</p>
+                <p>• просмотр спорных чатов</p>
+                <p>• управление баннером</p>
+
+            </div>
+
+        </section>
 
     </main>
 
@@ -932,1008 +700,529 @@
 
 <script>
 
-/* ==========================================================
-   SUPABASE CONFIG
-   ==========================================================
+/* ============================================================
+   SUPABASE
+============================================================ */
 
-   ВСТАВЬ СЮДА:
-   1. Project URL
-   2. ПУБЛИЧНЫЙ anon/publishable key
+const SUPABASE_URL = "https://woc.dgbeffdyydvafbbwd.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_9zLs2SW7TKk7nE5nc2SlrQ_p338-6dB";
 
-   НЕ ВСТАВЛЯЙ service_role / secret key.
-========================================================== */
-
-const SUPABASE_URL =
-    "https://woc.dgbeffdyydvafbbwd.supabase.co";
+const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+);
 
 
-const SUPABASE_ANON_KEY =
-    "sb_publishable_9zLs2SW7TKk7nE5nc2SlrQ_p338-6dB";
-
-
-const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_ANON_KEY
-    );
-
-
-/* ==========================================================
+/* ============================================================
    STATE
-========================================================== */
-
-let registrationMode = false;
+============================================================ */
 
 let currentUser = null;
+let sessionToken = null;
 
-let currentProfile = null;
+
+/* ============================================================
+   ELEMENTS
+============================================================ */
+
+const authScreen = document.getElementById("authScreen");
+const app = document.getElementById("app");
+
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+
+const loginTab = document.getElementById("loginTab");
+const registerTab = document.getElementById("registerTab");
+
+const authMessage = document.getElementById("authMessage");
+
+const adminNav = document.getElementById("adminNav");
+const balanceBox = document.getElementById("balanceBox");
 
 
-/* ==========================================================
-   HELPERS
-========================================================== */
+/* ============================================================
+   MESSAGE
+============================================================ */
 
-function show(element) {
+function showMessage(text, type = "error") {
 
-    element.style.display = "block";
-
+    authMessage.innerHTML = `
+        <div class="${type}">
+            ${escapeHtml(text)}
+        </div>
+    `;
 }
 
 
-function hide(element) {
+/* ============================================================
+   ESCAPE HTML
+============================================================ */
 
-    element.style.display = "none";
+function escapeHtml(value) {
 
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 }
 
 
-function showAuthError(text) {
+/* ============================================================
+   AUTH TABS
+============================================================ */
 
-    const element =
-        document.getElementById("authError");
+loginTab.addEventListener("click", () => {
 
-    element.textContent = text;
+    loginTab.classList.add("active");
+    registerTab.classList.remove("active");
 
-    show(element);
+    loginForm.classList.remove("hidden");
+    registerForm.classList.add("hidden");
 
-    hide(
-        document.getElementById("authSuccess")
-    );
-
-}
-
-
-function showAuthSuccess(text) {
-
-    const element =
-        document.getElementById("authSuccess");
-
-    element.textContent = text;
-
-    show(element);
-
-    hide(
-        document.getElementById("authError")
-    );
-
-}
+    authMessage.innerHTML = "";
+});
 
 
-function clearAuthMessages() {
+registerTab.addEventListener("click", () => {
 
-    hide(
-        document.getElementById("authError")
-    );
+    registerTab.classList.add("active");
+    loginTab.classList.remove("active");
 
-    hide(
-        document.getElementById("authSuccess")
-    );
+    registerForm.classList.remove("hidden");
+    loginForm.classList.add("hidden");
 
-}
-
-
-/* ==========================================================
-   AUTH MODE
-========================================================== */
-
-function toggleRegistrationMode() {
-
-    registrationMode =
-        !registrationMode;
-
-    clearAuthMessages();
+    authMessage.innerHTML = "";
+});
 
 
-    const fields =
-        document.getElementById(
-            "registrationFields"
-        );
+/* ============================================================
+   REGISTER
+============================================================ */
 
+registerForm.addEventListener("submit", async (event) => {
 
-    if (registrationMode) {
+    event.preventDefault();
 
-        document.getElementById(
-            "authTitle"
-        ).textContent =
-            "Создание аккаунта";
-
-
-        document.getElementById(
-            "authSubtitle"
-        ).textContent =
-            "Создай свой аккаунт SchoolNet.";
-
-
-        document.getElementById(
-            "authButton"
-        ).textContent =
-            "Зарегистрироваться";
-
-
-        document.getElementById(
-            "modeButton"
-        ).textContent =
-            "Уже есть аккаунт";
-
-
-        fields.classList.remove(
-            "hidden"
-        );
-
-    } else {
-
-        document.getElementById(
-            "authTitle"
-        ).textContent =
-            "Вход в SchoolNet";
-
-
-        document.getElementById(
-            "authSubtitle"
-        ).textContent =
-            "Войди в свой аккаунт.";
-
-
-        document.getElementById(
-            "authButton"
-        ).textContent =
-            "Войти";
-
-
-        document.getElementById(
-            "modeButton"
-        ).textContent =
-            "Регистрация";
-
-
-        fields.classList.add(
-            "hidden"
-        );
-
-    }
-
-}
-
-
-/* ==========================================================
-   REGISTER / LOGIN
-========================================================== */
-
-async function submitAuth() {
-
-    clearAuthMessages();
-
-
-    const email =
-        document.getElementById(
-            "email"
-        ).value.trim();
-
+    const username =
+        document.getElementById("registerUsername").value.trim();
 
     const password =
-        document.getElementById(
-            "password"
-        ).value;
-
-
-    if (!email || !password) {
-
-        showAuthError(
-            "Введите email и пароль."
-        );
-
-        return;
-    }
-
-
-    /* ======================================================
-       REGISTRATION
-    ====================================================== */
-
-    if (registrationMode) {
-
-        const username =
-            document.getElementById(
-                "username"
-            ).value.trim();
-
-
-        const nickname =
-            document.getElementById(
-                "nickname"
-            ).value.trim();
-
-
-        const city =
-            document.getElementById(
-                "city"
-            ).value.trim();
-
-
-        const school =
-            document.getElementById(
-                "school"
-            ).value.trim();
-
-
-        if (!username) {
-
-            showAuthError(
-                "Введите имя пользователя."
-            );
-
-            return;
-        }
-
-
-        if (password.length < 6) {
-
-            showAuthError(
-                "Пароль должен быть минимум 6 символов."
-            );
-
-            return;
-        }
-
-
-        const {
-            data,
-            error
-        } =
-            await supabaseClient.auth.signUp({
-
-                email: email,
-
-                password: password,
-
-                options: {
-
-                    data: {
-
-                        username:
-                            username,
-
-                        nickname:
-                            nickname,
-
-                        city:
-                            city,
-
-                        school:
-                            school
-
-                    }
-
-                }
-
-            });
-
-
-        if (error) {
-
-            showAuthError(
-                error.message
-            );
-
-            return;
-        }
-
-
-        /*
-         * Если email confirmation включён,
-         * Supabase может не дать session сразу.
-         */
-
-        if (!data.session) {
-
-            showAuthSuccess(
-                "Аккаунт создан. Проверь почту для подтверждения."
-            );
-
-            return;
-        }
-
-
-        await loadApplication();
-
-        return;
-    }
-
-
-    /* ======================================================
-       LOGIN
-    ====================================================== */
-
-    const {
-        data,
-        error
-    } =
-        await supabaseClient.auth
-            .signInWithPassword({
-
-                email:
-                    email,
-
-                password:
-                    password
-
-            });
-
-
-    if (error || !data.user) {
-
-        showAuthError(
-            "Неверный email или пароль."
-        );
-
-        return;
-    }
-
-
-    await loadApplication();
-
-}
-
-
-/* ==========================================================
-   LOAD APPLICATION
-========================================================== */
-
-async function loadApplication() {
-
-    clearAuthMessages();
-
-
-    /*
-     * Получаем реального пользователя
-     * из Supabase Auth.
-     */
-
-    const {
-        data: {
-            user
-        },
-        error
-    } =
-        await supabaseClient.auth
-            .getUser();
-
-
-    if (error || !user) {
-
-        await logout();
-
-        return;
-    }
-
-
-    /*
-     * КРИТИЧЕСКАЯ ПРОВЕРКА.
-     *
-     * Нельзя просто иметь Auth-сессию.
-     *
-     * Профиль должен существовать
-     * в public.users и принадлежать
-     * именно этому Auth user.
-     */
-
-    const {
-        data: profile,
-        error: profileError
-    } =
-        await supabaseClient
-            .from("users")
-            .select(
-                "auth_user_id,username,nickname,city,school"
-            )
-            .eq(
-                "auth_user_id",
-                user.id
-            )
-            .maybeSingle();
-
-
-    if (profileError) {
-
-        console.error(
-            profileError
-        );
-
-        await supabaseClient.auth
-            .signOut();
-
-
-        showAuthError(
-            "Не удалось загрузить профиль."
-        );
-
-        showLoginScreen();
-
-        return;
-    }
-
-
-    /*
-     * Если Auth-пользователь есть,
-     * но users-профиля нет —
-     * доступ в приложение запрещается.
-     */
-
-    if (!profile) {
-
-        await supabaseClient.auth
-            .signOut();
-
-
-        showAuthError(
-            "Профиль не найден. Вход отменён."
-        );
-
-        showLoginScreen();
-
-        return;
-    }
-
-
-    currentUser =
-        user;
-
-
-    currentProfile =
-        profile;
-
-
-    document
-        .getElementById("authScreen")
-        .classList.add("hidden");
-
-
-    document
-        .getElementById("appScreen")
-        .classList.remove("hidden");
-
-
-    document
-        .getElementById("headerUser")
-        .classList.remove("hidden");
-
-
-    updateProfileUI();
-
-
-    showPage(
-        "home"
-    );
-
-}
-
-
-/* ==========================================================
-   SHOW LOGIN
-========================================================== */
-
-function showLoginScreen() {
-
-    currentUser =
-        null;
-
-    currentProfile =
-        null;
-
-
-    document
-        .getElementById("appScreen")
-        .classList.add("hidden");
-
-
-    document
-        .getElementById("headerUser")
-        .classList.add("hidden");
-
-
-    document
-        .getElementById("authScreen")
-        .classList.remove("hidden");
-
-}
-
-
-/* ==========================================================
-   UPDATE PROFILE UI
-========================================================== */
-
-function updateProfileUI() {
-
-    if (
-        !currentUser ||
-        !currentProfile
-    ) {
-
-        return;
-    }
-
-
-    const username =
-        currentProfile.username ||
-        "user";
-
+        document.getElementById("registerPassword").value;
 
     const nickname =
-        currentProfile.nickname ||
-        username;
-
+        document.getElementById("registerNickname").value.trim();
 
     const city =
-        currentProfile.city ||
-        "Не указан";
-
+        document.getElementById("registerCity").value;
 
     const school =
-        currentProfile.school ||
-        "Не указана";
+        document.getElementById("registerSchool").value;
 
 
-    document.getElementById(
-        "headerName"
-    ).textContent =
-        nickname;
-
-
-    document.getElementById(
-        "welcomeTitle"
-    ).textContent =
-        "Привет, " +
-        nickname +
-        " 👋";
-
-
-    document.getElementById(
-        "profileName"
-    ).textContent =
-        nickname;
-
-
-    document.getElementById(
-        "profileUsername"
-    ).textContent =
-        "@" +
-        username;
-
-
-    document.getElementById(
-        "profileEmail"
-    ).textContent =
-        currentUser.email ||
-        "—";
-
-
-    document.getElementById(
-        "profileNickname"
-    ).textContent =
-        nickname;
-
-
-    document.getElementById(
-        "profileCity"
-    ).textContent =
-        city;
-
-
-    document.getElementById(
-        "profileSchool"
-    ).textContent =
-        school;
-
-
-    document.getElementById(
-        "avatar"
-    ).textContent =
-        nickname
-            .charAt(0)
-            .toUpperCase();
-
-
-    document.getElementById(
-        "editUsername"
-    ).value =
-        currentProfile.username ||
-        "";
-
-
-    document.getElementById(
-        "editNickname"
-    ).value =
-        currentProfile.nickname ||
-        "";
-
-
-    document.getElementById(
-        "editCity"
-    ).value =
-        currentProfile.city ||
-        "";
-
-
-    document.getElementById(
-        "editSchool"
-    ).value =
-        currentProfile.school ||
-        "";
-
-}
-
-
-/* ==========================================================
-   NAVIGATION
-========================================================== */
-
-function showPage(page) {
-
-    const pages =
-        document.querySelectorAll(
-            ".page"
-        );
-
-
-    pages.forEach(
-        function(element) {
-
-            element.classList.add(
-                "hidden"
-            );
-
-        }
-    );
-
-
-    if (page === "home") {
-
-        document
-            .getElementById(
-                "homePage"
-            )
-            .classList.remove(
-                "hidden"
-            );
-
+    if (username.length < 3) {
+        showMessage("Логин должен быть минимум 3 символа");
+        return;
     }
 
-
-    if (page === "profile") {
-
-        document
-            .getElementById(
-                "profilePage"
-            )
-            .classList.remove(
-                "hidden"
-            );
-
+    if (password.length < 6) {
+        showMessage("Пароль должен быть минимум 6 символов");
+        return;
     }
 
-
-    if (page === "settings") {
-
-        document
-            .getElementById(
-                "settingsPage"
-            )
-            .classList.remove(
-                "hidden"
-            );
-
-    }
-
-}
-
-
-/* ==========================================================
-   SAVE PROFILE
-========================================================== */
-
-async function saveProfile() {
-
-    const errorBox =
-        document.getElementById(
-            "settingsError"
-        );
-
-
-    const successBox =
-        document.getElementById(
-            "settingsSuccess"
-        );
-
-
-    hide(
-        errorBox
-    );
-
-    hide(
-        successBox
-    );
-
-
-    if (!currentUser) {
-
-        showLoginScreen();
-
+    if (!nickname) {
+        showMessage("Введите никнейм");
         return;
     }
 
 
-    const username =
-        document.getElementById(
-            "editUsername"
-        ).value.trim();
+    showMessage("Создаём аккаунт...", "success");
 
 
-    const nickname =
-        document.getElementById(
-            "editNickname"
-        ).value.trim();
+    const { data, error } =
+        await supabaseClient.rpc("register_user", {
 
+            p_username: username,
+            p_password: password,
+            p_nickname: nickname,
+            p_city: city,
+            p_school: school
 
-    const city =
-        document.getElementById(
-            "editCity"
-        ).value.trim();
-
-
-    const school =
-        document.getElementById(
-            "editSchool"
-        ).value.trim();
-
-
-    if (!username) {
-
-        errorBox.textContent =
-            "Имя пользователя не может быть пустым.";
-
-        show(
-            errorBox
-        );
-
-        return;
-    }
-
-
-    /*
-     * Благодаря RLS запрос ниже может
-     * изменить только строку,
-     * auth_user_id которой совпадает
-     * с текущим auth.uid().
-     */
-
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-            .from("users")
-            .update({
-
-                username:
-                    username,
-
-                nickname:
-                    nickname,
-
-                city:
-                    city,
-
-                school:
-                    school
-
-            })
-            .eq(
-                "auth_user_id",
-                currentUser.id
-            )
-            .select(
-                "auth_user_id,username,nickname,city,school"
-            )
-            .single();
+        });
 
 
     if (error) {
 
-        console.error(
-            error
-        );
-
-        errorBox.textContent =
-            error.message;
-
-        show(
-            errorBox
+        showMessage(
+            error.message || "Ошибка регистрации"
         );
 
         return;
     }
 
 
-    currentProfile =
-        data;
-
-
-    updateProfileUI();
-
-
-    successBox.textContent =
-        "Профиль успешно сохранён.";
-
-    show(
-        successBox
+    showMessage(
+        "Аккаунт создан! Теперь войдите.",
+        "success"
     );
 
-}
+
+    registerForm.reset();
+
+    loginTab.click();
+
+    document.getElementById("loginUsername").value =
+        username;
+
+});
 
 
-/* ==========================================================
-   LOGOUT
-========================================================== */
+/* ============================================================
+   LOGIN
+============================================================ */
 
-async function logout() {
+loginForm.addEventListener("submit", async (event) => {
 
-    await supabaseClient.auth
-        .signOut();
-
-
-    showLoginScreen();
-
-}
+    event.preventDefault();
 
 
-/* ==========================================================
-   AUTH STATE
-========================================================== */
+    const username =
+        document.getElementById("loginUsername").value.trim();
 
-supabaseClient.auth
-    .onAuthStateChange(
-        async function(
-            event,
-            session
-        ) {
+    const password =
+        document.getElementById("loginPassword").value;
 
-            /*
-             * Если сессия исчезла —
-             * приложение закрывается.
-             */
 
-            if (!session) {
+    if (!username || !password) {
 
-                showLoginScreen();
+        showMessage(
+            "Введите логин и пароль"
+        );
 
+        return;
+    }
+
+
+    showMessage(
+        "Проверяем данные...",
+        "success"
+    );
+
+
+    const { data, error } =
+        await supabaseClient.rpc("login_user", {
+
+            p_username: username,
+            p_password: password
+
+        });
+
+
+    if (error) {
+
+        showMessage(
+            error.message || "Ошибка входа"
+        );
+
+        return;
+    }
+
+
+    if (!data || !data.token || !data.user) {
+
+        showMessage(
+            "Сервер вернул неправильный ответ"
+        );
+
+        return;
+    }
+
+
+    sessionToken = data.token;
+    currentUser = data.user;
+
+
+    localStorage.setItem(
+        "schoolnet_session",
+        sessionToken
+    );
+
+
+    showApp();
+
+});
+
+
+/* ============================================================
+   CHECK SESSION
+============================================================ */
+
+async function restoreSession() {
+
+    const savedToken =
+        localStorage.getItem("schoolnet_session");
+
+
+    if (!savedToken) {
+        return;
+    }
+
+
+    const { data, error } =
+        await supabaseClient.rpc(
+            "check_session",
+            {
+                p_token: savedToken
             }
-
-        }
-    );
+        );
 
 
-/* ==========================================================
-   EVENTS
-========================================================== */
+    if (error || !data || !data.user) {
 
-document
-    .getElementById(
-        "authButton"
-    )
-    .addEventListener(
-        "click",
-        submitAuth
-    );
+        localStorage.removeItem(
+            "schoolnet_session"
+        );
+
+        return;
+    }
 
 
-document
-    .getElementById(
-        "modeButton"
-    )
-    .addEventListener(
-        "click",
-        toggleRegistrationMode
-    );
+    sessionToken = savedToken;
+    currentUser = data.user;
+
+    showApp();
+}
 
 
-document
-    .getElementById(
-        "headerLogout"
-    )
-    .addEventListener(
-        "click",
-        logout
-    );
+/* ============================================================
+   SHOW APP
+============================================================ */
+
+function showApp() {
+
+    authScreen.classList.add("hidden");
+    app.classList.remove("hidden");
+
+    updateInterface();
+
+    showPage("home");
+}
 
 
-document
-    .getElementById(
-        "sidebarLogout"
-    )
-    .addEventListener(
-        "click",
-        logout
-    );
+/* ============================================================
+   UPDATE INTERFACE
+============================================================ */
+
+function updateInterface() {
+
+    if (!currentUser) return;
 
 
-document
-    .getElementById(
-        "saveProfile"
-    )
-    .addEventListener(
-        "click",
-        saveProfile
-    );
+    const balance =
+        Number(currentUser.balance || 0);
 
 
-document
-    .querySelectorAll(
-        "[data-page]"
-    )
-    .forEach(
-        function(button) {
+    balanceBox.textContent =
+        `${balance.toFixed(2)} ₽`;
 
-            button.addEventListener(
-                "click",
-                function() {
 
-                    showPage(
-                        button.dataset.page
-                    );
+    document.getElementById("homeNickname")
+        .textContent =
+        currentUser.nickname || currentUser.username;
 
+
+    document.getElementById("homeBalance")
+        .textContent =
+        `${balance.toFixed(2)} ₽`;
+
+
+    document.getElementById("homeCompleted")
+        .textContent =
+        currentUser.completed ?? 0;
+
+
+    document.getElementById("homeRating")
+        .textContent =
+        currentUser.rating ?? 0;
+
+
+    document.getElementById("homeViolations")
+        .textContent =
+        currentUser.violations ?? 0;
+
+
+    document.getElementById("profileUsername")
+        .textContent =
+        currentUser.username || "—";
+
+
+    document.getElementById("profileNickname")
+        .textContent =
+        currentUser.nickname || "—";
+
+
+    document.getElementById("profileCity")
+        .textContent =
+        currentUser.city || "—";
+
+
+    document.getElementById("profileSchool")
+        .textContent =
+        currentUser.school || "—";
+
+
+    document.getElementById("profileRole")
+        .textContent =
+        currentUser.role || "user";
+
+
+    document.getElementById("profileBalance")
+        .textContent =
+        `${balance.toFixed(2)} ₽`;
+
+
+    /*
+       ВАЖНО:
+       Только superadmin получает панель Scratch.
+    */
+
+    if (currentUser.role === "superadmin") {
+
+        adminNav.classList.remove("hidden");
+
+    } else {
+
+        adminNav.classList.add("hidden");
+
+    }
+}
+
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+
+document.querySelectorAll(".nav-btn")
+    .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const page =
+                button.dataset.page;
+
+            if (!page) return;
+
+            showPage(page);
+
+        });
+
+    });
+
+
+function showPage(pageName) {
+
+    document.querySelectorAll(".page")
+        .forEach(page => {
+
+            page.classList.add("hidden");
+
+        });
+
+
+    const page =
+        document.getElementById(
+            `page-${pageName}`
+        );
+
+
+    if (!page) return;
+
+
+    /*
+       Дополнительная защита панели.
+    */
+
+    if (
+        pageName === "admin" &&
+        currentUser?.role !== "superadmin"
+    ) {
+
+        return;
+
+    }
+
+
+    page.classList.remove("hidden");
+
+
+    document.querySelectorAll(".nav-btn")
+        .forEach(button => {
+
+            button.classList.remove("active");
+
+        });
+
+
+    const activeButton =
+        document.querySelector(
+            `.nav-btn[data-page="${pageName}"]`
+        );
+
+
+    if (activeButton) {
+
+        activeButton.classList.add("active");
+
+    }
+}
+
+
+/* ============================================================
+   LOGOUT
+============================================================ */
+
+document.getElementById("logoutBtn")
+    .addEventListener("click", async () => {
+
+        if (sessionToken) {
+
+            await supabaseClient.rpc(
+                "logout_user",
+                {
+                    p_token: sessionToken
                 }
             );
 
         }
-    );
 
 
-/* ==========================================================
-   INITIAL SESSION CHECK
-========================================================== */
-
-(async function() {
-
-    const {
-        data: {
-            session
-        }
-    } =
-        await supabaseClient.auth
-            .getSession();
+        localStorage.removeItem(
+            "schoolnet_session"
+        );
 
 
-    if (session) {
+        sessionToken = null;
+        currentUser = null;
 
-        await loadApplication();
 
-    } else {
+        app.classList.add("hidden");
+        authScreen.classList.remove("hidden");
 
-        showLoginScreen();
 
-    }
+        loginForm.reset();
+        registerForm.reset();
 
-})();
+        loginTab.click();
+
+    });
+
+
+/* ============================================================
+   START
+============================================================ */
+
+restoreSession();
 
 </script>
 
