@@ -1,1458 +1,1941 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🏫 SchoolNet 67</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SchoolNet GASTER</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
         }
+
+        :root {
+            --blue: #2563eb;
+            --blue-dark: #1d4ed8;
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --text: #172033;
+            --muted: #718096;
+            --border: #e5e7eb;
+            --danger: #dc2626;
+        }
+
         body {
-            background: #0a0a0a;
-            color: #00ffcc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            margin: 0;
             min-height: 100vh;
-            padding: 20px;
+            background: var(--bg);
+            color: var(--text);
+            font-family:
+                Inter,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                sans-serif;
         }
-        #app {
-            max-width: 900px;
-            width: 100%;
-            background: #111;
-            border: 1px solid #00ffcc;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 0 30px #00ffcc33;
+
+        button,
+        input {
+            font: inherit;
         }
-        h1,
-        h2,
-        h3 {
-            text-align: center;
-            text-shadow: 0 0 10px #00ffcc;
-            margin-bottom: 15px;
-        }
-        .card {
-            background: #1a1a1a;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            border-left: 4px solid #00ffcc;
-        }
-        .card.urgent {
-            border-left: 4px solid #ff3333;
-            background: #1a0a0a;
-        }
-        .card.premium {
-            border-left: 4px solid #ffaa00;
-            background: #1a1a0a;
-            box-shadow: 0 0 20px #ffaa0033;
-        }
-        .card .price {
-            color: #ffaa00;
-            font-weight: bold;
-        }
-        .card .comm {
-            color: #ff5555;
-            font-size: 14px;
-        }
-        .card .status {
-            background: #333;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            display: inline-block;
-        }
-        .card .urgent-badge {
-            background: #ff3333;
-            color: #fff;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-        .card .premium-badge {
-            background: #ffaa00;
-            color: #000;
-            padding: 2px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-        input,
-        textarea,
-        select {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            background: #222;
-            border: 1px solid #00ffcc55;
-            color: #00ffcc;
-            border-radius: 8px;
-        }
+
         button {
-            background: #00ffcc;
-            color: #0a0a0a;
-            border: none;
-            padding: 10px 20px;
-            font-weight: bold;
-            border-radius: 8px;
+            border: 0;
             cursor: pointer;
-            transition: 0.2s;
         }
-        button:hover {
-            background: #00ddbb;
-            box-shadow: 0 0 15px #00ffcc;
+
+        input {
+            outline: none;
         }
-        .row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+
         .hidden {
             display: none !important;
         }
-        .del-btn {
-            background: #ff3333;
-            color: white;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 12px;
-            cursor: pointer;
-        }
-        input,
-        textarea,
-        select {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            background: #222;
-            border: 1px solid #00ffcc55;
-            color: #00ffcc;
-            border-radius: 8px;
-        }
-        button {
-            background: #00ffcc;
-            color: #0a0a0a;
-            border: none;
-            padding: 10px 20px;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        button:hover {
-            background: #00ddbb;
-            box-shadow: 0 0 15px #00ffcc;
-        }
-        .row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .del-btn {
-            background: #ff3333;
-            color: white;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 12px;
-            cursor: pointer;
-        }
-        .admin-btn {
-            background: #ffaa00;
-            color: #000;
-            border: none;
-            padding: 4px 12px;
-            border-radius: 12px;
-            cursor: pointer;
-        }
-        .filter-bar {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-bottom: 15px;
-        }
-        .filter-bar button {
-            background: #222;
-            color: #00ffcc;
-            border: 1px solid #00ffcc55;
-        }
-        .filter-bar button.active {
-            background: #00ffcc;
-            color: #0a0a0a;
-        }
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 2px solid #00ffcc;
-            object-fit: cover;
-            display: block;
-            margin: 10px auto;
-        }
-        .rules-box {
-            background: #1a1a1a;
-            border: 1px solid #ffaa00;
-            padding: 20px;
-            border-radius: 12px;
-            max-height: 400px;
-            overflow-y: auto;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #ccc;
-        }
-        .rules-box h3 {
-            color: #ffaa00;
-            text-align: left;
-        }
-        .rules-box ul {
-            padding-left: 20px;
-        }
-        .rules-box li {
-            margin-bottom: 5px;
-        }
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #1a1a1a;
-            border: 1px solid #00ffcc;
-            padding: 15px 25px;
-            border-radius: 12px;
-            color: #00ffcc;
-            z-index: 999;
-            box-shadow: 0 0 30px #00ffcc33;
-            display: none;
-        }
-        .welcome-banner {
-            background: #00ffcc11;
-            border: 1px solid #00ffcc55;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .welcome-banner:hover {
-            background: #00ffcc22;
-        }
-        .welcome-banner h2 {
-            color: #00ffcc;
-            margin-bottom: 5px;
-        }
-        .welcome-banner p {
-            color: #aaa;
-        }
-        .help-chat {
-            background: #1a1a1a;
-            border: 1px solid #ffaa00;
-            border-radius: 12px;
-            padding: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .help-chat .msg {
-            margin: 5px 0;
-            padding: 8px 12px;
-            background: #111;
-            border-radius: 8px;
-            border-left: 3px solid #ffaa00;
-        }
-        .help-chat .msg .sender {
-            color: #ffaa00;
-            font-weight: bold;
-        }
-        .flex {
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            height: 66px;
+            background: white;
+            border-bottom: 1px solid var(--border);
+
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin: 10px 0;
+            justify-content: space-between;
+
+            padding: 0 24px;
+
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .flex input {
-            width: auto;
+
+        .logo {
+            font-size: 23px;
+            font-weight: 900;
+            color: var(--blue);
+            letter-spacing: -0.5px;
         }
-        .flex label {
-            color: #888;
-            font-size: 14px;
-        }
-        .flex a {
-            color: #00ffcc;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-        .status-msg {
-            margin-top: 10px;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
-            text-align: center;
-        }
-        .status-msg.error {
-            color: #ff5555;
-            background: #ff555511;
-            border: 1px solid #ff555533;
-        }
-        .status-msg.success {
-            color: #00ff88;
-            background: #00ff8811;
-            border: 1px solid #00ff8833;
-        }
-        .rules-agree {
-            color: #888;
-            font-size: 13px;
-            text-align: center;
-            margin: 8px 0;
-        }
-        .city-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+
+        .header-right {
+            display: flex;
+            align-items: center;
             gap: 12px;
-            margin-top: 10px;
         }
-        .city-card {
-            background: #1a1a1a;
-            border: 2px solid #00ffcc33;
-            border-radius: 12px;
-            padding: 18px 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-            font-weight: bold;
-            color: #00ffcc;
+
+        .header-name {
+            font-weight: 700;
         }
-        .city-card:hover {
-            background: #00ffcc22;
-            border-color: #00ffcc;
-            transform: scale(1.02);
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        .button {
+            padding: 11px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            transition: .15s;
         }
-        .city-card.selected {
-            border-color: #00ffcc;
-            background: #00ffcc22;
-            box-shadow: 0 0 20px #00ffcc44;
+
+        .button-primary {
+            background: var(--blue);
+            color: white;
         }
-        .city-card .icon {
+
+        .button-primary:hover {
+            background: var(--blue-dark);
+        }
+
+        .button-secondary {
+            background: #eef2f7;
+            color: #263247;
+        }
+
+        .button-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .button-danger {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .button-danger:hover {
+            background: #fecaca;
+        }
+
+        /* =========================
+           AUTH
+        ========================= */
+
+        .auth-container {
+            width: 100%;
+            max-width: 440px;
+
+            margin: 70px auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 26px;
+
+            box-shadow:
+                0 10px 35px rgba(15, 23, 42, .06);
+        }
+
+        .auth-card h1 {
+            margin: 0 0 8px;
             font-size: 28px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin: 0 0 25px;
+            line-height: 1.5;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        .field label {
             display: block;
-            margin-bottom: 6px;
-        }
-        .back-btn {
-            background: none;
-            border: 1px solid #00ffcc55;
-            color: #00ffcc;
-            padding: 8px 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 15px;
+            margin-bottom: 7px;
+
             font-size: 14px;
-            transition: 0.2s;
+            font-weight: 700;
         }
-        .back-btn:hover {
-            background: #00ffcc22;
-            border-color: #00ffcc;
+
+        .field input {
+            width: 100%;
+
+            padding: 13px 14px;
+
+            border: 1px solid #d4dae3;
+            border-radius: 11px;
+
+            background: white;
+            color: var(--text);
+
+            transition: .15s;
         }
-        .step-label {
-            color: #666;
-            font-size: 13px;
+
+        .field input:focus {
+            border-color: var(--blue);
+
+            box-shadow:
+                0 0 0 3px rgba(37, 99, 235, .10);
+        }
+
+        .auth-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+
+            margin-top: 20px;
+        }
+
+        .message {
+            display: none;
+
+            padding: 12px 14px;
+
+            border-radius: 11px;
+
+            margin-bottom: 15px;
+
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .message-success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* =========================
+           APPLICATION
+        ========================= */
+
+        .container {
+            max-width: 1150px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 230px 1fr;
+            gap: 22px;
+        }
+
+        .sidebar {
+            height: max-content;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 900;
+            margin-bottom: 15px;
+        }
+
+        .nav-button {
+            width: 100%;
+
+            background: transparent;
+
+            padding: 12px 13px;
+
+            border-radius: 10px;
+
+            text-align: left;
+
+            font-weight: 700;
+            color: #344054;
+
+            margin-bottom: 4px;
+        }
+
+        .nav-button:hover {
+            background: #f1f5f9;
+        }
+
+        .nav-button-danger {
+            color: #b42318;
+        }
+
+        .page {
+            min-height: 300px;
+        }
+
+        .page h1 {
+            margin-top: 0;
+            font-size: 29px;
+        }
+
+        /* =========================
+           PROFILE
+        ========================= */
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+
+            margin-bottom: 28px;
+        }
+
+        .avatar {
+            width: 78px;
+            height: 78px;
+
+            border-radius: 50%;
+
+            background: var(--blue);
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 30px;
+            font-weight: 900;
+        }
+
+        .profile-name {
+            font-size: 26px;
+            font-weight: 900;
+        }
+
+        .profile-username {
+            margin-top: 4px;
+            color: var(--muted);
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+
+            gap: 13px;
+        }
+
+        .profile-info {
+            background: #f8fafc;
+
+            border-radius: 13px;
+
+            padding: 16px;
+        }
+
+        .profile-info-label {
+            color: var(--muted);
+            font-size: 12px;
+
             margin-bottom: 5px;
         }
-        .btn-save {
-            width: 100%;
-            padding: 14px;
-            background: #00ffcc;
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
+
+        .profile-info-value {
+            font-weight: 700;
+
+            overflow-wrap: anywhere;
+        }
+
+        /* =========================
+           HOME
+        ========================= */
+
+        .welcome-box {
+            background: linear-gradient(
+                135deg,
+                #eff6ff,
+                #f8fafc
+            );
+
+            border-radius: 15px;
+
+            padding: 22px;
+
             margin-top: 20px;
-            transition: 0.2s;
         }
-        .btn-save:hover {
-            background: #00ddbb;
-            box-shadow: 0 0 20px #00ffcc;
+
+        .welcome-box h3 {
+            margin-top: 0;
         }
-        .btn-save:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
+
+        /* =========================
+           SETTINGS
+        ========================= */
+
+        .settings-actions {
+            margin-top: 20px;
         }
-        .mod-panel {
-            background: #1a1a1a;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            border-left: 4px solid #ffaa00;
-        }
-        .mod-panel h4 {
-            color: #ffaa00;
-            margin-bottom: 8px;
-        }
-        .mod-panel .result-box {
-            background: #0a0a0a;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #00ffcc33;
-            font-size: 14px;
-            max-height: 180px;
-            overflow-y: auto;
-            margin-top: 8px;
-        }
-        .mod-panel .result-box .item {
-            padding: 4px 0;
-            border-bottom: 1px solid #00ffcc11;
-        }
-        .mod-panel .result-box .item:last-child {
-            border-bottom: none;
-        }
-        .badge-senior {
-            background: #ffaa0022;
-            padding: 2px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            color: #ffaa00;
-            border: 1px solid #ffaa0055;
-        }
-        .admin-card {
-            background: #1a1a1a;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            border-left: 4px solid #00ffcc;
-        }
-        .admin-card h3 {
-            font-size: 16px;
-            margin-bottom: 8px;
-            color: #00ffcc;
-        }
-        .admin-card .result-box {
-            background: #0a0a0a;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #00ffcc33;
-            font-size: 14px;
-            max-height: 180px;
-            overflow-y: auto;
-            margin-top: 8px;
-        }
-        .admin-card .result-box .item {
-            padding: 4px 0;
-            border-bottom: 1px solid #00ffcc11;
-        }
-        .admin-card .result-box .item:last-child {
-            border-bottom: none;
-        }
-        @media (max-width:600px) {
-            #app {
-                padding: 10px;
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 760px) {
+
+            .header {
+                padding: 0 15px;
             }
-            .city-grid {
-                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+
+            .header-name {
+                display: none;
+            }
+
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-container {
+                margin-top: 35px;
+            }
+
+            .auth-actions {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
+
 <body>
 
-    <div id="app">
-        <h1>🏫 SchoolNet 1.0</h1>
-        <p style="text-align:center;color:#888;">Одинцово • Лицей №2</p>
-        <hr style="border-color:#00ffcc55;margin:15px 0;">
+<!-- ======================================================
+     HEADER
+====================================================== -->
 
-        <!-- АВТОРИЗАЦИЯ -->
-        <div id="authSection" style="text-align:center;">
-            <div id="authForm">
-                <input type="text" id="authUsername" placeholder="Логин (например, @username)" style="max-width:400px;margin:10px auto;display:block;" />
-                <input type="password" id="authPassword" placeholder="Пароль" style="max-width:400px;margin:10px auto;display:block;" />
-                <p class="rules-agree">🔹 Продолжая, вы соглашаетесь с <a onclick="showRules()">правилами</a></p>
-                <button onclick="signUp()" style="background:#ffaa00;">📝 Регистрация</button>
-                <button onclick="signIn()">🔑 Войти</button>
-                <div id="authStatus" class="status-msg hidden"></div>
-            </div>
-            <div id="userInfo" class="hidden">
-                <p>👋 Привет, <span id="userNickname"></span>!</p>
-                <p style="font-size:12px;color:#888;">Твой ID: <span id="userIdDisplay"></span></p>
-                <p style="font-size:12px;color:#888;">🏫 <span id="userSchoolDisplay"></span></p>
-                <button onclick="signOut()">🚪 Выйти</button>
-            </div>
-        </div>
+<header class="header">
 
-        <!-- ПРАВИЛА -->
-        <div id="rulesBlock" class="hidden">
-            <h2>📜 Правила SchoolNet</h2>
-            <div class="rules-box" id="rulesContent"></div>
-            <button onclick="hideRules()" style="margin-top:10px;">✖️ Закрыть</button>
-        </div>
-
-        <!-- ВЫБОР ГОРОДА И ШКОЛЫ (ТОЛЬКО ОДИНЦОВО + ЛИЦЕЙ №2) -->
-        <div id="citySchoolForm" class="hidden" style="text-align:center;padding:20px;">
-            <h2>🏫 Выберите вашу школу</h2>
-            <div id="stepCity">
-                <div class="step-label">🔹 Шаг 1 — выберите город</div>
-                <div class="city-grid" id="cityGrid"></div>
-            </div>
-            <div id="stepSchool" class="hidden">
-                <button class="back-btn" onclick="goToCities()">← Назад к городам</button>
-                <div class="step-label">🔹 Шаг 2 — выберите школу в <span id="selectedCityName"></span></div>
-                <div class="city-grid" id="schoolGrid"></div>
-            </div>
-            <button id="saveBtn" class="btn-save" disabled onclick="saveCitySchool()">✅ Сохранить</button>
-        </div>
-
-        <hr style="border-color:#00ffcc55;margin:15px 0;">
-
-        <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
-        <div id="mainUI" class="hidden">
-
-            <!-- БАННЕР -->
-            <div id="bannerContainer" class="hidden" style="margin-bottom:15px;"></div>
-
-            <!-- ПРИВЕТСТВИЕ -->
-            <div id="welcomeBanner" class="welcome-banner" onclick="dismissWelcome()">
-                <h2>👋 Добро пожаловать в SchoolNet!</h2>
-                <p>Задавай любые вопросы — у нас добрые люди сидят ;)</p>
-                <p style="font-size:12px;color:#666;margin-top:5px;">(нажми, чтобы закрыть)</p>
-            </div>
-
-            <!-- НАВИГАЦИЯ -->
-            <div class="row" style="justify-content:center;gap:5px;flex-wrap:wrap;">
-                <button onclick="showTab('feed')">📋 Лента</button>
-                <button onclick="showTab('myorders')">📌 Мои заказы</button>
-                <button onclick="showTab('create')">➕ Создать</button>
-                <button onclick="showTab('profile')">👤 Профиль</button>
-                <button onclick="showTab('history')">📜 История</button>
-                <button onclick="showTab('withdraw')">💸 Вывод</button>
-                <button onclick="showTab('help')">🆘 Помощь</button>
-                <button onclick="showTab('rules')">📜 Правила</button>
-                <button id="moderatorBtn" class="hidden" onclick="showTab('moderate')">🛡️ Модерация</button>
-                <button id="seniorModBtn" class="hidden" onclick="showTab('seniormod')">⚜️ Старший модер</button>
-                <button id="adminBtn" class="hidden" onclick="showTab('admin')">⚙️ Админ</button>
-            </div>
-
-            <!-- ЛЕНТА -->
-            <div id="tab-feed">
-                <h2>📋 Активные заказы</h2>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
-                    <input type="text" id="searchInput" placeholder="🔍 Поиск..." oninput="filterOrders()" style="flex:1;min-width:200px;" />
-                    <select id="categoryFilter" onchange="filterOrders()">
-                        <option value="all">Все категории</option>
-                        <option value="study">📚 Учёба</option>
-                        <option value="shopping">🛒 Покупки</option>
-                        <option value="help">🐶 Помощь</option>
-                        <option value="games">🎮 Игры</option>
-                        <option value="sport">💪 Спорт</option>
-                        <option value="other">🔘 Другое</option>
-                    </select>
-                    <button onclick="filterOrders()">🔍 Найти</button>
-                </div>
-                <div id="ordersList"></div>
-            </div>
-
-            <!-- МОИ ЗАКАЗЫ -->
-            <div id="tab-myorders" class="hidden">
-                <h2>📌 Мои активные заказы</h2>
-                <div id="myOrdersList"></div>
-            </div>
-
-            <!-- СОЗДАНИЕ -->
-            <div id="tab-create" class="hidden">
-                <h2>📝 Новый заказ</h2>
-                <form id="orderForm">
-                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                        <button type="button" onclick="useTemplate('t1')">🥪 Бутерброд</button>
-                        <button type="button" onclick="useTemplate('t2')">📸 Фото</button>
-                        <button type="button" onclick="useTemplate('t3')">📝 Записка</button>
-                        <button type="button" onclick="useTemplate('t4')">📚 Уроки</button>
-                        <button type="button" onclick="useTemplate('t5')">🛒 Магазин</button>
-                    </div>
-                    <input type="text" id="taskDesc" placeholder="Что нужно сделать?" required />
-                    <input type="number" id="taskPrice" placeholder="Цена (₽)" required oninput="calcNet()" />
-                    <select id="taskCategory">
-                        <option value="study">📚 Учёба</option>
-                        <option value="shopping">🛒 Покупки</option>
-                        <option value="help">🐶 Помощь</option>
-                        <option value="games">🎮 Игры</option>
-                        <option value="sport">💪 Спорт</option>
-                        <option value="other">🔘 Другое</option>
-                    </select>
-                    <label><input type="checkbox" id="taskUrgent" /> 🔥 Срочно (+5% комиссии)</label>
-                    <label><input type="checkbox" id="taskPremium" /> ⭐ Премиум (+25 ₽)</label>
-                    <div style="color:#aaa;font-size:14px;">💰 Выполнивший получит: <span id="netDisplay">0</span> ₽ (комиссия <span id="userCommDisplay">20</span>%)</div>
-                    <textarea id="taskContact" placeholder="Контакт (Telegram / номер)"></textarea>
-                    <button type="submit">Опубликовать</button>
-                </form>
-            </div>
-
-            <!-- ПРОФИЛЬ -->
-            <div id="tab-profile" class="hidden">
-                <h2>👤 Мой профиль</h2>
-                <div id="profileInfo"></div>
-                <hr style="border-color:#00ffcc55;margin:15px 0;">
-                <h3>📜 Мои заказы</h3>
-                <div id="userOrders"></div>
-                <h3>⚖️ Штрафы</h3>
-                <div id="userPenalties"></div>
-                <h3>📊 Статистика</h3>
-                <div id="userStats"></div>
-            </div>
-
-            <!-- ИСТОРИЯ -->
-            <div id="tab-history" class="hidden">
-                <h2>📜 История заказов</h2>
-                <div id="historyList"></div>
-            </div>
-
-            <!-- ВЫВОД -->
-            <div id="tab-withdraw" class="hidden">
-                <h2>💸 Вывод средств</h2>
-                <div id="withdrawSection"></div>
-            </div>
-
-            <!-- ПОМОЩЬ -->
-            <div id="tab-help" class="hidden">
-                <h2>🆘 Помощь</h2>
-                <p style="color:#888;">Задайте вопрос — младшие модераторы ответят.</p>
-                <div class="help-chat" id="helpChat"></div>
-                <div style="display:flex;gap:10px;margin-top:10px;">
-                    <input type="text" id="helpInput" placeholder="Ваш вопрос..." style="flex:1;" />
-                    <button onclick="sendHelpMessage()">📩 Отправить</button>
-                </div>
-                <div style="text-align:center;margin-top:20px;">
-                    <a href="https://t.me/winogradik" target="_blank" style="background:#00ffcc;color:#000;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block;">
-                        📩 Написать админу в Telegram
-                    </a>
-                    <p style="color:#888;font-size:13px;margin-top:8px;">
-                        🔹 Срочные вопросы решаются лично<br>
-                        🔹 Отвечаю в течение 24 часов
-                    </p>
-                </div>
-            </div>
-
-            <!-- МОДЕРАЦИЯ (МЛАДШИЙ) -->
-            <div id="tab-moderate" class="hidden">
-                <h2>🛡️ Модераторская панель</h2>
-                <div id="moderateContent"></div>
-            </div>
-
-            <!-- СТАРШИЙ МОДЕРАТОР -->
-            <div id="tab-seniormod" class="hidden">
-                <h2>⚜️ Старший модератор</h2>
-                <div id="seniorModContent"></div>
-            </div>
-
-            <!-- АДМИНКА -->
-            <div id="tab-admin" class="hidden">
-                <h2>⚙️ Админ-панель</h2>
-                <div id="adminContent"></div>
-            </div>
-        </div>
-
-        <div id="toast" class="toast"></div>
+    <div class="logo">
+        SchoolNet
     </div>
 
-    <script>
-        // ============================================================
-        // 1. SUPABASE (ЗАМЕНИ НА СВОИ КЛЮЧИ)
-        // ============================================================
-        const SUPABASE_URL = "https://woc.dgbeffdyydvafbbwd.supabase.co";
-        const SUPABASE_ANON_KEY = "sb_publishable_9zLs2SW7TKk7nE5nc2SlrQ_p338-6dB";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    <div
+        id="headerUser"
+        class="header-right hidden"
+    >
 
-        // ============================================================
-        // 2. ПРАВИЛА
-        // ============================================================
-        const RULES_TEXT = `
-            <h3>1. Общие положения</h3>
-            <ul><li><b>1.1:</b> Начиная работу с SchoolNet, вы принимаете условия.</li><li><b>1.2:</b> Незнание правил не освобождает от ответственности.</li></ul>
-            <h3>2. ЗАПРЕЩЕНО</h3>
-            <ul><li>Алкоголь, табак, подделка документов, вандализм, порнография 18+</li><li>Создавать заказ без намерения оплатить</li></ul>
-            <h3>3. Штрафы</h3>
-            <ul><li>+5% к комиссии за нарушение, до 80%.</li><li>Вечный штраф за грубые нарушения.</li></ul>
-            <h3>4. Апелляции</h3>
-            <ul><li>В течение 3 дней подать апелляцию модератору.</li><li>При несогласии — старшему модератору.</li><li>Проигрыш = удвоение штрафа навсегда.</li></ul>
-            <h3>5. Рейтинг</h3>
-            <ul><li>Оценка 1–5 звёзд после выполнения.</li><li>Низкий рейтинг — временная блокировка.</li></ul>
-            <h3>6. Премиум</h3>
-            <ul><li>+25 ₽ → выше в списке, чаще попадается, цветное выделение.</li></ul>
-            <h3>7. Ответственность</h3>
-            <ul><li>Предоплата полной суммы.</li><li>Возврат до 7 рабочих дней.</li><li>Выплата исполнителю до 14 рабочих дней (21 при загрузке).</li></ul>
-            <h3>8. Конфиденциальность</h3>
-            <ul><li>Данные не передаются третьим лицам.</li><li>Анонимный режим — скрыть контакт.</li></ul>
-            <h3>9. Администрация</h3>
-            <ul><li>Меняет правила, удаляет заказы, блокирует пользователей.</li></ul>
-            <h3>10. Согласие</h3>
-            <ul><li>Используя SchoolNet, вы принимаете эти правила.</li></ul>
-        `;
+        <span
+            id="headerName"
+            class="header-name"
+        >
+        </span>
 
-        function showRules() {
-            document.getElementById('authForm').classList.add('hidden');
-            document.getElementById('rulesBlock').classList.remove('hidden');
-            document.getElementById('rulesContent').innerHTML = RULES_TEXT;
-        }
+        <button
+            id="headerLogout"
+            class="button button-danger"
+        >
+            Выйти
+        </button>
 
-        function hideRules() {
-            document.getElementById('authForm').classList.remove('hidden');
-            document.getElementById('rulesBlock').classList.add('hidden');
-        }
+    </div>
 
-        // ============================================================
-        // 3. ПЕРЕМЕННЫЕ
-        // ============================================================
-        let currentUser = null;
-        let currentFilter = 'all';
-        let searchQuery = '';
-        let allOrders = [];
-        let selectedCity = null;
-        let selectedSchool = null;
-        const cities = [
-            { id: 'odincovo', name: 'Одинцово', icon: '🏙️' }
-        ];
-        const schools = {
-            odincovo: ['Лицей №2']
-        };
+</header>
 
-        // ============================================================
-        // 4. ВЫБОР ГОРОДА И ШКОЛЫ
-        // ============================================================
-        function renderCities() {
-            const container = document.getElementById('cityGrid');
-            container.innerHTML = cities.map(c => `
-                <div class="city-card ${selectedCity === c.id ? 'selected' : ''}" onclick="selectCity('${c.id}')">
-                    <span class="icon">${c.icon}</span>
-                    ${c.name}
+
+<!-- ======================================================
+     AUTH SCREEN
+====================================================== -->
+
+<section id="authScreen">
+
+    <div class="auth-container">
+
+        <div class="card auth-card">
+
+            <h1 id="authTitle">
+                Вход в SchoolNet
+            </h1>
+
+            <p
+                id="authSubtitle"
+                class="subtitle"
+            >
+                Войди в свой аккаунт.
+            </p>
+
+
+            <div
+                id="authError"
+                class="message message-error"
+            ></div>
+
+            <div
+                id="authSuccess"
+                class="message message-success"
+            ></div>
+
+
+            <!-- REGISTRATION FIELDS -->
+
+            <div
+                id="registrationFields"
+                class="hidden"
+            >
+
+                <div class="field">
+
+                    <label for="username">
+                        Имя пользователя
+                    </label>
+
+                    <input
+                        id="username"
+                        type="text"
+                        autocomplete="username"
+                        placeholder="например, vinograd"
+                    >
+
                 </div>
-            `).join('');
-        }
 
-        function renderSchools() {
-            const container = document.getElementById('schoolGrid');
-            const list = schools[selectedCity] || [];
-            container.innerHTML = list.map(s => `
-                <div class="city-card ${selectedSchool === s ? 'selected' : ''}" onclick="selectSchool('${s}')">
-                    ${s}
+
+                <div class="field">
+
+                    <label for="nickname">
+                        Никнейм
+                    </label>
+
+                    <input
+                        id="nickname"
+                        type="text"
+                        placeholder="Твой ник"
+                    >
+
                 </div>
-            `).join('');
-            document.getElementById('selectedCityName').textContent = cities.find(c => c.id === selectedCity)?.name || '';
+
+
+                <div class="field">
+
+                    <label for="city">
+                        Город
+                    </label>
+
+                    <input
+                        id="city"
+                        type="text"
+                        placeholder="Город"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="school">
+                        Школа
+                    </label>
+
+                    <input
+                        id="school"
+                        type="text"
+                        placeholder="Школа"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="field">
+
+                <label for="email">
+                    Email
+                </label>
+
+                <input
+                    id="email"
+                    type="email"
+                    autocomplete="email"
+                    placeholder="you@example.com"
+                >
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="field">
+
+                <label for="password">
+                    Пароль
+                </label>
+
+                <input
+                    id="password"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="Минимум 6 символов"
+                >
+
+            </div>
+
+
+            <div class="auth-actions">
+
+                <button
+                    id="authButton"
+                    class="button button-primary"
+                >
+                    Войти
+                </button>
+
+                <button
+                    id="modeButton"
+                    class="button button-secondary"
+                >
+                    Регистрация
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     MAIN APPLICATION
+====================================================== -->
+
+<section
+    id="appScreen"
+    class="hidden"
+>
+
+    <main class="container">
+
+        <div class="layout">
+
+
+            <!-- SIDEBAR -->
+
+            <aside class="card sidebar">
+
+                <div class="sidebar-title">
+                    SchoolNet
+                </div>
+
+
+                <button
+                    class="nav-button"
+                    data-page="home"
+                >
+                    🏠 Главная
+                </button>
+
+
+                <button
+                    class="nav-button"
+                    data-page="profile"
+                >
+                    👤 Профиль
+                </button>
+
+
+                <button
+                    class="nav-button"
+                    data-page="settings"
+                >
+                    ⚙️ Настройки
+                </button>
+
+
+                <button
+                    id="sidebarLogout"
+                    class="nav-button nav-button-danger"
+                >
+                    🚪 Выйти
+                </button>
+
+            </aside>
+
+
+            <!-- CONTENT -->
+
+            <section>
+
+
+                <!-- HOME -->
+
+                <div
+                    id="homePage"
+                    class="card page"
+                >
+
+                    <h1 id="welcomeTitle">
+                        Добро пожаловать 👋
+                    </h1>
+
+                    <p class="subtitle">
+                        Добро пожаловать в SchoolNet.
+                    </p>
+
+
+                    <div class="welcome-box">
+
+                        <h3>
+                            Твой аккаунт защищён
+                        </h3>
+
+                        <p class="muted">
+                            Вход выполняется через Supabase Auth,
+                            а профиль загружается только для
+                            авторизованного пользователя.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PROFILE -->
+
+                <div
+                    id="profilePage"
+                    class="card page hidden"
+                >
+
+                    <div class="profile-header">
+
+                        <div
+                            id="avatar"
+                            class="avatar"
+                        >
+                            ?
+                        </div>
+
+
+                        <div>
+
+                            <div
+                                id="profileName"
+                                class="profile-name"
+                            >
+                                Загрузка...
+                            </div>
+
+
+                            <div
+                                id="profileUsername"
+                                class="profile-username"
+                            >
+                                @user
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="profile-grid">
+
+
+                        <div class="profile-info">
+
+                            <div class="profile-info-label">
+                                Email
+                            </div>
+
+                            <div
+                                id="profileEmail"
+                                class="profile-info-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+
+                        <div class="profile-info">
+
+                            <div class="profile-info-label">
+                                Никнейм
+                            </div>
+
+                            <div
+                                id="profileNickname"
+                                class="profile-info-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+
+                        <div class="profile-info">
+
+                            <div class="profile-info-label">
+                                Город
+                            </div>
+
+                            <div
+                                id="profileCity"
+                                class="profile-info-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+
+                        <div class="profile-info">
+
+                            <div class="profile-info-label">
+                                Школа
+                            </div>
+
+                            <div
+                                id="profileSchool"
+                                class="profile-info-value"
+                            >
+                                —
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SETTINGS -->
+
+                <div
+                    id="settingsPage"
+                    class="card page hidden"
+                >
+
+                    <h2>
+                        Настройки профиля
+                    </h2>
+
+                    <p class="subtitle">
+                        Здесь можно изменить данные профиля.
+                    </p>
+
+
+                    <div
+                        id="settingsError"
+                        class="message message-error"
+                    ></div>
+
+
+                    <div
+                        id="settingsSuccess"
+                        class="message message-success"
+                    ></div>
+
+
+                    <div class="field">
+
+                        <label for="editUsername">
+                            Имя пользователя
+                        </label>
+
+                        <input
+                            id="editUsername"
+                            type="text"
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="editNickname">
+                            Никнейм
+                        </label>
+
+                        <input
+                            id="editNickname"
+                            type="text"
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="editCity">
+                            Город
+                        </label>
+
+                        <input
+                            id="editCity"
+                            type="text"
+                        >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="editSchool">
+                            Школа
+                        </label>
+
+                        <input
+                            id="editSchool"
+                            type="text"
+                        >
+
+                    </div>
+
+
+                    <div class="settings-actions">
+
+                        <button
+                            id="saveProfile"
+                            class="button button-primary"
+                        >
+                            Сохранить профиль
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+        </div>
+
+    </main>
+
+</section>
+
+
+<script>
+
+/* ==========================================================
+   SUPABASE CONFIG
+   ==========================================================
+
+   ВСТАВЬ СЮДА:
+   1. Project URL
+   2. ПУБЛИЧНЫЙ anon/publishable key
+
+   НЕ ВСТАВЛЯЙ service_role / secret key.
+========================================================== */
+
+const SUPABASE_URL =
+    "https://woc.dgbeffdyydvafbbwd.supabase.co";
+
+
+const SUPABASE_ANON_KEY =
+    "sb_publishable_9zLs2SW7TKk7nE5nc2SlrQ_p338-6dB";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+
+
+/* ==========================================================
+   STATE
+========================================================== */
+
+let registrationMode = false;
+
+let currentUser = null;
+
+let currentProfile = null;
+
+
+/* ==========================================================
+   HELPERS
+========================================================== */
+
+function show(element) {
+
+    element.style.display = "block";
+
+}
+
+
+function hide(element) {
+
+    element.style.display = "none";
+
+}
+
+
+function showAuthError(text) {
+
+    const element =
+        document.getElementById("authError");
+
+    element.textContent = text;
+
+    show(element);
+
+    hide(
+        document.getElementById("authSuccess")
+    );
+
+}
+
+
+function showAuthSuccess(text) {
+
+    const element =
+        document.getElementById("authSuccess");
+
+    element.textContent = text;
+
+    show(element);
+
+    hide(
+        document.getElementById("authError")
+    );
+
+}
+
+
+function clearAuthMessages() {
+
+    hide(
+        document.getElementById("authError")
+    );
+
+    hide(
+        document.getElementById("authSuccess")
+    );
+
+}
+
+
+/* ==========================================================
+   AUTH MODE
+========================================================== */
+
+function toggleRegistrationMode() {
+
+    registrationMode =
+        !registrationMode;
+
+    clearAuthMessages();
+
+
+    const fields =
+        document.getElementById(
+            "registrationFields"
+        );
+
+
+    if (registrationMode) {
+
+        document.getElementById(
+            "authTitle"
+        ).textContent =
+            "Создание аккаунта";
+
+
+        document.getElementById(
+            "authSubtitle"
+        ).textContent =
+            "Создай свой аккаунт SchoolNet.";
+
+
+        document.getElementById(
+            "authButton"
+        ).textContent =
+            "Зарегистрироваться";
+
+
+        document.getElementById(
+            "modeButton"
+        ).textContent =
+            "Уже есть аккаунт";
+
+
+        fields.classList.remove(
+            "hidden"
+        );
+
+    } else {
+
+        document.getElementById(
+            "authTitle"
+        ).textContent =
+            "Вход в SchoolNet";
+
+
+        document.getElementById(
+            "authSubtitle"
+        ).textContent =
+            "Войди в свой аккаунт.";
+
+
+        document.getElementById(
+            "authButton"
+        ).textContent =
+            "Войти";
+
+
+        document.getElementById(
+            "modeButton"
+        ).textContent =
+            "Регистрация";
+
+
+        fields.classList.add(
+            "hidden"
+        );
+
+    }
+
+}
+
+
+/* ==========================================================
+   REGISTER / LOGIN
+========================================================== */
+
+async function submitAuth() {
+
+    clearAuthMessages();
+
+
+    const email =
+        document.getElementById(
+            "email"
+        ).value.trim();
+
+
+    const password =
+        document.getElementById(
+            "password"
+        ).value;
+
+
+    if (!email || !password) {
+
+        showAuthError(
+            "Введите email и пароль."
+        );
+
+        return;
+    }
+
+
+    /* ======================================================
+       REGISTRATION
+    ====================================================== */
+
+    if (registrationMode) {
+
+        const username =
+            document.getElementById(
+                "username"
+            ).value.trim();
+
+
+        const nickname =
+            document.getElementById(
+                "nickname"
+            ).value.trim();
+
+
+        const city =
+            document.getElementById(
+                "city"
+            ).value.trim();
+
+
+        const school =
+            document.getElementById(
+                "school"
+            ).value.trim();
+
+
+        if (!username) {
+
+            showAuthError(
+                "Введите имя пользователя."
+            );
+
+            return;
         }
 
-        function selectCity(cityId) {
-            selectedCity = cityId;
-            selectedSchool = null;
-            document.getElementById('stepCity').classList.add('hidden');
-            document.getElementById('stepSchool').classList.remove('hidden');
-            renderSchools();
-            updateSaveButton();
+
+        if (password.length < 6) {
+
+            showAuthError(
+                "Пароль должен быть минимум 6 символов."
+            );
+
+            return;
         }
 
-        function goToCities() {
-            document.getElementById('stepCity').classList.remove('hidden');
-            document.getElementById('stepSchool').classList.add('hidden');
-            renderCities();
-            updateSaveButton();
-        }
 
-        function selectSchool(school) {
-            selectedSchool = school;
-            renderSchools();
-            updateSaveButton();
-        }
+        const {
+            data,
+            error
+        } =
+            await supabaseClient.auth.signUp({
 
-        function updateSaveButton() {
-            const btn = document.getElementById('saveBtn');
-            btn.disabled = !(selectedCity && selectedSchool);
-        }
+                email: email,
 
-        // ============================================================
-        // 5. АВТОРИЗАЦИЯ
-        // ============================================================
-        async function signUp() {
-            const username = document.getElementById('authUsername').value.trim();
-            const password = document.getElementById('authPassword').value.trim();
-            if (!username || !password) return setAuthStatus('❌ Заполните поля', 'error');
-            if (!username.startsWith('@')) return setAuthStatus('❌ Логин должен начинаться с @', 'error');
-            if (password.length < 6) return setAuthStatus('❌ Пароль минимум 6 символов', 'error');
-
-            const { data: existing } = await supabase
-                .from('users')
-                .select('username')
-                .eq('username', username)
-                .maybeSingle();
-            if (existing) return setAuthStatus('❌ Логин занят', 'error');
-
-            const { count } = await supabase.from('users').select('*', { count: 'exact' });
-            const userId = 'U-' + String(count + 1).padStart(5, '0');
-            const isAdmin = count === 0;
-
-            const newUser = {
-                id: userId,
-                username: username,
                 password: password,
-                nickname: username,
-                commission: 20,
-                violations: 0,
-                completed: 0,
-                permanent_penalty: false,
-                rating: 0,
-                rating_count: 0,
-                role: isAdmin ? 'admin' : 'user',
-                is_admin: isAdmin,
-                is_moderator: isAdmin,
-                is_senior_mod: false,
-                balance: 1000,
-                city: null,
-                school: null
-            };
 
-            const { error } = await supabase.from('users').insert(newUser);
-            if (error) return setAuthStatus('❌ Ошибка: ' + error.message, 'error');
-            setAuthStatus('✅ Регистрация успешна! Теперь войдите.', 'success');
-        }
+                options: {
 
-        async function signIn() {
-            const username = document.getElementById('authUsername').value.trim();
-            const password = document.getElementById('authPassword').value.trim();
-            if (!username || !password) return setAuthStatus('❌ Заполните поля', 'error');
+                    data: {
 
-            const { data: user, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('username', username)
-                .eq('password', password)
-                .maybeSingle();
+                        username:
+                            username,
 
-            if (error || !user) return setAuthStatus('❌ Неверный логин или пароль', 'error');
+                        nickname:
+                            nickname,
 
-            currentUser = user;
+                        city:
+                            city,
 
-            // Если пользователь админ — показываем админ-кнопку
-            if (currentUser.is_admin) {
-                document.getElementById('adminBtn').classList.remove('hidden');
-                document.getElementById('moderatorBtn').classList.remove('hidden');
-            }
+                        school:
+                            school
 
-            if (!currentUser.city || !currentUser.school) {
-                document.getElementById('citySchoolForm').classList.remove('hidden');
-                document.getElementById('mainUI').classList.add('hidden');
-                document.getElementById('userInfo').classList.add('hidden');
-                document.getElementById('authForm').classList.add('hidden');
-                renderCities();
-                setAuthStatus('⚠️ Заполните город и школу', 'error');
-                return;
-            }
+                    }
 
-            showMainUI();
-        }
-
-        async function saveCitySchool() {
-            if (!selectedCity || !selectedSchool) return;
-            const cityName = cities.find(c => c.id === selectedCity)?.name || '';
-            const schoolName = selectedSchool;
-            const { error } = await supabase
-                .from('users')
-                .update({ city: cityName, school: schoolName })
-                .eq('id', currentUser.id);
-            if (error) return showToast('❌ Ошибка: ' + error.message);
-            currentUser.city = cityName;
-            currentUser.school = schoolName;
-            document.getElementById('citySchoolForm').classList.add('hidden');
-            showMainUI();
-            showToast('✅ Город и школа сохранены!');
-        }
-
-        function showMainUI() {
-            document.getElementById('userInfo').classList.remove('hidden');
-            document.getElementById('authForm').classList.add('hidden');
-            document.getElementById('userNickname').textContent = currentUser.nickname || currentUser.username;
-            document.getElementById('userIdDisplay').textContent = currentUser.id;
-            document.getElementById('userSchoolDisplay').textContent = currentUser.school + ' • ' + currentUser.city;
-            document.getElementById('mainUI').classList.remove('hidden');
-            document.getElementById('rulesBlock').classList.add('hidden');
-            setAuthStatus('', '');
-            showToast('✅ Добро пожаловать, ' + currentUser.username + '!');
-            loadOrders();
-            loadMyOrders();
-            loadHistory();
-            loadHelpMessages();
-            loadWithdrawHistory();
-            updateBalance();
-            showTab('feed');
-        }
-
-        function signOut() {
-            currentUser = null;
-            document.getElementById('userInfo').classList.add('hidden');
-            document.getElementById('authForm').classList.remove('hidden');
-            document.getElementById('mainUI').classList.add('hidden');
-            document.getElementById('citySchoolForm').classList.add('hidden');
-            document.getElementById('moderatorBtn').classList.add('hidden');
-            document.getElementById('seniorModBtn').classList.add('hidden');
-            document.getElementById('adminBtn').classList.add('hidden');
-            document.getElementById('rulesBlock').classList.add('hidden');
-            setAuthStatus('👋 Вы вышли', 'success');
-            showToast('👋 Вы вышли');
-        }
-
-        function setAuthStatus(msg, type) {
-            const el = document.getElementById('authStatus');
-            el.textContent = msg;
-            el.className = 'status-msg';
-            if (type) el.classList.add(type);
-            if (msg) el.classList.remove('hidden');
-            else el.classList.add('hidden');
-        }
-
-        // ============================================================
-        // 6. ЗАКАЗЫ
-        // ============================================================
-        async function loadOrders() {
-            if (!currentUser) return;
-            let query = supabase.from('orders').select('*')
-                .eq('status', 'active')
-                .eq('city', currentUser.city)
-                .eq('school', currentUser.school)
-                .order('premium', { ascending: false })
-                .order('created_at', { ascending: false });
-            if (currentFilter !== 'all') query = query.eq('category', currentFilter);
-            const { data, error } = await query;
-            if (error) return showToast('❌ Ошибка загрузки');
-            allOrders = data || [];
-            renderOrders();
-        }
-
-        function renderOrders() {
-            let filtered = allOrders;
-            if (searchQuery.trim()) {
-                const q = searchQuery.toLowerCase();
-                filtered = filtered.filter(o => o.description.toLowerCase().includes(q));
-            }
-            const container = document.getElementById('ordersList');
-            if (filtered.length === 0) {
-                container.innerHTML = '<div class="card" style="border-left-color:#666;"><p style="color:#666;">Нет заказов</p></div>';
-                return;
-            }
-            container.innerHTML = filtered.map(o => `
-                <div class="card ${o.urgent ? 'urgent' : ''} ${o.premium ? 'premium' : ''}">
-                    <div><span class="price">💰 ${o.price} ₽</span> <span class="comm">(комиссия ${o.commission}%)</span> ${o.urgent ? '<span class="urgent-badge">🔥 Срочно</span>' : ''} ${o.premium ? '<span class="premium-badge">⭐ Премиум</span>' : ''}</div>
-                    <div><strong>📌 ${o.description}</strong> <span style="color:#888;font-size:14px;">${o.category || ''}</span></div>
-                    <div>📞 ${o.contact} • ⏳ ${new Date(o.created_at).toLocaleString()}</div>
-                    <div>👤 ${o.username || 'Аноним'}</div>
-                    <div style="margin-top:8px;">
-                        <span class="status">🔵 Активен</span>
-                        ${currentUser && o.user_id !== currentUser.id ? `<button onclick="takeOrder('${o.id}')" style="background:#00aa88;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">✅ Взяться</button>` : ''}
-                        ${currentUser && o.user_id === currentUser.id ? `<button onclick="cancelOrder('${o.id}')" style="background:#ff8800;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">❌ Отменить</button>` : ''}
-                        ${currentUser && (currentUser.is_admin || currentUser.is_moderator) ? `<button class="del-btn" onclick="deleteOrder('${o.id}')">🗑️</button>` : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        async function loadMyOrders() {
-            if (!currentUser) return;
-            const { data, error } = await supabase
-                .from('orders')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .eq('status', 'active');
-            if (error) return showToast('❌ Ошибка');
-            const container = document.getElementById('myOrdersList');
-            if (!data || data.length === 0) {
-                container.innerHTML = '<p>📭 Нет активных заказов</p>';
-                return;
-            }
-            container.innerHTML = data.map(o => `
-                <div class="card ${o.urgent ? 'urgent' : ''}">
-                    <div>📌 ${o.description}</div>
-                    <div>💰 ${o.price} ₽ • ${o.status}</div>
-                    <button onclick="cancelOrder('${o.id}')" style="background:#ff8800;color:#000;border:none;padding:2px 12px;border-radius:12px;cursor:pointer;">❌ Отменить</button>
-                </div>
-            `).join('');
-        }
-
-        async function createOrder(desc, price, contact, category, urgent, premium) {
-            if (!currentUser) return showToast('❌ Войдите');
-
-            if (currentUser.balance < price) {
-                return showToast('❌ Недостаточно средств на балансе');
-            }
-
-            let commission = currentUser.commission || 20;
-            if (urgent) commission = Math.min(80, commission + 5);
-            const net = Math.floor(price * (100 - commission) / 100);
-            const finalPrice = premium ? price + 25 : price;
-
-            const newBalance = currentUser.balance - finalPrice;
-            const { error: balanceError } = await supabase
-                .from('users')
-                .update({ balance: newBalance })
-                .eq('id', currentUser.id);
-
-            if (balanceError) {
-                return showToast('❌ Ошибка списания: ' + balanceError.message);
-            }
-
-            const orderId = 'ORD-' + Date.now();
-            const order = {
-                id: orderId,
-                description: desc,
-                price: finalPrice,
-                commission: commission,
-                net: net,
-                contact: contact || 'Аноним',
-                user_id: currentUser.id,
-                username: currentUser.username,
-                category: category || 'other',
-                urgent: urgent || false,
-                premium: premium || false,
-                status: 'active',
-                created_at: new Date().toISOString(),
-                city: currentUser.city || 'Одинцово',
-                school: currentUser.school || 'Лицей №2'
-            };
-
-            const { error: orderError } = await supabase.from('orders').insert(order);
-            if (orderError) {
-                await supabase
-                    .from('users')
-                    .update({ balance: currentUser.balance })
-                    .eq('id', currentUser.id);
-                return showToast('❌ Ошибка создания: ' + orderError.message);
-            }
-
-            currentUser.balance = newBalance;
-            updateBalance();
-            showToast('✅ Заказ создан!');
-            loadOrders();
-            loadMyOrders();
-        }
-
-        async function takeOrder(orderId) {
-            if (!currentUser) return showToast('❌ Войдите');
-            const { error } = await supabase
-                .from('orders')
-                .update({ executor_id: currentUser.id })
-                .eq('id', orderId);
-            if (error) return showToast('❌ Ошибка');
-            showToast('✅ Вы взяли заказ!');
-            loadOrders();
-        }
-
-        async function cancelOrder(orderId) {
-            if (!currentUser) return showToast('❌ Войдите');
-            if (!confirm('Отменить заказ?')) return;
-            const { error } = await supabase
-                .from('orders')
-                .update({ status: 'cancelled' })
-                .eq('id', orderId)
-                .eq('user_id', currentUser.id);
-            if (error) return showToast('❌ Ошибка');
-            const { data: order } = await supabase
-                .from('orders')
-                .select('price')
-                .eq('id', orderId)
-                .single();
-            if (order) {
-                const newBalance = (currentUser.balance || 0) + order.price;
-                await supabase
-                    .from('users')
-                    .update({ balance: newBalance })
-                    .eq('id', currentUser.id);
-                currentUser.balance = newBalance;
-                updateBalance();
-            }
-            showToast('✅ Заказ отменён, деньги возвращены');
-            loadOrders();
-            loadMyOrders();
-        }
-
-        async function deleteOrder(orderId) {
-            if (!confirm('Удалить навсегда?')) return;
-            const { error } = await supabase.from('orders').delete().eq('id', orderId);
-            if (error) return showToast('❌ Ошибка');
-            showToast('✅ Удалено');
-            loadOrders();
-            loadMyOrders();
-        }
-
-        // ============================================================
-        // 7. ШАБЛОНЫ
-        // ============================================================
-        async function useTemplate(templateId) {
-            const templates = {
-                't1': { description: 'Купить бутерброд в столовой', price: 150, category: 'shopping' },
-                't2': { description: 'Сделать фото на память', price: 200, category: 'help' },
-                't3': { description: 'Написать записку от имени', price: 100, category: 'study' },
-                't4': { description: 'Помочь с домашним заданием', price: 300, category: 'study' },
-                't5': { description: 'Сходить в магазин за продуктами', price: 250, category: 'shopping' }
-            };
-            const t = templates[templateId];
-            if (!t) return showToast('❌ Шаблон не найден');
-            document.getElementById('taskDesc').value = t.description;
-            document.getElementById('taskPrice').value = t.price;
-            document.getElementById('taskCategory').value = t.category;
-            calcNet();
-            showTab('create');
-        }
-
-        // ============================================================
-        // 8. ПРОФИЛЬ И СТАТИСТИКА
-        // ============================================================
-        async function showProfile() {
-            if (!currentUser) return;
-            const user = currentUser;
-            const rating = user.rating_count ? (user.rating / user.rating_count).toFixed(1) : '0.0';
-            document.getElementById('profileInfo').innerHTML = `
-                <div style="text-align:center;">
-                    <div class="profile-avatar" style="background:#222;display:flex;align-items:center;justify-content:center;font-size:40px;">👤</div>
-                    <p><strong>ID:</strong> ${user.id}</p>
-                    <p><strong>Логин:</strong> ${user.username}</p>
-                    <p><strong>Имя:</strong> ${user.nickname || user.username}</p>
-                    <p><strong>🏫</strong> ${user.school || 'Не выбрана'} • ${user.city || 'Не выбран'}</p>
-                    <p><strong>Комиссия:</strong> ${user.commission}% ${user.permanent_penalty ? '⚠️ Вечный штраф' : ''}</p>
-                    <p><strong>Рейтинг:</strong> ⭐ ${rating} (${user.rating_count} оценок)</p>
-                    <p><strong>Выполнено:</strong> ${user.completed} заказов</p>
-                    <p><strong>Баланс:</strong> ${user.balance || 0} ₽</p>
-                    <p><strong>Роль:</strong> ${user.role || 'пользователь'}</p>
-                </div>
-            `;
-
-            const { data: orders } = await supabase.from('orders').select('*').eq('user_id', user.id);
-            document.getElementById('userOrders').innerHTML = (orders || []).slice(0, 5).map(o => `
-                <div class="card" style="border-left-color:${o.status === 'done' ? '#00aa88' : '#ffaa00'};">
-                    ${o.description} — ${o.price} ₽ (${o.status})
-                </div>
-            `).join('') || '<p>Нет заказов</p>';
-
-            const { data: penalties } = await supabase.from('penalties').select('*').eq('user_id', user.id);
-            document.getElementById('userPenalties').innerHTML = (penalties || []).map(p => `
-                <div class="card" style="border-left-color:#ff3333;">
-                    ${p.reason_text} (${p.status})
-                </div>
-            `).join('') || '<p>Нет штрафов</p>';
-
-            const totalEarned = (orders || []).filter(o => o.status === 'done').reduce((sum, o) => sum + (o.net || 0), 0);
-            const monthEarned = (orders || []).filter(o => o.status === 'done' && new Date(o.created_at).getMonth() === new Date()
-                    .getMonth())
-                .reduce((sum, o) => sum + (o.net || 0), 0);
-            const categories = (orders || []).filter(o => o.status === 'done').map(o => o.category || 'other');
-            const topCategory = categories.length ? categories.sort((a, b) => categories.filter(v => v === a).length - categories
-                .filter(v => v === b).length).pop() : 'Нет';
-
-            document.getElementById('userStats').innerHTML = `
-                <div class="card" style="border-left-color:#00ff88;">
-                    <div><strong>💰 Всего заработано:</strong> ${totalEarned} ₽</div>
-                    <div><strong>📆 За месяц:</strong> ${monthEarned} ₽</div>
-                    <div><strong>🏷️ Топ категория:</strong> ${topCategory === 'Нет' ? 'Нет заказов' : topCategory}</div>
-                    <div><strong>⭐ Средняя оценка:</strong> ${rating}</div>
-                </div>
-            `;
-        }
-
-        // ============================================================
-        // 9. БАЛАНС
-        // ============================================================
-        function updateBalance() {
-            const el = document.getElementById('userBalance');
-            if (el && currentUser) {
-                el.textContent = currentUser.balance || 0;
-            }
-        }
-
-        // ============================================================
-        // 10. ИСТОРИЯ
-        // ============================================================
-        async function loadHistory() {
-            if (!currentUser) return;
-            const { data, error } = await supabase.from('orders').select('*').eq('user_id', currentUser.id);
-            if (error) return showToast('❌ Ошибка');
-            const container = document.getElementById('historyList');
-            if (!data || data.length === 0) {
-                container.innerHTML = '<p>📭 Нет заказов в истории</p>';
-                return;
-            }
-            container.innerHTML = data.map(o => `
-                <div class="card" style="border-left-color:${o.status === 'done' ? '#00aa88' : '#ffaa00'};">
-                    <div>📌 ${o.description}</div>
-                    <div>💰 ${o.price} ₽ • ${o.status === 'done' ? '✅ Выполнен' : o.status === 'cancelled' ? '❌ Отменён' : '📌 Активен'}</div>
-                    <div>📅 ${new Date(o.created_at).toLocaleDateString()}</div>
-                </div>
-            `).join('');
-        }
-
-        // ============================================================
-        // 11. ВЫВОД
-        // ============================================================
-        async function submitWithdraw() {
-            if (!currentUser) return showToast('❌ Войдите');
-            const amount = parseInt(document.getElementById('withdrawAmount').value);
-            const method = document.getElementById('withdrawMethod').value;
-            const details = document.getElementById('withdrawDetails').value.trim();
-
-            if (!amount) return showToast('❌ Введите сумму');
-            if (amount < 50) return showToast('❌ Минимальная сумма — 50 ₽');
-            if (amount > (currentUser.balance || 0)) return showToast('❌ Недостаточно средств');
-            if (!details) return showToast('❌ Введите реквизиты');
-
-            if (method === 'card') {
-                if (!luhnCheck(details)) {
-                    return showToast('❌ Некорректный номер карты');
                 }
-            }
 
-            const requestId = 'W-' + Date.now();
-            const { error } = await supabase.from('withdraw_requests').insert({
-                id: requestId,
-                user_id: currentUser.id,
-                amount: amount,
-                method: method,
-                details: details,
-                status: 'pending'
             });
-            if (error) return showToast('❌ Ошибка: ' + error.message);
-            showToast('✅ Заявка отправлена! Ожидайте обработки.');
-            document.getElementById('withdrawAmount').value = '';
-            document.getElementById('withdrawDetails').value = '';
-            loadWithdrawHistory();
+
+
+        if (error) {
+
+            showAuthError(
+                error.message
+            );
+
+            return;
         }
 
-        async function loadWithdrawHistory() {
-            if (!currentUser) return;
-            const { data, error } = await supabase
-                .from('withdraw_requests')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .order('created_at', { ascending: false });
-            if (error) return showToast('❌ Ошибка загрузки');
-            const container = document.getElementById('withdrawSection');
-            if (!data || data.length === 0) {
-                container.innerHTML = `
-                    <p style="color:#888;">Ваш баланс: <strong>${currentUser.balance || 0} ₽</strong></p>
-                    <input type="number" id="withdrawAmount" placeholder="Сумма (₽)" min="50" />
-                    <select id="withdrawMethod">
-                        <option value="card">💳 Карта</option>
-                        <option value="phone">📱 Телефон</option>
-                    </select>
-                    <input type="text" id="withdrawDetails" placeholder="Реквизиты" />
-                    <button onclick="submitWithdraw()">📤 Подать заявку</button>
-                    <p>📭 Нет заявок на вывод</p>
-                `;
-                return;
+
+        /*
+         * Если email confirmation включён,
+         * Supabase может не дать session сразу.
+         */
+
+        if (!data.session) {
+
+            showAuthSuccess(
+                "Аккаунт создан. Проверь почту для подтверждения."
+            );
+
+            return;
+        }
+
+
+        await loadApplication();
+
+        return;
+    }
+
+
+    /* ======================================================
+       LOGIN
+    ====================================================== */
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth
+            .signInWithPassword({
+
+                email:
+                    email,
+
+                password:
+                    password
+
+            });
+
+
+    if (error || !data.user) {
+
+        showAuthError(
+            "Неверный email или пароль."
+        );
+
+        return;
+    }
+
+
+    await loadApplication();
+
+}
+
+
+/* ==========================================================
+   LOAD APPLICATION
+========================================================== */
+
+async function loadApplication() {
+
+    clearAuthMessages();
+
+
+    /*
+     * Получаем реального пользователя
+     * из Supabase Auth.
+     */
+
+    const {
+        data: {
+            user
+        },
+        error
+    } =
+        await supabaseClient.auth
+            .getUser();
+
+
+    if (error || !user) {
+
+        await logout();
+
+        return;
+    }
+
+
+    /*
+     * КРИТИЧЕСКАЯ ПРОВЕРКА.
+     *
+     * Нельзя просто иметь Auth-сессию.
+     *
+     * Профиль должен существовать
+     * в public.users и принадлежать
+     * именно этому Auth user.
+     */
+
+    const {
+        data: profile,
+        error: profileError
+    } =
+        await supabaseClient
+            .from("users")
+            .select(
+                "auth_user_id,username,nickname,city,school"
+            )
+            .eq(
+                "auth_user_id",
+                user.id
+            )
+            .maybeSingle();
+
+
+    if (profileError) {
+
+        console.error(
+            profileError
+        );
+
+        await supabaseClient.auth
+            .signOut();
+
+
+        showAuthError(
+            "Не удалось загрузить профиль."
+        );
+
+        showLoginScreen();
+
+        return;
+    }
+
+
+    /*
+     * Если Auth-пользователь есть,
+     * но users-профиля нет —
+     * доступ в приложение запрещается.
+     */
+
+    if (!profile) {
+
+        await supabaseClient.auth
+            .signOut();
+
+
+        showAuthError(
+            "Профиль не найден. Вход отменён."
+        );
+
+        showLoginScreen();
+
+        return;
+    }
+
+
+    currentUser =
+        user;
+
+
+    currentProfile =
+        profile;
+
+
+    document
+        .getElementById("authScreen")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("appScreen")
+        .classList.remove("hidden");
+
+
+    document
+        .getElementById("headerUser")
+        .classList.remove("hidden");
+
+
+    updateProfileUI();
+
+
+    showPage(
+        "home"
+    );
+
+}
+
+
+/* ==========================================================
+   SHOW LOGIN
+========================================================== */
+
+function showLoginScreen() {
+
+    currentUser =
+        null;
+
+    currentProfile =
+        null;
+
+
+    document
+        .getElementById("appScreen")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("headerUser")
+        .classList.add("hidden");
+
+
+    document
+        .getElementById("authScreen")
+        .classList.remove("hidden");
+
+}
+
+
+/* ==========================================================
+   UPDATE PROFILE UI
+========================================================== */
+
+function updateProfileUI() {
+
+    if (
+        !currentUser ||
+        !currentProfile
+    ) {
+
+        return;
+    }
+
+
+    const username =
+        currentProfile.username ||
+        "user";
+
+
+    const nickname =
+        currentProfile.nickname ||
+        username;
+
+
+    const city =
+        currentProfile.city ||
+        "Не указан";
+
+
+    const school =
+        currentProfile.school ||
+        "Не указана";
+
+
+    document.getElementById(
+        "headerName"
+    ).textContent =
+        nickname;
+
+
+    document.getElementById(
+        "welcomeTitle"
+    ).textContent =
+        "Привет, " +
+        nickname +
+        " 👋";
+
+
+    document.getElementById(
+        "profileName"
+    ).textContent =
+        nickname;
+
+
+    document.getElementById(
+        "profileUsername"
+    ).textContent =
+        "@" +
+        username;
+
+
+    document.getElementById(
+        "profileEmail"
+    ).textContent =
+        currentUser.email ||
+        "—";
+
+
+    document.getElementById(
+        "profileNickname"
+    ).textContent =
+        nickname;
+
+
+    document.getElementById(
+        "profileCity"
+    ).textContent =
+        city;
+
+
+    document.getElementById(
+        "profileSchool"
+    ).textContent =
+        school;
+
+
+    document.getElementById(
+        "avatar"
+    ).textContent =
+        nickname
+            .charAt(0)
+            .toUpperCase();
+
+
+    document.getElementById(
+        "editUsername"
+    ).value =
+        currentProfile.username ||
+        "";
+
+
+    document.getElementById(
+        "editNickname"
+    ).value =
+        currentProfile.nickname ||
+        "";
+
+
+    document.getElementById(
+        "editCity"
+    ).value =
+        currentProfile.city ||
+        "";
+
+
+    document.getElementById(
+        "editSchool"
+    ).value =
+        currentProfile.school ||
+        "";
+
+}
+
+
+/* ==========================================================
+   NAVIGATION
+========================================================== */
+
+function showPage(page) {
+
+    const pages =
+        document.querySelectorAll(
+            ".page"
+        );
+
+
+    pages.forEach(
+        function(element) {
+
+            element.classList.add(
+                "hidden"
+            );
+
+        }
+    );
+
+
+    if (page === "home") {
+
+        document
+            .getElementById(
+                "homePage"
+            )
+            .classList.remove(
+                "hidden"
+            );
+
+    }
+
+
+    if (page === "profile") {
+
+        document
+            .getElementById(
+                "profilePage"
+            )
+            .classList.remove(
+                "hidden"
+            );
+
+    }
+
+
+    if (page === "settings") {
+
+        document
+            .getElementById(
+                "settingsPage"
+            )
+            .classList.remove(
+                "hidden"
+            );
+
+    }
+
+}
+
+
+/* ==========================================================
+   SAVE PROFILE
+========================================================== */
+
+async function saveProfile() {
+
+    const errorBox =
+        document.getElementById(
+            "settingsError"
+        );
+
+
+    const successBox =
+        document.getElementById(
+            "settingsSuccess"
+        );
+
+
+    hide(
+        errorBox
+    );
+
+    hide(
+        successBox
+    );
+
+
+    if (!currentUser) {
+
+        showLoginScreen();
+
+        return;
+    }
+
+
+    const username =
+        document.getElementById(
+            "editUsername"
+        ).value.trim();
+
+
+    const nickname =
+        document.getElementById(
+            "editNickname"
+        ).value.trim();
+
+
+    const city =
+        document.getElementById(
+            "editCity"
+        ).value.trim();
+
+
+    const school =
+        document.getElementById(
+            "editSchool"
+        ).value.trim();
+
+
+    if (!username) {
+
+        errorBox.textContent =
+            "Имя пользователя не может быть пустым.";
+
+        show(
+            errorBox
+        );
+
+        return;
+    }
+
+
+    /*
+     * Благодаря RLS запрос ниже может
+     * изменить только строку,
+     * auth_user_id которой совпадает
+     * с текущим auth.uid().
+     */
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("users")
+            .update({
+
+                username:
+                    username,
+
+                nickname:
+                    nickname,
+
+                city:
+                    city,
+
+                school:
+                    school
+
+            })
+            .eq(
+                "auth_user_id",
+                currentUser.id
+            )
+            .select(
+                "auth_user_id,username,nickname,city,school"
+            )
+            .single();
+
+
+    if (error) {
+
+        console.error(
+            error
+        );
+
+        errorBox.textContent =
+            error.message;
+
+        show(
+            errorBox
+        );
+
+        return;
+    }
+
+
+    currentProfile =
+        data;
+
+
+    updateProfileUI();
+
+
+    successBox.textContent =
+        "Профиль успешно сохранён.";
+
+    show(
+        successBox
+    );
+
+}
+
+
+/* ==========================================================
+   LOGOUT
+========================================================== */
+
+async function logout() {
+
+    await supabaseClient.auth
+        .signOut();
+
+
+    showLoginScreen();
+
+}
+
+
+/* ==========================================================
+   AUTH STATE
+========================================================== */
+
+supabaseClient.auth
+    .onAuthStateChange(
+        async function(
+            event,
+            session
+        ) {
+
+            /*
+             * Если сессия исчезла —
+             * приложение закрывается.
+             */
+
+            if (!session) {
+
+                showLoginScreen();
+
             }
-            container.innerHTML = `
-                <p style="color:#888;">Ваш баланс: <strong>${currentUser.balance || 0} ₽</strong></p>
-                <input type="number" id="withdrawAmount" placeholder="Сумма (₽)" min="50" />
-                <select id="withdrawMethod">
-                    <option value="card">💳 Карта</option>
-                    <option value="phone">📱 Телефон</option>
-                </select>
-                <input type="text" id="withdrawDetails" placeholder="Реквизиты" />
-                <button onclick="submitWithdraw()">📤 Подать заявку</button>
-                <hr style="border-color:#00ffcc55;margin:15px 0;">
-                ${data.map(r => `
-                    <div class="card" style="border-left-color:${r.status === 'approved' ? '#00aa88' : r.status === 'rejected' ? '#ff3333' : '#ffaa00'};">
-                        <div>💰 ${r.amount} ₽ • ${r.method}</div>
-                        <div>${r.details}</div>
-                        <div>Статус: ${r.status === 'pending' ? '⏳ Ожидает' : r.status === 'approved' ? '✅ Одобрено' : '❌ Отклонено'}</div>
-                        <div style="font-size:12px;color:#666;">${new Date(r.created_at).toLocaleString()}</div>
-                    </div>
-                `).join('')}
-            `;
-        }
 
-        // ============================================================
-        // 12. АЛГОРИТМ ЛУНА
-        // ============================================================
-        function luhnCheck(cardNumber) {
-            const digits = cardNumber.replace(/\D/g, '').split('').map(Number);
-            if (digits.length !== 16) return false;
-            let sum = 0;
-            for (let i = 0; i < digits.length; i++) {
-                let digit = digits[i];
-                if ((digits.length - i) % 2 === 0) {
-                    digit *= 2;
-                    if (digit > 9) digit -= 9;
+        }
+    );
+
+
+/* ==========================================================
+   EVENTS
+========================================================== */
+
+document
+    .getElementById(
+        "authButton"
+    )
+    .addEventListener(
+        "click",
+        submitAuth
+    );
+
+
+document
+    .getElementById(
+        "modeButton"
+    )
+    .addEventListener(
+        "click",
+        toggleRegistrationMode
+    );
+
+
+document
+    .getElementById(
+        "headerLogout"
+    )
+    .addEventListener(
+        "click",
+        logout
+    );
+
+
+document
+    .getElementById(
+        "sidebarLogout"
+    )
+    .addEventListener(
+        "click",
+        logout
+    );
+
+
+document
+    .getElementById(
+        "saveProfile"
+    )
+    .addEventListener(
+        "click",
+        saveProfile
+    );
+
+
+document
+    .querySelectorAll(
+        "[data-page]"
+    )
+    .forEach(
+        function(button) {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    showPage(
+                        button.dataset.page
+                    );
+
                 }
-                sum += digit;
-            }
-            return sum % 10 === 0;
+            );
+
         }
+    );
 
-        // ============================================================
-        // 13. ПОМОЩЬ
-        // ============================================================
-        async function sendHelpMessage() {
-            if (!currentUser) return showToast('❌ Войдите');
-            const msg = document.getElementById('helpInput').value.trim();
-            if (!msg) return;
-            const { error } = await supabase.from('help_chat').insert({
-                user_id: currentUser.id,
-                username: currentUser.username,
-                message: msg,
-                created_at: new Date().toISOString()
-            });
-            if (error) return showToast('❌ Ошибка');
-            document.getElementById('helpInput').value = '';
-            loadHelpMessages();
+
+/* ==========================================================
+   INITIAL SESSION CHECK
+========================================================== */
+
+(async function() {
+
+    const {
+        data: {
+            session
         }
+    } =
+        await supabaseClient.auth
+            .getSession();
 
-        async function loadHelpMessages() {
-            const { data, error } = await supabase.from('help_chat').select('*').order('created_at', { ascending: true });
-            if (error) return;
-            const container = document.getElementById('helpChat');
-            container.innerHTML = (data || []).map(m => `
-                <div class="msg">
-                    <span class="sender">${m.username || 'Аноним'}:</span> ${m.message}
-                    <span style="color:#666;font-size:11px;margin-left:10px;">${new Date(m.created_at).toLocaleTimeString()}</span>
-                </div>
-            `).join('') || '<p style="color:#666;">Сообщений пока нет</p>';
-        }
 
-        // ============================================================
-        // 14. МОДЕРАЦИЯ
-        // ============================================================
-        function loadModeratePanel() {
-            document.getElementById('moderateContent').innerHTML = `
-                <div class="mod-panel">
-                    <h4>🛡️ Панель модератора</h4>
-                    <p>Здесь будут споры, штрафы и апелляции (в разработке)</p>
-                </div>
-            `;
-        }
+    if (session) {
 
-        // ============================================================
-        // 15. СТАРШИЙ МОДЕРАТОР
-        // ============================================================
-        function loadSeniorModPanel() {
-            document.getElementById('seniorModContent').innerHTML = `
-                <div class="mod-panel" style="border-left-color:#ffaa00;">
-                    <h4>⚜️ Старший модератор</h4>
-                    <p>Апелляции 2-го уровня, снятие штрафов (в разработке)</p>
-                </div>
-            `;
-        }
+        await loadApplication();
 
-        // ============================================================
-        // 16. АДМИНКА
-        // ============================================================
-        async function loadAdminPanel() {
-            if (!currentUser || !currentUser.is_admin) {
-                document.getElementById('adminContent').innerHTML = '<p style="color:#ff5555;">⛔ Только админ</p>';
-                return;
-            }
+    } else {
 
-            const { data: users } = await supabase.from('users').select('*');
-            const { data: orders } = await supabase.from('orders').select('*');
+        showLoginScreen();
 
-            document.getElementById('adminContent').innerHTML = `
-                <div class="admin-card">
-                    <h3>👤 Пользователи (${users?.length || 0})</h3>
-                    ${users?.map(u => `
-                        <div class="card" style="border-left-color:#ffaa00;">
-                            ${u.id} — ${u.username} (баланс: ${u.balance || 0} ₽)
-                            ${u.is_admin ? '🔴 Админ' : u.is_moderator ? '🟢 Модератор' : '👤 Пользователь'}
-                        </div>
-                    `).join('') || '<p>Нет пользователей</p>'}
-                </div>
-                <div class="admin-card">
-                    <h3>📦 Заказы (${orders?.length || 0})</h3>
-                    ${orders?.map(o => `
-                        <div class="card" style="border-left-color:${o.status === 'done' ? '#00aa88' : '#00ffcc'};">
-                            ${o.description} — ${o.price} ₽ (${o.status})
-                            <button class="del-btn" onclick="deleteOrder('${o.id}')">🗑️</button>
-                        </div>
-                    `).join('') || '<p>Нет заказов</p>'}
-                </div>
-            `;
-        }
+    }
 
-        // ============================================================
-        // 17. UI
-        // ============================================================
-        function showTab(tab) {
-            const tabs = ['feed', 'myorders', 'create', 'profile', 'history', 'withdraw', 'help', 'rules', 'moderate', 'seniormod', 'admin'];
-            tabs.forEach(t => {
-                const el = document.getElementById(`tab-${t}`);
-                if (el) {
-                    el.classList.toggle('hidden', t !== tab);
-                }
-            });
-            if (tab === 'feed') loadOrders();
-            if (tab === 'myorders') loadMyOrders();
-            if (tab === 'profile') showProfile();
-            if (tab === 'history') loadHistory();
-            if (tab === 'withdraw') { loadWithdrawHistory(); updateBalance(); }
-            if (tab === 'help') loadHelpMessages();
-            if (tab === 'rules') document.getElementById('rulesContent').innerHTML = RULES_TEXT;
-            if (tab === 'moderate') loadModeratePanel();
-            if (tab === 'seniormod') loadSeniorModPanel();
-            if (tab === 'admin') loadAdminPanel();
-        }
+})();
 
-        function filterOrders() {
-            searchQuery = document.getElementById('searchInput').value;
-            currentFilter = document.getElementById('categoryFilter').value;
-            loadOrders();
-        }
+</script>
 
-        function calcNet() {
-            const price = parseInt(document.getElementById('taskPrice').value) || 0;
-            const comm = parseInt(document.getElementById('userCommDisplay').textContent) || 20;
-            document.getElementById('netDisplay').textContent = Math.floor(price * (100 - comm) / 100);
-        }
-
-        function dismissWelcome() {
-            document.getElementById('welcomeBanner').classList.add('hidden');
-        }
-
-        // ============================================================
-        // 18. TOAST
-        // ============================================================
-        let toastTimeout;
-
-        function showToast(msg) {
-            const el = document.getElementById('toast');
-            el.textContent = msg;
-            el.style.display = 'block';
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => { el.style.display = 'none'; }, 5000);
-        }
-
-        // ============================================================
-        // 19. ОБРАБОТЧИКИ
-        // ============================================================
-        document.getElementById('orderForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const desc = document.getElementById('taskDesc').value.trim();
-            const price = parseInt(document.getElementById('taskPrice').value);
-            const contact = document.getElementById('taskContact').value.trim() || 'Аноним';
-            const category = document.getElementById('taskCategory').value;
-            const urgent = document.getElementById('taskUrgent').checked;
-            const premium = document.getElementById('taskPremium').checked;
-            if (!desc || !price) return showToast('❌ Заполните поля');
-            await createOrder(desc, price, contact, category, urgent, premium);
-            this.reset();
-            document.getElementById('netDisplay').textContent = '0';
-            showTab('feed');
-        });
-
-        // ============================================================
-        // 20. ЗАПУСК
-        // ============================================================
-        console.log('🏫 SchoolNet 1.0 запущен!');
-        console.log('👑 Первый зарегистрированный пользователь становится админом.');
-    </script>
 </body>
 </html>
