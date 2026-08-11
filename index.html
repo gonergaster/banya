@@ -2,1228 +2,1736 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SchoolNet 1.0</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SchoolNet 67</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
 
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#070b0d;
+  --panel:#101719;
+  --panel2:#151e20;
+  --border:#263336;
+  --text:#f2f7f7;
+  --muted:#8b9b9d;
+  --cyan:#00ffcc;
+  --green:#39e58c;
+  --orange:#ffaa00;
+  --red:#ff4d5a;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background: #0b0f12;
-    color: #fff;
-    min-height: 100vh;
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:
+    radial-gradient(circle at top,rgba(0,255,204,.08),transparent 35%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
 }
 
-button,
-input,
-select {
-    font: inherit;
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.screen{min-height:100vh}
+
+#authScreen{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
 }
 
-button {
-    cursor: pointer;
+.auth-box{
+  width:100%;
+  max-width:460px;
+  background:rgba(16,23,25,.97);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:30px;
+  box-shadow:0 20px 80px rgba(0,0,0,.45);
 }
 
-.hidden {
-    display: none !important;
+.logo{
+  text-align:center;
+  font-size:34px;
+  font-weight:900;
+  color:var(--cyan);
+  margin-bottom:8px;
 }
 
-/* =========================
-   AUTH
-========================= */
-
-#authScreen {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
+.subtitle{
+  text-align:center;
+  color:var(--muted);
+  margin-bottom:25px;
 }
 
-.auth-box {
-    width: 100%;
-    max-width: 430px;
-    background: #11181d;
-    border: 1px solid #26343b;
-    border-radius: 22px;
-    padding: 28px;
-    box-shadow: 0 0 40px rgba(0,255,204,.08);
+.auth-tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:20px;
 }
 
-.logo {
-    text-align: center;
-    font-size: 30px;
-    font-weight: 900;
-    color: #00ffcc;
-    margin-bottom: 8px;
+.auth-tab{
+  background:var(--panel2);
+  color:var(--muted);
+  border:1px solid var(--border);
+  padding:12px;
+  border-radius:12px;
 }
 
-.subtitle {
-    text-align: center;
-    color: #87969e;
-    margin-bottom: 25px;
+.auth-tab.active{
+  color:#001a16;
+  background:var(--cyan);
+  border-color:var(--cyan);
+  font-weight:800;
 }
 
-.tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
+.field{margin-bottom:15px}
+
+.field label{
+  display:block;
+  color:#b9c6c7;
+  margin-bottom:7px;
+  font-size:14px;
 }
 
-.tab-btn {
-    flex: 1;
-    padding: 12px;
-    border: 1px solid #2b3940;
-    border-radius: 12px;
-    background: #151d22;
-    color: #9caab0;
+.field input,
+.field select,
+.field textarea{
+  width:100%;
+  padding:13px 14px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  outline:none;
+  background:#0b1113;
+  color:white;
 }
 
-.tab-btn.active {
-    background: #00ffcc;
-    color: #07100e;
-    border-color: #00ffcc;
-    font-weight: 800;
+.field textarea{
+  resize:vertical;
+  min-height:120px;
 }
 
-.form-group {
-    margin-bottom: 15px;
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  border-color:var(--cyan);
 }
 
-.form-group label {
-    display: block;
-    color: #aebbc0;
-    margin-bottom: 7px;
-    font-size: 14px;
+.main-btn{
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:13px;
+  background:var(--cyan);
+  color:#001511;
+  font-weight:900;
+  margin-top:5px;
 }
 
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 13px;
-    border-radius: 11px;
-    border: 1px solid #2c3b42;
-    background: #0c1216;
-    color: white;
-    outline: none;
+.main-btn:disabled{
+  opacity:.6;
+  cursor:wait;
 }
 
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #00ffcc;
+.error,.success{
+  padding:11px;
+  border-radius:10px;
+  margin-bottom:15px;
+  font-size:14px;
 }
 
-.primary-btn {
-    width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
-    background: #00ffcc;
-    color: #06100d;
-    font-weight: 900;
-    margin-top: 5px;
+.error{
+  color:#ff7882;
+  background:rgba(255,77,90,.1);
+  border:1px solid rgba(255,77,90,.3);
 }
 
-.primary-btn:hover {
-    filter: brightness(1.08);
+.success{
+  color:var(--green);
+  background:rgba(57,229,140,.08);
+  border:1px solid rgba(57,229,140,.25);
 }
 
-.error {
-    background: rgba(255,70,70,.1);
-    border: 1px solid rgba(255,70,70,.3);
-    color: #ff7d7d;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    font-size: 14px;
+header{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:rgba(7,11,13,.94);
+  backdrop-filter:blur(15px);
+  border-bottom:1px solid var(--border);
 }
 
-.success {
-    background: rgba(0,255,170,.08);
-    border: 1px solid rgba(0,255,170,.25);
-    color: #00ffcc;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    font-size: 14px;
+.header-inner{
+  max-width:1250px;
+  margin:auto;
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  gap:15px;
 }
 
-/* =========================
-   APP
-========================= */
-
-#app {
-    min-height: 100vh;
+.brand{
+  color:var(--cyan);
+  font-weight:900;
+  font-size:21px;
 }
 
-.header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    background: rgba(11,15,18,.96);
-    border-bottom: 1px solid #253238;
-    backdrop-filter: blur(10px);
+.balance{
+  color:var(--green);
+  font-weight:900;
+  margin-left:auto;
 }
 
-.header-inner {
-    max-width: 1200px;
-    margin: auto;
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
+.logout-btn{
+  background:transparent;
+  color:var(--muted);
+  border:1px solid var(--border);
+  padding:8px 12px;
+  border-radius:10px;
 }
 
-.header-logo {
-    color: #00ffcc;
-    font-weight: 900;
-    font-size: 22px;
+.banner{
+  max-width:1250px;
+  margin:18px auto 0;
+  padding:0 18px;
 }
 
-.balance {
-    background: #151d21;
-    border: 1px solid #29383f;
-    border-radius: 10px;
-    padding: 9px 13px;
-    color: #00ffcc;
-    font-weight: 800;
+.banner-box{
+  min-height:100px;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:
+    linear-gradient(135deg,rgba(0,255,204,.08),rgba(255,170,0,.04)),
+    var(--panel);
+  display:flex;
+  align-items:center;
+  padding:22px;
 }
 
-.container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 20px;
+.banner-box h2{
+  color:var(--cyan);
+  margin-bottom:6px;
 }
 
-.banner {
-    background: linear-gradient(120deg, #12251f, #15191d);
-    border: 1px solid #21443b;
-    border-radius: 18px;
-    padding: 22px;
-    margin-bottom: 20px;
+.banner-box p{color:var(--muted)}
+
+.container{
+  max-width:1250px;
+  margin:auto;
+  padding:18px;
 }
 
-.banner h2 {
-    color: #00ffcc;
-    margin-bottom: 7px;
+.user-card,
+.panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:18px;
 }
 
-.banner p {
-    color: #aeb9bd;
+.nickname{
+  font-size:24px;
+  font-weight:900;
 }
 
-.nav {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    margin-bottom: 20px;
-    padding-bottom: 4px;
+.username{
+  color:var(--muted);
+  margin-top:4px;
 }
 
-.nav button {
-    white-space: nowrap;
-    padding: 10px 14px;
-    background: #12191d;
-    border: 1px solid #29373d;
-    color: #aeb9bd;
-    border-radius: 10px;
+.role{
+  display:inline-block;
+  margin-top:9px;
+  padding:5px 9px;
+  border-radius:8px;
+  background:rgba(0,255,204,.1);
+  border:1px solid rgba(0,255,204,.25);
+  color:var(--cyan);
+  font-size:12px;
+  font-weight:800;
 }
 
-.nav button.active {
-    color: #00100b;
-    background: #00ffcc;
-    border-color: #00ffcc;
-    font-weight: 800;
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:18px;
 }
 
-.card {
-    background: #11181d;
-    border: 1px solid #26343a;
-    border-radius: 17px;
-    padding: 20px;
-    margin-bottom: 15px;
+.stat{
+  background:var(--panel2);
+  border:1px solid var(--border);
+  padding:14px;
+  border-radius:13px;
 }
 
-.card h2 {
-    margin-bottom: 8px;
+.stat-title{
+  color:var(--muted);
+  font-size:12px;
 }
 
-.muted {
-    color: #849299;
+.stat-value{
+  font-size:20px;
+  font-weight:900;
+  margin-top:5px;
 }
 
-.profile-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+nav{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:5px;
+  margin-bottom:18px;
 }
 
-.stat {
-    background: #0c1216;
-    border: 1px solid #26343a;
-    padding: 16px;
-    border-radius: 13px;
+nav button{
+  white-space:nowrap;
+  background:var(--panel);
+  border:1px solid var(--border);
+  color:var(--muted);
+  padding:11px 15px;
+  border-radius:11px;
 }
 
-.stat-title {
-    color: #849299;
-    font-size: 13px;
+nav button.active{
+  color:#001511;
+  background:var(--cyan);
+  border-color:var(--cyan);
+  font-weight:900;
 }
 
-.stat-value {
-    color: #00ffcc;
-    font-size: 22px;
-    font-weight: 900;
-    margin-top: 5px;
+.section{display:none}
+.section.active{display:block}
+
+.panel h2{margin-bottom:14px}
+.muted{color:var(--muted)}
+
+.tasks-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:15px;
 }
 
-.admin {
-    border-color: #805e1b;
-    background: linear-gradient(135deg,#17150d,#11181d);
+.refresh-btn{
+  background:var(--panel2);
+  color:var(--cyan);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:9px 13px;
 }
 
-.admin-title {
-    color: #ffaa00;
-    font-weight: 900;
+.tasks-list{
+  display:grid;
+  gap:12px;
 }
 
-.danger {
-    background: #351519;
-    color: #ff7777;
-    border: 1px solid #633038;
-    border-radius: 10px;
-    padding: 10px 14px;
+.task-card{
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:17px;
 }
 
-.logout {
-    margin-top: 10px;
+.task-top{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:flex-start;
 }
 
-@media(max-width:650px) {
-    .profile-grid {
-        grid-template-columns: 1fr;
-    }
+.task-title{
+  font-size:18px;
+  font-weight:900;
+}
 
-    .header-inner {
-        flex-wrap: wrap;
-    }
+.task-price{
+  color:var(--green);
+  font-size:19px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.task-description{
+  color:#bac5c6;
+  margin-top:9px;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+
+.task-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:13px;
+}
+
+.task-tag{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:8px;
+  background:rgba(0,255,204,.07);
+  border:1px solid rgba(0,255,204,.16);
+  color:var(--muted);
+  font-size:12px;
+}
+
+.task-actions{
+  margin-top:14px;
+  display:flex;
+  gap:8px;
+}
+
+.task-btn{
+  border:0;
+  border-radius:10px;
+  padding:10px 14px;
+  font-weight:800;
+}
+
+.take-btn{
+  background:var(--cyan);
+  color:#001511;
+}
+
+.complete-btn{
+  background:var(--green);
+  color:#001511;
+}
+
+.danger-btn{
+  background:rgba(255,77,90,.1);
+  border:1px solid rgba(255,77,90,.3);
+  color:#ff7882;
+}
+
+.empty,.loading{
+  text-align:center;
+  padding:35px 15px;
+  color:var(--muted);
+}
+
+.location-box{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.location-item{
+  background:var(--panel2);
+  padding:15px;
+  border-radius:12px;
+  border:1px solid var(--border);
+}
+
+.location-label{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:5px;
+}
+
+.money-card{
+  background:
+    linear-gradient(135deg,rgba(57,229,140,.09),rgba(0,255,204,.05)),
+    var(--panel2);
+  border:1px solid rgba(57,229,140,.2);
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:15px;
+}
+
+.money-value{
+  font-size:32px;
+  color:var(--green);
+  font-weight:900;
+  margin:8px 0;
+}
+
+.money-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.money-btn{
+  border:1px solid var(--border);
+  background:var(--panel2);
+  color:white;
+  border-radius:12px;
+  padding:13px;
+  font-weight:800;
+}
+
+.money-btn:hover{
+  border-color:var(--cyan);
+}
+
+.request-card{
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:14px;
+  margin-top:10px;
+}
+
+.request-status{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:7px;
+  font-size:12px;
+  background:rgba(255,170,0,.1);
+  color:var(--orange);
+}
+
+.admin-panel{
+  border-color:rgba(255,170,0,.35);
+}
+
+.admin-title{
+  color:var(--orange);
+}
+
+#toast{
+  position:fixed;
+  left:50%;
+  bottom:25px;
+  transform:translateX(-50%) translateY(100px);
+  opacity:0;
+  pointer-events:none;
+  z-index:100;
+  background:#172123;
+  border:1px solid var(--border);
+  padding:13px 17px;
+  border-radius:12px;
+  transition:.25s;
+  box-shadow:0 15px 40px rgba(0,0,0,.4);
+}
+
+#toast.show{
+  transform:translateX(-50%) translateY(0);
+  opacity:1;
+}
+
+@media(max-width:700px){
+  .auth-box{padding:22px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .location-box{grid-template-columns:1fr}
+  .money-actions{grid-template-columns:1fr}
+  .header-inner{flex-wrap:wrap}
+  .balance{
+    order:3;
+    width:100%;
+  }
+  .task-top{flex-direction:column}
+  .task-actions{flex-direction:column}
+  .task-btn{width:100%}
 }
 </style>
 </head>
 
 <body>
 
-<!-- =========================
-     AUTH SCREEN
-========================= -->
+<!-- ================= AUTH ================= -->
 
-<section id="authScreen">
+<div id="authScreen" class="screen">
+  <div class="auth-box">
 
-    <div class="auth-box">
+    <div class="logo">🏫 SchoolNet</div>
+    <div class="subtitle">Школьная платформа заданий</div>
 
-        <div class="logo">🏫 SchoolNet 1.0</div>
-        <div class="subtitle">Школьная система заданий</div>
+    <div class="auth-tabs">
+      <button id="loginTab" class="auth-tab active">Вход</button>
+      <button id="registerTab" class="auth-tab">Регистрация</button>
+    </div>
 
-        <div class="tabs">
-            <button id="loginTab" class="tab-btn active">
-                Вход
-            </button>
+    <div id="authMessage"></div>
 
-            <button id="registerTab" class="tab-btn">
-                Регистрация
-            </button>
-        </div>
+    <form id="loginForm">
 
-        <div id="authMessage"></div>
+      <div class="field">
+        <label>Логин</label>
+        <input id="loginUsername"
+               type="text"
+               autocomplete="username"
+               required
+               placeholder="Введите логин">
+      </div>
 
-        <!-- LOGIN -->
+      <div class="field">
+        <label>Пароль</label>
+        <input id="loginPassword"
+               type="password"
+               autocomplete="current-password"
+               required
+               placeholder="Введите пароль">
+      </div>
 
-        <form id="loginForm">
+      <button class="main-btn" type="submit">
+        Войти
+      </button>
 
-            <div class="form-group">
-                <label>Логин</label>
-                <input
-                    id="loginUsername"
-                    type="text"
-                    autocomplete="username"
-                    required
-                >
-            </div>
+    </form>
 
-            <div class="form-group">
-                <label>Пароль</label>
-                <input
-                    id="loginPassword"
-                    type="password"
-                    autocomplete="current-password"
-                    required
-                >
-            </div>
+    <form id="registerForm" class="hidden">
 
-            <button class="primary-btn" type="submit">
-                Войти
-            </button>
+      <div class="field">
+        <label>Логин</label>
+        <input id="registerUsername"
+               type="text"
+               minlength="3"
+               required
+               placeholder="Минимум 3 символа">
+      </div>
 
-        </form>
+      <div class="field">
+        <label>Пароль</label>
+        <input id="registerPassword"
+               type="password"
+               minlength="6"
+               required
+               placeholder="Минимум 6 символов">
+      </div>
 
-        <!-- REGISTER -->
+      <div class="field">
+        <label>Никнейм</label>
+        <input id="registerNickname"
+               type="text"
+               required
+               placeholder="Твой никнейм">
+      </div>
 
-        <form id="registerForm" class="hidden">
+      <div class="field">
+        <label>Город</label>
+        <select id="registerCity" required>
+          <option value="Одинцово">Одинцово</option>
+        </select>
+      </div>
 
-            <div class="form-group">
-                <label>Логин</label>
-                <input
-                    id="registerUsername"
-                    type="text"
-                    minlength="3"
-                    required
-                >
-            </div>
+      <div class="field">
+        <label>Школа</label>
+        <select id="registerSchool" required>
+          <option value="Лицей №2">Лицей №2</option>
+        </select>
+      </div>
 
-            <div class="form-group">
-                <label>Пароль</label>
-                <input
-                    id="registerPassword"
-                    type="password"
-                    minlength="6"
-                    required
-                >
-            </div>
+      <button class="main-btn" type="submit">
+        Создать аккаунт
+      </button>
 
-            <div class="form-group">
-                <label>Никнейм</label>
-                <input
-                    id="registerNickname"
-                    type="text"
-                    required
-                >
-            </div>
+    </form>
 
-            <div class="form-group">
-                <label>Город</label>
+  </div>
+</div>
 
-                <select id="registerCity" required>
-                    <option value="Одинцово">Одинцово</option>
-                </select>
-            </div>
+<!-- ================= APP ================= -->
 
-            <div class="form-group">
-                <label>Школа</label>
+<div id="appScreen" class="screen hidden">
 
-                <select id="registerSchool" required>
-                    <option value="Лицей №2">Лицей №2</option>
-                </select>
-            </div>
+<header>
+  <div class="header-inner">
 
-            <button class="primary-btn" type="submit">
-                Создать аккаунт
-            </button>
+    <div class="brand">🏫 SchoolNet</div>
 
-        </form>
+    <div id="headerBalance" class="balance">
+      Баланс: 0 SNK
+    </div>
+
+    <button id="logoutBtn" class="logout-btn">
+      Выйти
+    </button>
+
+  </div>
+</header>
+
+<div class="banner">
+  <div class="banner-box">
+    <div>
+      <h2>Добро пожаловать в SchoolNet!</h2>
+      <p>Создавай задания или выполняй задания других пользователей.</p>
+    </div>
+  </div>
+</div>
+
+<main class="container">
+
+<div class="user-card">
+
+  <div class="nickname" id="profileNickname">—</div>
+  <div class="username" id="profileUsername">@—</div>
+  <div class="role" id="profileRole">👤 Пользователь</div>
+
+  <div class="stats">
+
+    <div class="stat">
+      <div class="stat-title">Баланс</div>
+      <div id="statBalance" class="stat-value">0 SNK</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-title">Выполнено</div>
+      <div id="statCompleted" class="stat-value">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-title">Рейтинг</div>
+      <div id="statRating" class="stat-value">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-title">Нарушения</div>
+      <div id="statViolations" class="stat-value">0</div>
+    </div>
+
+  </div>
+</div>
+
+<nav>
+
+  <button class="nav-btn active" data-section="feed">
+    📋 Заказы
+  </button>
+
+  <button class="nav-btn" data-section="orders">
+    📦 Мои заказы
+  </button>
+
+  <button class="nav-btn" data-section="create">
+    ➕ Создать
+  </button>
+
+  <button class="nav-btn" data-section="money">
+    💰 SNKoin
+  </button>
+
+  <button class="nav-btn" data-section="profile">
+    👤 Профиль
+  </button>
+
+  <button id="adminNav"
+          class="nav-btn hidden"
+          data-section="admin">
+    🛡️ Управление
+  </button>
+
+</nav>
+
+<!-- ================= FEED ================= -->
+
+<section id="section-feed" class="section active">
+
+  <div class="panel">
+
+    <div class="tasks-header">
+      <h2>📋 Доступные заказы</h2>
+
+      <button id="refreshTasksBtn"
+              class="refresh-btn">
+        🔄 Обновить
+      </button>
+    </div>
+
+    <div id="tasksList" class="tasks-list">
+      <div class="loading">Загрузка заказов...</div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ================= MY ORDERS ================= -->
+
+<section id="section-orders" class="section">
+
+  <div class="panel">
+
+    <div class="tasks-header">
+      <h2>📦 Мои заказы</h2>
+
+      <button id="refreshMyTasksBtn"
+              class="refresh-btn">
+        🔄 Обновить
+      </button>
+    </div>
+
+    <div id="myTasksList" class="tasks-list">
+      <div class="loading">Загрузка...</div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ================= CREATE ================= -->
+
+<section id="section-create" class="section">
+
+  <div class="panel">
+
+    <h2>➕ Создать заказ</h2>
+
+    <p class="muted" style="margin-bottom:18px">
+      Опиши задание, которое должен выполнить другой школьник.
+    </p>
+
+    <div class="field">
+      <label>Название</label>
+      <input id="newOrderTitle"
+             maxlength="120"
+             placeholder="Например: Купить тетрадь">
+    </div>
+
+    <div class="field">
+      <label>Описание</label>
+      <textarea id="newOrderDescription"
+                maxlength="2000"
+                placeholder="Подробно опиши, что нужно сделать">
+      </textarea>
+    </div>
+
+    <div class="field">
+      <label>Стоимость, SNKoin</label>
+      <input id="newOrderPrice"
+             type="number"
+             min="1"
+             max="100000"
+             step="1"
+             placeholder="100">
+    </div>
+
+    <div class="field">
+      <label>Категория</label>
+
+      <select id="newOrderCategory">
+        <option value="study">📚 Учёба</option>
+        <option value="shopping">🛒 Покупки</option>
+        <option value="help">🤝 Помощь</option>
+        <option value="games">🎮 Игры</option>
+        <option value="sport">⚽ Спорт</option>
+        <option value="other">📌 Другое</option>
+      </select>
+    </div>
+
+    <button id="createTaskBtn"
+            class="main-btn"
+            type="button">
+      Создать заказ
+    </button>
+
+  </div>
+
+</section>
+
+<!-- ================= MONEY ================= -->
+
+<section id="section-money" class="section">
+
+  <div class="panel">
+
+    <h2>💰 SNKoin</h2>
+
+    <div class="money-card">
+
+      <div class="muted">Текущий баланс</div>
+
+      <div id="moneyBalance"
+           class="money-value">
+        0 SNK
+      </div>
+
+      <div class="muted">
+        внутренняя валюта SchoolNet
+      </div>
 
     </div>
 
-</section>
+    <div class="money-actions">
 
+      <button class="money-btn"
+              onclick="showDepositForm()">
+        ⭐ Пополнить
+      </button>
 
-<!-- =========================
-     MAIN APP
-========================= -->
+      <button class="money-btn"
+              onclick="showWithdrawalForm()">
+        🎁 Вывести
+      </button>
 
-<section id="app" class="hidden">
+    </div>
 
-    <header class="header">
+  </div>
 
-        <div class="header-inner">
+  <div id="moneyFormPanel" class="panel hidden"></div>
 
-            <div class="header-logo">
-                🏫 SchoolNet
-            </div>
+  <div class="panel">
 
-            <div id="balanceBox" class="balance">
-                0 ₽
-            </div>
+    <h2>📜 Мои заявки</h2>
 
-        </div>
+    <div id="moneyRequests">
+      <div class="loading">
+        Загрузка...
+      </div>
+    </div>
 
-    </header>
-
-
-    <main class="container">
-
-        <div class="banner">
-
-            <h2>Добро пожаловать в SchoolNet</h2>
-
-            <p>
-                Выполняй задания, создавай заказы и получай деньги.
-            </p>
-
-        </div>
-
-
-        <nav class="nav">
-
-            <button class="nav-btn active" data-page="home">
-                🏠 Главная
-            </button>
-
-            <button class="nav-btn" data-page="orders">
-                📋 Заказы
-            </button>
-
-            <button class="nav-btn" data-page="create">
-                ➕ Создать
-            </button>
-
-            <button class="nav-btn" data-page="profile">
-                👤 Профиль
-            </button>
-
-            <button
-                id="adminNav"
-                class="nav-btn hidden"
-                data-page="admin"
-            >
-                🛡️ Панель Scratch
-            </button>
-
-            <button id="logoutBtn" class="danger">
-                Выйти
-            </button>
-
-        </nav>
-
-
-        <!-- HOME -->
-
-        <section id="page-home" class="page">
-
-            <div class="card">
-
-                <h2>
-                    👋 Привет, <span id="homeNickname"></span>
-                </h2>
-
-                <p class="muted">
-                    Здесь будут отображаться доступные задания.
-                </p>
-
-            </div>
-
-            <div class="profile-grid">
-
-                <div class="stat">
-                    <div class="stat-title">Баланс</div>
-                    <div id="homeBalance" class="stat-value">
-                        0 ₽
-                    </div>
-                </div>
-
-                <div class="stat">
-                    <div class="stat-title">Выполнено</div>
-                    <div id="homeCompleted" class="stat-value">
-                        0
-                    </div>
-                </div>
-
-                <div class="stat">
-                    <div class="stat-title">Рейтинг</div>
-                    <div id="homeRating" class="stat-value">
-                        0
-                    </div>
-                </div>
-
-                <div class="stat">
-                    <div class="stat-title">Нарушения</div>
-                    <div id="homeViolations" class="stat-value">
-                        0
-                    </div>
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ORDERS -->
-
-        <section id="page-orders" class="page hidden">
-
-            <div class="card">
-
-                <h2>📋 Заказы</h2>
-
-                <p class="muted">
-                    Система заказов будет подключена следующим этапом.
-                </p>
-
-            </div>
-
-        </section>
-
-
-        <!-- CREATE -->
-
-        <section id="page-create" class="page hidden">
-
-            <div class="card">
-
-                <h2>➕ Создать заказ</h2>
-
-                <p class="muted">
-                    Здесь появится форма создания задания.
-                </p>
-
-            </div>
-
-        </section>
-
-
-        <!-- PROFILE -->
-
-        <section id="page-profile" class="page hidden">
-
-            <div class="card">
-
-                <h2>👤 Профиль</h2>
-
-                <div class="profile-grid">
-
-                    <div class="stat">
-                        <div class="stat-title">Логин</div>
-                        <div id="profileUsername" class="stat-value">
-                            —
-                        </div>
-                    </div>
-
-                    <div class="stat">
-                        <div class="stat-title">Никнейм</div>
-                        <div id="profileNickname" class="stat-value">
-                            —
-                        </div>
-                    </div>
-
-                    <div class="stat">
-                        <div class="stat-title">Город</div>
-                        <div id="profileCity" class="stat-value">
-                            —
-                        </div>
-                    </div>
-
-                    <div class="stat">
-                        <div class="stat-title">Школа</div>
-                        <div id="profileSchool" class="stat-value">
-                            —
-                        </div>
-                    </div>
-
-                    <div class="stat">
-                        <div class="stat-title">Роль</div>
-                        <div id="profileRole" class="stat-value">
-                            —
-                        </div>
-                    </div>
-
-                    <div class="stat">
-                        <div class="stat-title">Баланс</div>
-                        <div id="profileBalance" class="stat-value">
-                            0 ₽
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- ADMIN -->
-
-        <section id="page-admin" class="page hidden">
-
-            <div class="card admin">
-
-                <div class="admin-title">
-                    🛡️ ПАНЕЛЬ SCRATCH
-                </div>
-
-                <h2>
-                    Superadmin
-                </h2>
-
-                <p class="muted">
-                    Эта панель доступна только аккаунту с ролью
-                    <b>superadmin</b>.
-                </p>
-
-            </div>
-
-
-            <div class="card">
-
-                <h2>⚙️ Управление</h2>
-
-                <p class="muted">
-                    Здесь следующим этапом подключим:
-                </p>
-
-                <br>
-
-                <p>• управление пользователями</p>
-                <p>• блокировку и разморозку</p>
-                <p>• выдачу и снятие нарушений</p>
-                <p>• управление ролями</p>
-                <p>• изменение баланса</p>
-                <p>• управление городами и школами</p>
-                <p>• модерацию заказов</p>
-                <p>• просмотр спорных чатов</p>
-                <p>• управление баннером</p>
-
-            </div>
-
-        </section>
-
-    </main>
+  </div>
 
 </section>
 
+<!-- ================= PROFILE ================= -->
+
+<section id="section-profile" class="section">
+
+  <div class="panel">
+
+    <h2>👤 Профиль</h2>
+
+    <div class="location-box">
+
+      <div class="location-item">
+        <div class="location-label">Логин</div>
+        <strong id="profileLogin">—</strong>
+      </div>
+
+      <div class="location-item">
+        <div class="location-label">Никнейм</div>
+        <strong id="profileNick">—</strong>
+      </div>
+
+      <div class="location-item">
+        <div class="location-label">Город</div>
+        <strong id="profileCity">—</strong>
+      </div>
+
+      <div class="location-item">
+        <div class="location-label">Школа</div>
+        <strong id="profileSchool">—</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ================= ADMIN ================= -->
+
+<section id="section-admin" class="section">
+
+  <div class="panel admin-panel">
+
+    <h2 class="admin-title">🛡️ Управление</h2>
+
+    <p class="muted">
+      Панель администратора SchoolNet.
+    </p>
+
+  </div>
+
+  <div id="superAdminPanel"
+       class="panel admin-panel hidden">
+
+    <h2 class="admin-title">👑 Superadmin</h2>
+
+    <p class="muted">
+      Расширенное управление SchoolNet.
+    </p>
+
+  </div>
+
+</section>
+
+</main>
+</div>
+
+<div id="toast"></div>
 
 <script>
+/* =====================================================
+   SUPABASE - ТВОИ КЛЮЧИ
+===================================================== */
 
-/* ============================================================
-   SUPABASE
-============================================================ */
-
-const SUPABASE_URL = "https://woc.dgbeffdyydvafbbwd.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_9zLs2SW7TKk7nE5nc2SlrQ_p338-6dB";
+const SUPABASE_URL = "https://wcicdqbetfdydvafbbwd.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_9zLs2SW7TKk7nE5nc2SIrQ_p338-6dB";
 
 const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
 );
 
-
-/* ============================================================
+/* =====================================================
    STATE
-============================================================ */
+===================================================== */
 
 let currentUser = null;
-let sessionToken = null;
+let sessionToken = localStorage.getItem("schoolnet_session");
 
-
-/* ============================================================
+/* =====================================================
    ELEMENTS
-============================================================ */
+===================================================== */
 
 const authScreen = document.getElementById("authScreen");
-const app = document.getElementById("app");
-
-const loginForm = document.getElementById("loginForm");
-const registerForm = document.getElementById("registerForm");
-
+const appScreen = document.getElementById("appScreen");
 const loginTab = document.getElementById("loginTab");
 const registerTab = document.getElementById("registerTab");
-
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
 const authMessage = document.getElementById("authMessage");
+const tasksList = document.getElementById("tasksList");
+const myTasksList = document.getElementById("myTasksList");
 
-const adminNav = document.getElementById("adminNav");
-const balanceBox = document.getElementById("balanceBox");
+/* =====================================================
+   HELPERS
+===================================================== */
 
-
-/* ============================================================
-   MESSAGE
-============================================================ */
-
-function showMessage(text, type = "error") {
-
-    authMessage.innerHTML = `
-        <div class="${type}">
-            ${escapeHtml(text)}
-        </div>
-    `;
+function escapeHTML(value) {
+  if (value === null || value === undefined) return "";
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
-
-/* ============================================================
-   ESCAPE HTML
-============================================================ */
-
-function escapeHtml(value) {
-
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+function escapeJS(value) {
+  return String(value || "")
+    .replaceAll("\\", "\\\\")
+    .replaceAll("'", "\\'");
 }
 
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2800);
+}
 
-/* ============================================================
+function showAuthMessage(message, type = "error") {
+  authMessage.innerHTML = `<div class="${type}">${escapeHTML(message)}</div>`;
+}
+
+function clearAuthMessage() {
+  authMessage.innerHTML = "";
+}
+
+function setLoading(button, loading, text) {
+  button.disabled = loading;
+  button.textContent = loading ? "Подождите..." : text;
+}
+
+function formatMoney(value) {
+  return Number(value || 0).toLocaleString("ru-RU", {
+    maximumFractionDigits: 2
+  }) + " SNK";
+}
+
+function getRoleName(role) {
+  switch (role) {
+    case "superadmin":
+      return "👑 Суперадмин";
+    case "admin":
+      return "🛡️ Администратор";
+    case "senior_moderator":
+      return "🔷 Старший модератор";
+    case "junior_moderator":
+      return "🔹 Младший модератор";
+    case "moderator":
+      return "🛡️ Модератор";
+    default:
+      return "👤 Пользователь";
+  }
+}
+
+/* =====================================================
    AUTH TABS
-============================================================ */
+===================================================== */
 
 loginTab.addEventListener("click", () => {
-
-    loginTab.classList.add("active");
-    registerTab.classList.remove("active");
-
-    loginForm.classList.remove("hidden");
-    registerForm.classList.add("hidden");
-
-    authMessage.innerHTML = "";
+  loginTab.classList.add("active");
+  registerTab.classList.remove("active");
+  loginForm.classList.remove("hidden");
+  registerForm.classList.add("hidden");
+  clearAuthMessage();
 });
-
 
 registerTab.addEventListener("click", () => {
-
-    registerTab.classList.add("active");
-    loginTab.classList.remove("active");
-
-    registerForm.classList.remove("hidden");
-    loginForm.classList.add("hidden");
-
-    authMessage.innerHTML = "";
+  registerTab.classList.add("active");
+  loginTab.classList.remove("active");
+  registerForm.classList.remove("hidden");
+  loginForm.classList.add("hidden");
+  clearAuthMessage();
 });
 
-
-/* ============================================================
-   REGISTER
-============================================================ */
-
-registerForm.addEventListener("submit", async (event) => {
-
-    event.preventDefault();
-
-    const username =
-        document.getElementById("registerUsername").value.trim();
-
-    const password =
-        document.getElementById("registerPassword").value;
-
-    const nickname =
-        document.getElementById("registerNickname").value.trim();
-
-    const city =
-        document.getElementById("registerCity").value;
-
-    const school =
-        document.getElementById("registerSchool").value;
-
-
-    if (username.length < 3) {
-        showMessage("Логин должен быть минимум 3 символа");
-        return;
-    }
-
-    if (password.length < 6) {
-        showMessage("Пароль должен быть минимум 6 символов");
-        return;
-    }
-
-    if (!nickname) {
-        showMessage("Введите никнейм");
-        return;
-    }
-
-
-    showMessage("Создаём аккаунт...", "success");
-
-
-    const { data, error } =
-        await supabaseClient.rpc("register_user", {
-
-            p_username: username,
-            p_password: password,
-            p_nickname: nickname,
-            p_city: city,
-            p_school: school
-
-        });
-
-
-    if (error) {
-
-        showMessage(
-            error.message || "Ошибка регистрации"
-        );
-
-        return;
-    }
-
-
-    showMessage(
-        "Аккаунт создан! Теперь войдите.",
-        "success"
-    );
-
-
-    registerForm.reset();
-
-    loginTab.click();
-
-    document.getElementById("loginUsername").value =
-        username;
-
-});
-
-
-/* ============================================================
+/* =====================================================
    LOGIN
-============================================================ */
+===================================================== */
 
-loginForm.addEventListener("submit", async (event) => {
+loginForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  clearAuthMessage();
 
-    event.preventDefault();
+  const username = document.getElementById("loginUsername").value.trim();
+  const password = document.getElementById("loginPassword").value;
+  const button = loginForm.querySelector("button");
 
+  setLoading(button, true, "Войти");
 
-    const username =
-        document.getElementById("loginUsername").value.trim();
+  try {
+    const { data, error } = await supabaseClient.rpc("login_user", {
+      p_username: username,
+      p_password: password
+    });
 
-    const password =
-        document.getElementById("loginPassword").value;
-
-
-    if (!username || !password) {
-
-        showMessage(
-            "Введите логин и пароль"
-        );
-
-        return;
-    }
-
-
-    showMessage(
-        "Проверяем данные...",
-        "success"
-    );
-
-
-    const { data, error } =
-        await supabaseClient.rpc("login_user", {
-
-            p_username: username,
-            p_password: password
-
-        });
-
-
-    if (error) {
-
-        showMessage(
-            error.message || "Ошибка входа"
-        );
-
-        return;
-    }
-
-
+    if (error) throw error;
     if (!data || !data.token || !data.user) {
-
-        showMessage(
-            "Сервер вернул неправильный ответ"
-        );
-
-        return;
+      throw new Error("Сервер вернул неправильный ответ.");
     }
-
 
     sessionToken = data.token;
+    localStorage.setItem("schoolnet_session", sessionToken);
     currentUser = data.user;
+    openApp();
+    showToast("Вы успешно вошли.");
 
-
-    localStorage.setItem(
-        "schoolnet_session",
-        sessionToken
-    );
-
-
-    showApp();
-
+  } catch (error) {
+    console.error(error);
+    showAuthMessage(error.message || "Не удалось выполнить вход.");
+  } finally {
+    setLoading(button, false, "Войти");
+  }
 });
 
+/* =====================================================
+   REGISTER
+===================================================== */
 
-/* ============================================================
-   CHECK SESSION
-============================================================ */
+registerForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  clearAuthMessage();
 
-async function restoreSession() {
+  const username = document.getElementById("registerUsername").value.trim();
+  const password = document.getElementById("registerPassword").value;
+  const nickname = document.getElementById("registerNickname").value.trim();
+  const city = document.getElementById("registerCity").value;
+  const school = document.getElementById("registerSchool").value;
+  const button = registerForm.querySelector("button");
 
-    const savedToken =
-        localStorage.getItem("schoolnet_session");
+  if (username.length < 3) {
+    showAuthMessage("Логин должен быть минимум 3 символа.");
+    return;
+  }
+  if (password.length < 6) {
+    showAuthMessage("Пароль должен быть минимум 6 символов.");
+    return;
+  }
+  if (!nickname) {
+    showAuthMessage("Введите никнейм.");
+    return;
+  }
 
+  setLoading(button, true, "Создать аккаунт");
 
-    if (!savedToken) {
-        return;
-    }
+  try {
+    const { data, error } = await supabaseClient.rpc("register_user", {
+      p_username: username,
+      p_password: password,
+      p_nickname: nickname,
+      p_city: city,
+      p_school: school
+    });
 
+    if (error) throw error;
+    if (!data) throw new Error("Аккаунт не был создан.");
 
-    const { data, error } =
-        await supabaseClient.rpc(
-            "check_session",
-            {
-                p_token: savedToken
-            }
-        );
+    registerForm.reset();
+    loginTab.click();
+    document.getElementById("loginUsername").value = username;
+    showAuthMessage("Аккаунт создан. Теперь войдите.", "success");
 
+  } catch (error) {
+    console.error(error);
+    showAuthMessage(error.message || "Не удалось создать аккаунт.");
+  } finally {
+    setLoading(button, false, "Создать аккаунт");
+  }
+});
 
-    if (error || !data || !data.user) {
+/* =====================================================
+   SESSION
+===================================================== */
 
-        localStorage.removeItem(
-            "schoolnet_session"
-        );
+async function checkSession() {
+  if (!sessionToken) {
+    showAuth();
+    return;
+  }
 
-        return;
-    }
+  try {
+    const { data, error } = await supabaseClient.rpc("check_session", {
+      p_token: sessionToken
+    });
 
+    if (error) throw error;
+    if (!data || !data.user) throw new Error("Сессия недействительна.");
 
-    sessionToken = savedToken;
     currentUser = data.user;
+    openApp();
 
-    showApp();
+  } catch (error) {
+    console.warn("Session error:", error);
+    localStorage.removeItem("schoolnet_session");
+    sessionToken = null;
+    currentUser = null;
+    showAuth();
+  }
 }
 
+/* =====================================================
+   OPEN APP
+===================================================== */
 
-/* ============================================================
-   SHOW APP
-============================================================ */
-
-function showApp() {
-
-    authScreen.classList.add("hidden");
-    app.classList.remove("hidden");
-
-    updateInterface();
-
-    showPage("home");
+function openApp() {
+  authScreen.classList.add("hidden");
+  appScreen.classList.remove("hidden");
+  renderUser();
+  loadTasks();
+  loadMyTasks();
+  loadMoneyRequests();
 }
 
+function showAuth() {
+  appScreen.classList.add("hidden");
+  authScreen.classList.remove("hidden");
+}
 
-/* ============================================================
-   UPDATE INTERFACE
-============================================================ */
+/* =====================================================
+   USER
+===================================================== */
 
-function updateInterface() {
+function renderUser() {
+  if (!currentUser) return;
 
-    if (!currentUser) return;
+  const nickname = currentUser.nickname || "Пользователь";
+  const username = currentUser.username || "";
+  const role = currentUser.role || "user";
+  const balance = Number(currentUser.balance || 0);
 
+  document.getElementById("profileNickname").textContent = nickname;
+  document.getElementById("profileUsername").textContent = "@" + username;
+  document.getElementById("profileRole").textContent = getRoleName(role);
+  document.getElementById("headerBalance").textContent = "Баланс: " + formatMoney(balance);
+  document.getElementById("statBalance").textContent = formatMoney(balance);
+  document.getElementById("moneyBalance").textContent = formatMoney(balance);
+  document.getElementById("statCompleted").textContent = currentUser.completed || 0;
+  document.getElementById("statRating").textContent = currentUser.rating || 0;
+  document.getElementById("statViolations").textContent = currentUser.violations || 0;
+  document.getElementById("profileLogin").textContent = username;
+  document.getElementById("profileNick").textContent = nickname;
+  document.getElementById("profileCity").textContent = currentUser.city || "—";
+  document.getElementById("profileSchool").textContent = currentUser.school || "—";
 
-    const balance =
-        Number(currentUser.balance || 0);
+  const isAdmin = currentUser.is_admin === true || role === "admin" || role === "superadmin";
+  if (isAdmin) {
+    document.getElementById("adminNav").classList.remove("hidden");
+  } else {
+    document.getElementById("adminNav").classList.add("hidden");
+  }
 
+  const isScratch = username.toLowerCase() === "scratch" && (role === "superadmin" || currentUser.is_admin === true);
+  if (isScratch) {
+    document.getElementById("superAdminPanel").classList.remove("hidden");
+  } else {
+    document.getElementById("superAdminPanel").classList.add("hidden");
+  }
+}
 
-    balanceBox.textContent =
-        `${balance.toFixed(2)} ₽`;
+/* =====================================================
+   TASKS
+===================================================== */
 
+async function loadTasks() {
+  if (!sessionToken) return;
+  tasksList.innerHTML = `<div class="loading">Загрузка заказов...</div>`;
 
-    document.getElementById("homeNickname")
-        .textContent =
-        currentUser.nickname || currentUser.username;
+  try {
+    const { data, error } = await supabaseClient.rpc("get_tasks", {
+      p_token: sessionToken
+    });
+    if (error) throw error;
+    renderTasks(Array.isArray(data) ? data : [], tasksList, "feed");
+  } catch (error) {
+    console.error(error);
+    tasksList.innerHTML = `
+      <div class="empty">
+        Не удалось загрузить заказы.<br>
+        <small>${escapeHTML(error.message || "")}</small>
+      </div>
+    `;
+  }
+}
 
+async function loadMyTasks() {
+  if (!sessionToken) return;
+  myTasksList.innerHTML = `<div class="loading">Загрузка заказов...</div>`;
 
-    document.getElementById("homeBalance")
-        .textContent =
-        `${balance.toFixed(2)} ₽`;
+  try {
+    const { data, error } = await supabaseClient.rpc("get_my_tasks", {
+      p_token: sessionToken
+    });
+    if (error) throw error;
+    renderTasks(Array.isArray(data) ? data : [], myTasksList, "mine");
+  } catch (error) {
+    console.error(error);
+    myTasksList.innerHTML = `
+      <div class="empty">
+        Не удалось загрузить заказы.<br>
+        <small>${escapeHTML(error.message || "")}</small>
+      </div>
+    `;
+  }
+}
 
+function renderTasks(tasks, container, mode) {
+  if (!tasks.length) {
+    container.innerHTML = `
+      <div class="empty">
+        ${mode === "feed" ? "📭 Сейчас нет доступных заказов." : "📦 У тебя пока нет заказов."}
+      </div>
+    `;
+    return;
+  }
 
-    document.getElementById("homeCompleted")
-        .textContent =
-        currentUser.completed ?? 0;
+  container.innerHTML = tasks.map(task => {
+    const status = task.status || "open";
+    const ownerId = task.owner_id;
+    const assignedTo = task.assigned_to;
+    const currentId = currentUser?.id || currentUser?.user_id || currentUser?.auth_user_id;
 
+    let action = "";
 
-    document.getElementById("homeRating")
-        .textContent =
-        currentUser.rating ?? 0;
-
-
-    document.getElementById("homeViolations")
-        .textContent =
-        currentUser.violations ?? 0;
-
-
-    document.getElementById("profileUsername")
-        .textContent =
-        currentUser.username || "—";
-
-
-    document.getElementById("profileNickname")
-        .textContent =
-        currentUser.nickname || "—";
-
-
-    document.getElementById("profileCity")
-        .textContent =
-        currentUser.city || "—";
-
-
-    document.getElementById("profileSchool")
-        .textContent =
-        currentUser.school || "—";
-
-
-    document.getElementById("profileRole")
-        .textContent =
-        currentUser.role || "user";
-
-
-    document.getElementById("profileBalance")
-        .textContent =
-        `${balance.toFixed(2)} ₽`;
-
-
-    /*
-       ВАЖНО:
-       Только superadmin получает панель Scratch.
-    */
-
-    if (currentUser.role === "superadmin") {
-
-        adminNav.classList.remove("hidden");
-
-    } else {
-
-        adminNav.classList.add("hidden");
-
+    if (mode === "feed" && status === "open" && ownerId !== currentId) {
+      action = `
+        <button class="task-btn take-btn" onclick="takeTask('${escapeJS(task.id)}')">
+          ✋ Взять заказ
+        </button>
+      `;
     }
+
+    if (mode === "mine" && assignedTo === currentId && status === "taken") {
+      action = `
+        <button class="task-btn complete-btn" onclick="completeTask('${escapeJS(task.id)}')">
+          ✅ Завершить
+        </button>
+      `;
+    }
+
+    return `
+      <div class="task-card">
+        <div class="task-top">
+          <div class="task-title">${escapeHTML(task.title)}</div>
+          <div class="task-price">${formatMoney(task.price)}</div>
+        </div>
+        <div class="task-description">${escapeHTML(task.description || "Описание отсутствует.")}</div>
+        <div class="task-meta">
+          <span class="task-tag">📂 ${escapeHTML(task.category || "other")}</span>
+          <span class="task-tag">📌 ${escapeHTML(getStatusName(status))}</span>
+        </div>
+        ${action ? `<div class="task-actions">${action}</div>` : ""}
+      </div>
+    `;
+  }).join("");
 }
 
+function getStatusName(status) {
+  switch (status) {
+    case "open":
+      return "Доступен";
+    case "taken":
+      return "Выполняется";
+    case "done":
+      return "Завершён";
+    case "cancelled":
+      return "Отменён";
+    default:
+      return status;
+  }
+}
 
-/* ============================================================
+/* =====================================================
+   CREATE TASK
+===================================================== */
+
+document.getElementById("createTaskBtn").addEventListener("click", async () => {
+  const title = document.getElementById("newOrderTitle").value.trim();
+  const description = document.getElementById("newOrderDescription").value.trim();
+  const price = Number(document.getElementById("newOrderPrice").value);
+  const category = document.getElementById("newOrderCategory").value;
+  const button = document.getElementById("createTaskBtn");
+
+  if (!title) {
+    showToast("Введите название заказа.");
+    return;
+  }
+  if (!description) {
+    showToast("Введите описание заказа.");
+    return;
+  }
+  if (!Number.isFinite(price) || price <= 0) {
+    showToast("Введите нормальную стоимость.");
+    return;
+  }
+
+  setLoading(button, true, "Создать заказ");
+
+  try {
+    const { data, error } = await supabaseClient.rpc("create_task", {
+      p_token: sessionToken,
+      p_title: title,
+      p_description: description,
+      p_price: price,
+      p_category: category
+    });
+
+    if (error) throw error;
+    if (!data) throw new Error("Заказ не был создан.");
+
+    document.getElementById("newOrderTitle").value = "";
+    document.getElementById("newOrderDescription").value = "";
+    document.getElementById("newOrderPrice").value = "";
+    showToast("Заказ создан.");
+
+    await loadTasks();
+    await loadMyTasks();
+    document.querySelector('[data-section="orders"]').click();
+
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Не удалось создать заказ.");
+  } finally {
+    setLoading(button, false, "Создать заказ");
+  }
+});
+
+/* =====================================================
+   TAKE TASK
+===================================================== */
+
+async function takeTask(taskId) {
+  if (!sessionToken) return;
+
+  try {
+    const { data, error } = await supabaseClient.rpc("take_task", {
+      p_token: sessionToken,
+      p_task_id: taskId
+    });
+
+    if (error) throw error;
+    if (!data) throw new Error("Не удалось взять заказ.");
+
+    showToast("Заказ взят.");
+    await loadTasks();
+    await loadMyTasks();
+
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Не удалось взять заказ.");
+  }
+}
+
+/* =====================================================
+   COMPLETE TASK
+===================================================== */
+
+async function completeTask(taskId) {
+  if (!sessionToken) return;
+  if (!confirm("Ты точно выполнил этот заказ?")) return;
+
+  try {
+    const { data, error } = await supabaseClient.rpc("complete_task", {
+      p_token: sessionToken,
+      p_task_id: taskId
+    });
+
+    if (error) throw error;
+    if (!data) throw new Error("Не удалось завершить заказ.");
+
+    showToast("Заказ завершён.");
+    await loadTasks();
+    await loadMyTasks();
+    await checkSession();
+
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Не удалось завершить заказ.");
+  }
+}
+
+/* =====================================================
+   MONEY FORMS
+===================================================== */
+
+function showDepositForm() {
+  const panel = document.getElementById("moneyFormPanel");
+  panel.classList.remove("hidden");
+  panel.innerHTML = `
+    <h2>⭐ Пополнение SNKoin</h2>
+    <p class="muted" style="margin-bottom:15px">Укажи количество Telegram Stars.</p>
+    <div class="field">
+      <label>Stars</label>
+      <input id="depositStars" type="number" min="1" step="1" placeholder="100">
+    </div>
+    <div class="field">
+      <label>Telegram username</label>
+      <input id="depositTelegram" type="text" placeholder="@username">
+    </div>
+    <button class="main-btn" onclick="createDepositRequest()">Отправить заявку</button>
+  `;
+}
+
+function showWithdrawalForm() {
+  const panel = document.getElementById("moneyFormPanel");
+  panel.classList.remove("hidden");
+  panel.innerHTML = `
+    <h2>🎁 Вывод SNKoin</h2>
+    <p class="muted" style="margin-bottom:15px">Выбери подарок для вывода.</p>
+    <div class="field">
+      <label>Подарок</label>
+      <select id="withdrawGift">
+        <option value="bear">🧸 Мишка</option>
+        <option value="gift">🎁 Подарок</option>
+        <option value="cake">🎂 Тортик</option>
+        <option value="rocket">🚀 Ракета</option>
+        <option value="cup">🏆 Кубок</option>
+        <option value="ring">💍 Кольцо</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Количество SNKoin</label>
+      <input id="withdrawAmount" type="number" min="1" step="1" placeholder="100">
+    </div>
+    <div class="field">
+      <label>Telegram username</label>
+      <input id="withdrawTelegram" type="text" placeholder="@username">
+    </div>
+    <button class="main-btn" onclick="createWithdrawalRequest()">Отправить заявку</button>
+  `;
+}
+
+/* =====================================================
+   DEPOSIT REQUEST
+===================================================== */
+
+async function createDepositRequest() {
+  const stars = Number(document.getElementById("depositStars").value);
+  const telegram = document.getElementById("depositTelegram").value.trim();
+
+  if (!stars || stars <= 0) {
+    showToast("Укажи количество Stars.");
+    return;
+  }
+
+  try {
+    const userId = currentUser?.id || currentUser?.user_id || currentUser?.auth_user_id;
+    const snkoin = stars;
+
+    const { error } = await supabaseClient.from("deposit_requests").insert({
+      user_id: String(userId),
+      telegram_username: telegram || null,
+      stars_amount: stars,
+      snkoin_amount: snkoin,
+      status: "pending"
+    });
+
+    if (error) throw error;
+
+    showToast("Заявка на пополнение отправлена.");
+    document.getElementById("moneyFormPanel").classList.add("hidden");
+    loadMoneyRequests();
+
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Не удалось создать заявку.");
+  }
+}
+
+/* =====================================================
+   WITHDRAW REQUEST
+===================================================== */
+
+async function createWithdrawalRequest() {
+  const gift = document.getElementById("withdrawGift").value;
+  const amount = Number(document.getElementById("withdrawAmount").value);
+  const telegram = document.getElementById("withdrawTelegram").value.trim();
+
+  if (!amount || amount <= 0) {
+    showToast("Укажи количество SNKoin.");
+    return;
+  }
+
+  const balance = Number(currentUser?.balance || 0);
+  if (amount > balance) {
+    showToast("Недостаточно SNKoin.");
+    return;
+  }
+
+  try {
+    const userId = currentUser?.id || currentUser?.user_id || currentUser?.auth_user_id;
+
+    const { error } = await supabaseClient.from("withdrawal_requests").insert({
+      user_id: String(userId),
+      telegram_username: telegram || null,
+      gift_type: gift,
+      amount_snkoin: amount,
+      status: "pending"
+    });
+
+    if (error) throw error;
+
+    showToast("Заявка на вывод отправлена.");
+    document.getElementById("moneyFormPanel").classList.add("hidden");
+    loadMoneyRequests();
+
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Не удалось создать заявку.");
+  }
+}
+
+/* =====================================================
+   MONEY REQUESTS
+===================================================== */
+
+async function loadMoneyRequests() {
+  const box = document.getElementById("moneyRequests");
+  if (!currentUser) return;
+  box.innerHTML = `<div class="loading">Загрузка...</div>`;
+
+  try {
+    const userId = currentUser?.id || currentUser?.user_id || currentUser?.auth_user_id;
+
+    const [deposits, withdrawals] = await Promise.all([
+      supabaseClient.from("deposit_requests").select("*").eq("user_id", String(userId)).order("created_at", { ascending: false }),
+      supabaseClient.from("withdrawal_requests").select("*").eq("user_id", String(userId)).order("created_at", { ascending: false })
+    ]);
+
+    if (deposits.error) throw deposits.error;
+    if (withdrawals.error) throw withdrawals.error;
+
+    const all = [];
+
+    (deposits.data || []).forEach(item => {
+      all.push({
+        kind: "deposit",
+        date: item.created_at,
+        status: item.status,
+        text: `⭐ Пополнение: ${item.stars_amount} Stars → ${item.snkoin_amount} SNK`
+      });
+    });
+
+    (withdrawals.data || []).forEach(item => {
+      all.push({
+        kind: "withdraw",
+        date: item.created_at,
+        status: item.status,
+        text: `🎁 Вывод: ${item.amount_snkoin} SNK → ${escapeHTML(item.gift_type)}`
+      });
+    });
+
+    all.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    if (!all.length) {
+      box.innerHTML = `<div class="empty">Заявок пока нет.</div>`;
+      return;
+    }
+
+    box.innerHTML = all.map(item => `
+      <div class="request-card">
+        <div>${item.text}</div>
+        <div style="margin-top:8px">
+          <span class="request-status">${escapeHTML(item.status || "pending")}</span>
+        </div>
+        <div class="muted" style="margin-top:7px;font-size:12px">
+          ${new Date(item.date).toLocaleString("ru-RU")}
+        </div>
+      </div>
+    `).join("");
+
+  } catch (error) {
+    console.error(error);
+    box.innerHTML = `
+      <div class="empty">
+        Не удалось загрузить заявки.<br>
+        <small>${escapeHTML(error.message || "")}</small>
+      </div>
+    `;
+  }
+}
+
+/* =====================================================
    NAVIGATION
-============================================================ */
+===================================================== */
 
-document.querySelectorAll(".nav-btn")
-    .forEach(button => {
+document.querySelectorAll(".nav-btn").forEach(button => {
+  button.addEventListener("click", async () => {
+    const section = button.dataset.section;
 
-        button.addEventListener("click", () => {
+    document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
 
-            const page =
-                button.dataset.page;
+    document.querySelectorAll(".section").forEach(el => el.classList.remove("active"));
 
-            if (!page) return;
+    const target = document.getElementById("section-" + section);
+    if (target) target.classList.add("active");
 
-            showPage(page);
+    if (section === "feed") await loadTasks();
+    if (section === "orders") await loadMyTasks();
+    if (section === "money") await loadMoneyRequests();
+  });
+});
 
-        });
+/* =====================================================
+   REFRESH
+===================================================== */
 
-    });
+document.getElementById("refreshTasksBtn").addEventListener("click", loadTasks);
+document.getElementById("refreshMyTasksBtn").addEventListener("click", loadMyTasks);
 
-
-function showPage(pageName) {
-
-    document.querySelectorAll(".page")
-        .forEach(page => {
-
-            page.classList.add("hidden");
-
-        });
-
-
-    const page =
-        document.getElementById(
-            `page-${pageName}`
-        );
-
-
-    if (!page) return;
-
-
-    /*
-       Дополнительная защита панели.
-    */
-
-    if (
-        pageName === "admin" &&
-        currentUser?.role !== "superadmin"
-    ) {
-
-        return;
-
-    }
-
-
-    page.classList.remove("hidden");
-
-
-    document.querySelectorAll(".nav-btn")
-        .forEach(button => {
-
-            button.classList.remove("active");
-
-        });
-
-
-    const activeButton =
-        document.querySelector(
-            `.nav-btn[data-page="${pageName}"]`
-        );
-
-
-    if (activeButton) {
-
-        activeButton.classList.add("active");
-
-    }
-}
-
-
-/* ============================================================
+/* =====================================================
    LOGOUT
-============================================================ */
+===================================================== */
 
-document.getElementById("logoutBtn")
-    .addEventListener("click", async () => {
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+  if (sessionToken) {
+    try {
+      await supabaseClient.rpc("logout_user", { p_token: sessionToken });
+    } catch (error) {
+      console.warn(error);
+    }
+  }
 
-        if (sessionToken) {
+  localStorage.removeItem("schoolnet_session");
+  sessionToken = null;
+  currentUser = null;
+  showAuth();
+  loginForm.reset();
+  showToast("Вы вышли из аккаунта.");
+});
 
-            await supabaseClient.rpc(
-                "logout_user",
-                {
-                    p_token: sessionToken
-                }
-            );
-
-        }
-
-
-        localStorage.removeItem(
-            "schoolnet_session"
-        );
-
-
-        sessionToken = null;
-        currentUser = null;
-
-
-        app.classList.add("hidden");
-        authScreen.classList.remove("hidden");
-
-
-        loginForm.reset();
-        registerForm.reset();
-
-        loginTab.click();
-
-    });
-
-
-/* ============================================================
+/* =====================================================
    START
-============================================================ */
+===================================================== */
 
-restoreSession();
-
+checkSession();
 </script>
 
 </body>
