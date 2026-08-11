@@ -467,6 +467,52 @@ document.getElementById("createTaskBtn").addEventListener("click", async () => {
   }
 });
 
+
+document.getElementById("createPostBtn").addEventListener("click", async () => {
+  const title = document.getElementById("newOrderTitle").value.trim();
+  const description = document.getElementById("newOrderDescription").value.trim();
+  const price = Number(document.getElementById("newOrderPrice").value);
+  const category = document.getElementById("newOrderCategory").value;
+  const button = document.getElementById("createTaskBtn");
+
+  if (!title) {
+    showToast("Введите название поста.");
+    return;
+  }
+  if (!description) {
+    showToast("Введите описание поста.");
+    return;
+  }
+
+  setLoading(button, true, "Создать заказ");
+
+  try {
+    const { data, error } = await supabaseClient.rpc("create_task", {
+      p_token: sessionToken,
+      p_title: title,
+      p_description: description,
+      p_category: category
+    });
+
+    if (error) throw error;
+    if (!data) throw new Error("Заказ не был создан.");
+
+    document.getElementById("newOrderTitle").value = "";
+    document.getElementById("newOrderDescription").value = "";
+    showToast("Пост создан.");
+
+    await loadTasks();
+    await loadMyTasks();
+    document.querySelector('[data-section="orders"]').click();
+
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Не удалось создать пост.");
+  } finally {
+    setLoading(button, false, "Создать пост");
+  }
+});
+
 /* =====================================================
    TAKE TASK
 ===================================================== */
