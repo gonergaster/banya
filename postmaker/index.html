@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>SchoolNet 67</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#070b0d;
+  --panel:#101719;
+  --panel2:#151e20;
+  --border:#263336;
+  --text:#f2f7f7;
+  --muted:#8b9b9d;
+  --cyan:#00ffcc;
+  --green:#39e58c;
+  --orange:#ffaa00;
+  --red:#ff4d5a;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:
+    radial-gradient(circle at top,rgba(0,255,204,.08),transparent 35%),
+    var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.screen{min-height:100vh}
+
+#authScreen{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+.auth-box{
+  width:100%;
+  max-width:460px;
+  background:rgba(16,23,25,.97);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:30px;
+  box-shadow:0 20px 80px rgba(0,0,0,.45);
+}
+
+.logo{
+  text-align:center;
+  font-size:34px;
+  font-weight:900;
+  color:var(--cyan);
+  margin-bottom:8px;
+}
+
+.subtitle{
+  text-align:center;
+  color:var(--muted);
+  margin-bottom:25px;
+}
+
+.auth-tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:20px;
+}
+
+.auth-tab{
+  background:var(--panel2);
+  color:var(--muted);
+  border:1px solid var(--border);
+  padding:12px;
+  border-radius:12px;
+}
+
+.auth-tab.active{
+  color:#001a16;
+  background:var(--cyan);
+  border-color:var(--cyan);
+  font-weight:800;
+}
+
+.field{margin-bottom:15px}
+
+.field label{
+  display:block;
+  color:#b9c6c7;
+  margin-bottom:7px;
+  font-size:14px;
+}
+
+.field input,
+.field select,
+.field textarea{
+  width:100%;
+  padding:13px 14px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  outline:none;
+  background:#0b1113;
+  color:white;
+}
+
+.field textarea{
+  resize:vertical;
+  min-height:120px;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+  border-color:var(--cyan);
+}
+
+.main-btn{
+  width:100%;
+  padding:14px;
+  border:0;
+  border-radius:13px;
+  background:var(--cyan);
+  color:#001511;
+  font-weight:900;
+  margin-top:5px;
+}
+
+.main-btn:disabled{
+  opacity:.6;
+  cursor:wait;
+}
+
+.error,.success{
+  padding:11px;
+  border-radius:10px;
+  margin-bottom:15px;
+  font-size:14px;
+}
+
+.error{
+  color:#ff7882;
+  background:rgba(255,77,90,.1);
+  border:1px solid rgba(255,77,90,.3);
+}
+
+.success{
+  color:var(--green);
+  background:rgba(57,229,140,.08);
+  border:1px solid rgba(57,229,140,.25);
+}
+
+header{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:rgba(7,11,13,.94);
+  backdrop-filter:blur(15px);
+  border-bottom:1px solid var(--border);
+}
+
+.header-inner{
+  max-width:1250px;
+  margin:auto;
+  padding:14px 18px;
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.brand{
+  color:var(--cyan);
+  font-weight:900;
+  font-size:21px;
+}
+
+.balance{
+  color:var(--green);
+  font-weight:900;
+  margin-left:auto;
+}
+
+.logout-btn{
+  background:transparent;
+  color:var(--muted);
+  border:1px solid var(--border);
+  padding:8px 12px;
+  border-radius:10px;
+}
+
+.banner{
+  max-width:1250px;
+  margin:18px auto 0;
+  padding:0 18px;
+}
+
+.banner-box{
+  min-height:100px;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:
+    linear-gradient(135deg,rgba(0,255,204,.08),rgba(255,170,0,.04)),
+    var(--panel);
+  display:flex;
+  align-items:center;
+  padding:22px;
+}
+
+.banner-box h2{
+  color:var(--cyan);
+  margin-bottom:6px;
+}
+
+.banner-box p{color:var(--muted)}
+
+.container{
+  max-width:1250px;
+  margin:auto;
+  padding:18px;
+}
+
+.user-card,
+.panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:18px;
+}
+
+.nickname{
+  font-size:24px;
+  font-weight:900;
+}
+
+.username{
+  color:var(--muted);
+  margin-top:4px;
+}
+
+.role{
+  display:inline-block;
+  margin-top:9px;
+  padding:5px 9px;
+  border-radius:8px;
+  background:rgba(0,255,204,.1);
+  border:1px solid rgba(0,255,204,.25);
+  color:var(--cyan);
+  font-size:12px;
+  font-weight:800;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:18px;
+}
+
+.stat{
+  background:var(--panel2);
+  border:1px solid var(--border);
+  padding:14px;
+  border-radius:13px;
+}
+
+.stat-title{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.stat-value{
+  font-size:20px;
+  font-weight:900;
+  margin-top:5px;
+}
+
+nav{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding-bottom:5px;
+  margin-bottom:18px;
+}
+
+nav button{
+  white-space:nowrap;
+  background:var(--panel);
+  border:1px solid var(--border);
+  color:var(--muted);
+  padding:11px 15px;
+  border-radius:11px;
+}
+
+nav button.active{
+  color:#001511;
+  background:var(--cyan);
+  border-color:var(--cyan);
+  font-weight:900;
+}
+
+.section{display:none}
+.section.active{display:block}
+
+.panel h2{margin-bottom:14px}
+.muted{color:var(--muted)}
+
+.tasks-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.refresh-btn{
+  background:var(--panel2);
+  color:var(--cyan);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:9px 13px;
+}
+
+.tasks-list{
+  display:grid;
+  gap:12px;
+}
+
+.task-card{
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:17px;
+}
+
+.task-top{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  align-items:flex-start;
+}
+
+.task-title{
+  font-size:18px;
+  font-weight:900;
+}
+
+.task-price{
+  color:var(--green);
+  font-size:19px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
+.task-description{
+  color:#bac5c6;
+  margin-top:9px;
+  line-height:1.5;
+  white-space:pre-wrap;
+}
+
+.task-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:13px;
+}
+
+.task-tag{
+  display:inline-block;
+  padding:5px 8px;
+  border-radius:8px;
+  background:rgba(0,255,204,.07);
+  border:1px solid rgba(0,255,204,.16);
+  color:var(--muted);
+  font-size:12px;
+}
+
+.task-actions{
+  margin-top:14px;
+  display:flex;
+  gap:8px;
+}
+
+.task-btn{
+  border:0;
+  border-radius:10px;
+  padding:10px 14px;
+  font-weight:800;
+}
+
+.take-btn{
+  background:var(--cyan);
+  color:#001511;
+}
+
+.complete-btn{
+  background:var(--green);
+  color:#001511;
+}
+
+.danger-btn{
+  background:rgba(255,77,90,.1);
+  border:1px solid rgba(255,77,90,.3);
+  color:#ff7882;
+}
+
+.empty,.loading{
+  text-align:center;
+  padding:35px 15px;
+  color:var(--muted);
+}
+
+.location-box{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.location-item{
+  background:var(--panel2);
+  padding:15px;
+  border-radius:12px;
+  border:1px solid var(--border);
+}
+
+.location-label{
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:5px;
+}
+
+.money-card{
+  background:
+    linear-gradient(135deg,rgba(57,229,140,.09),rgba(0,255,204,.05)),
+    var(--panel2);
+  border:1px solid rgba(57,229,140,.2);
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:15px;
+}
+
+.money-value{
+  font-size:32px;
+  color:var(--green);
+  font-weight:900;
+  margin:8px 0;
+}
+
+.money-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.money-btn{
+  border:1px solid var(--border);
+  background:var(--panel2);
+  color:white;
+  border-radius:12px;
+  padding:13px;
+  font-weight:800;
+}
+
+.money-btn:hover{
+  border-color:var(--cyan);
+}
+
+.request-card{
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:14px;
+  margin-top:10px;
+}
+
+.request-status{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:7px;
+  font-size:12px;
+  background:rgba(255,170,0,.1);
+  color:var(--orange);
+}
+
+.admin-panel{
+  border-color:rgba(255,170,0,.35);
+}
+
+.admin-title{
+  color:var(--orange);
+}
+
+#toast{
+  position:fixed;
+  left:50%;
+  bottom:25px;
+  transform:translateX(-50%) translateY(100px);
+  opacity:0;
+  pointer-events:none;
+  z-index:100;
+  background:#172123;
+  border:1px solid var(--border);
+  padding:13px 17px;
+  border-radius:12px;
+  transition:.25s;
+  box-shadow:0 15px 40px rgba(0,0,0,.4);
+}
+
+#toast.show{
+  transform:translateX(-50%) translateY(0);
+  opacity:1;
+}
+
+@media(max-width:700px){
+  .auth-box{padding:22px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .location-box{grid-template-columns:1fr}
+  .money-actions{grid-template-columns:1fr}
+  .header-inner{flex-wrap:wrap}
+  .balance{
+    order:3;
+    width:100%;
+  }
+  .task-top{flex-direction:column}
+  .task-actions{flex-direction:column}
+  .task-btn{width:100%}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= AUTH ================= -->
+
+<div id="authScreen" class="screen">
+  <div class="auth-box">
+
+    <div class="logo">🏫 SchoolNet</div>
+    <div class="subtitle">Школьная платформа заданий</div>
+
+    <div class="auth-tabs">
+      <button id="loginTab" class="auth-tab active">Вход</button>
+      <button id="registerTab" class="auth-tab">Регистрация</button>
+    </div>
+
+    <div id="authMessage"></div>
+
+    <form id="loginForm">
+
+      <div class="field">
+        <label>Логин</label>
+        <input id="loginUsername"
+               type="text"
+               autocomplete="username"
+               required
+               placeholder="Введите логин">
+      </div>
+
+      <div class="field">
+        <label>Пароль</label>
+        <input id="loginPassword"
+               type="password"
+               autocomplete="current-password"
+               required
+               placeholder="Введите пароль">
+      </div>
+
+      <button class="main-btn" type="submit">
+        Войти
+      </button>
+
+    </form>
+
+    <form id="registerForm" class="hidden">
+
+      <div class="field">
+        <label>Логин</label>
+        <input id="registerUsername"
+               type="text"
+               minlength="3"
+               required
+               placeholder="Минимум 3 символа">
+      </div>
+
+      <div class="field">
+        <label>Пароль</label>
+        <input id="registerPassword"
+               type="password"
+               minlength="6"
+               required
+               placeholder="Минимум 6 символов">
+      </div>
+
+      <div class="field">
+        <label>Никнейм</label>
+        <input id="registerNickname"
+               type="text"
+               required
+               placeholder="Твой никнейм">
+      </div>
+
+      <div class="field">
+        <label>Город</label>
+        <select id="registerCity" required>
+          <option value="Одинцово">Одинцово</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Школа</label>
+        <select id="registerSchool" required>
+          <option value="Лицей №2">Лицей №2</option>
+        </select>
+      </div>
+
+      <button class="main-btn" type="submit">
+        Создать аккаунт
+      </button>
+
+    </form>
+
+  </div>
+</div>
+
+<!-- ================= APP ================= -->
+
+<div id="appScreen" class="screen hidden">
+
+<header>
+  <div class="header-inner">
+
+    <div class="brand">🏫 SchoolNet</div>
+
+    <div id="headerBalance" class="balance">
+      Баланс: 0 SNK
+    </div>
+
+    <button id="logoutBtn" class="logout-btn">
+      Выйти
+    </button>
+
+  </div>
+</header>
+
+<div class="banner">
+  <div class="banner-box">
+    <div>
+      <h2>Добро пожаловать в SchoolNet!</h2>
+      <p>Создавай задания или выполняй задания других пользователей.</p>
+    </div>
+  </div>
+</div>
+
+<main class="container">
+
+<div class="user-card">
+
+  <div class="nickname" id="profileNickname">—</div>
+  <div class="username" id="profileUsername">@—</div>
+  <div class="role" id="profileRole">👤 Пользователь</div>
+
+  <div class="stats">
+
+    <div class="stat">
+      <div class="stat-title">Баланс</div>
+      <div id="statBalance" class="stat-value">0 SNK</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-title">Выполнено</div>
+      <div id="statCompleted" class="stat-value">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-title">Рейтинг</div>
+      <div id="statRating" class="stat-value">0</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-title">Нарушения</div>
+      <div id="statViolations" class="stat-value">0</div>
+    </div>
+
+  </div>
+</div>
+
+<nav>
+
+  <button class="nav-btn active" data-section="feed">
+    📋 Заказы
+  </button>
+
+  <button class="nav-btn" data-section="orders">
+    📦 Мои заказы
+  </button>
+
+  <button class="nav-btn" data-section="create">
+    ➕ Создать
+  </button>
+
+  <button class="nav-btn" data-section="money">
+    💰 SNKoin
+  </button>
+
+  <button class="nav-btn" data-section="profile">
+    👤 Профиль
+  </button>
+
+  <button id="adminNav"
+          class="nav-btn hidden"
+          data-section="admin">
+    🛡️ Управление
+  </button>
+
+</nav>
+
+<!-- ================= FEED ================= -->
+
+<section id="section-feed" class="section active">
+
+  <div class="panel">
+
+    <div class="tasks-header">
+      <h2>📋 Доступные заказы</h2>
+
+      <button id="refreshTasksBtn"
+              class="refresh-btn">
+        🔄 Обновить
+      </button>
+    </div>
+
+    <div id="tasksList" class="tasks-list">
+      <div class="loading">Загрузка заказов...</div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ================= MY ORDERS ================= -->
+
+<section id="section-orders" class="section">
+
+  <div class="panel">
+
+    <div class="tasks-header">
+      <h2>📦 Мои заказы</h2>
+
+      <button id="refreshMyTasksBtn"
+              class="refresh-btn">
+        🔄 Обновить
+      </button>
+    </div>
+
+    <div id="myTasksList" class="tasks-list">
+      <div class="loading">Загрузка...</div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ================= CREATE ================= -->
+
+<section id="section-create" class="section">
+
+  <div class="panel">
+
+    <h2>➕ Создать заказ</h2>
+
+    <p class="muted" style="margin-bottom:18px">
+      Опиши задание, которое должен выполнить другой школьник.
+    </p>
+
+    <div class="field">
+      <label>Название</label>
+      <input id="newOrderTitle"
+             maxlength="120"
+             placeholder="Например: Купить тетрадь">
+    </div>
+
+    <div class="field">
+      <label>Описание</label>
+      <textarea id="newOrderDescription"
+                maxlength="2000"
+                placeholder="Подробно опиши, что нужно сделать">
+      </textarea>
+    </div>
+
+    <div class="field">
+      <label>Стоимость, SNKoin</label>
+      <input id="newOrderPrice"
+             type="number"
+             min="1"
+             max="100000"
+             step="1"
+             placeholder="100">
+    </div>
+
+    <div class="field">
+      <label>Категория</label>
+
+      <select id="newOrderCategory">
+        <option value="study">📚 Учёба</option>
+        <option value="shopping">🛒 Покупки</option>
+        <option value="help">🤝 Помощь</option>
+        <option value="games">🎮 Игры</option>
+        <option value="sport">⚽ Спорт</option>
+        <option value="other">📌 Другое</option>
+      </select>
+    </div>
+
+    <button id="createTaskBtn"
+            class="main-btn"
+            type="button">
+      Создать заказ
+    </button>
+
+  </div>
+
+</section>
+
+<!-- ================= MONEY ================= -->
+
+<section id="section-money" class="section">
+
+  <div class="panel">
+
+    <h2>💰 SNKoin</h2>
+
+    <div class="money-card">
+
+      <div class="muted">Текущий баланс</div>
+
+      <div id="moneyBalance"
+           class="money-value">
+        0 SNK
+      </div>
+
+      <div class="muted">
+        внутренняя валюта SchoolNet
+      </div>
+
+    </div>
+
+    <div class="money-actions">
+
+      <button class="money-btn"
+              onclick="showDepositForm()">
+        ⭐ Пополнить
+      </button>
+
+      <button class="money-btn"
+              onclick="showWithdrawalForm()">
+        🎁 Вывести
+      </button>
+
+    </div>
+
+  </div>
+
+  <div id="moneyFormPanel" class="panel hidden"></div>
+
+  <div class="panel">
+
+    <h2>📜 Мои заявки</h2>
+
+    <div id="moneyRequests">
+      <div class="loading">
+        Загрузка...
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ================= PROFILE ================= -->
+
+<section id="section-profile" class="section">
+
+  <div class="panel">
+
+    <h2>👤 Профиль</h2>
+
+    <div class="location-box">
+
+      <div class="location-item">
+        <div class="location-label">Логин</div>
+        <strong id="profileLogin">—</strong>
+      </div>
+
+      <div class="location-item">
+        <div class="location-label">Никнейм</div>
+        <strong id="profileNick">—</strong>
+      </div>
+
+      <div class="location-item">
+        <div class="location-label">Город</div>
+        <strong id="profileCity">—</strong>
+      </div>
+
+      <div class="location-item">
+        <div class="location-label">Школа</div>
+        <strong id="profileSchool">—</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ================= ADMIN ================= -->
+
+<section id="section-admin" class="section">
+
+  <div class="panel admin-panel">
+
+    <h2 class="admin-title">🛡️ Управление</h2>
+
+    <p class="muted">
+      Панель администратора SchoolNet.
+    </p>
+
+  </div>
+
+  <div id="superAdminPanel"
+       class="panel admin-panel hidden">
+
+    <h2 class="admin-title">👑 Superadmin</h2>
+
+    <p class="muted">
+      Расширенное управление SchoolNet.
+    </p>
+
+  </div>
+
+</section>
+
+</main>
+</div>
+
+<div id="toast"></div>
+
+<script src="scripts/maingasterlol.js"></script>
+</body>
+</html>
