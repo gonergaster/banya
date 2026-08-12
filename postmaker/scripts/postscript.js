@@ -28,8 +28,8 @@ const registerTab = document.getElementById("registerTab");
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 const authMessage = document.getElementById("authMessage");
-const tasksList = document.getElementById("tasksList");
-const myTasksList = document.getElementById("myTasksList");
+const postsList = document.getElementById("postsList");
+const mypostsList = document.getElementById("mypostsList");
 
 /* =====================================================
    HELPERS
@@ -249,8 +249,8 @@ function openApp() {
   authScreen.classList.add("hidden");
   appScreen.classList.remove("hidden");
   renderUser();
-  loadTasks();
-  loadMyTasks();
+  loadposts();
+  loadMyposts();
   loadMoneyRequests();
 }
 
@@ -301,22 +301,22 @@ function renderUser() {
 }
 
 /* =====================================================
-   TASKS
+   postS
 ===================================================== */
 
-async function loadTasks() {
+async function loadposts() {
   if (!sessionToken) return;
-  tasksList.innerHTML = `<div class="loading">Загрузка заказов...</div>`;
+  postsList.innerHTML = `<div class="loading">Загрузка заказов...</div>`;
 
   try {
-    const { data, error } = await supabaseClient.rpc("get_tasks", {
+    const { data, error } = await supabaseClient.rpc("get_posts", {
       p_token: sessionToken
     });
     if (error) throw error;
-    renderTasks(Array.isArray(data) ? data : [], tasksList, "feed");
+    renderposts(Array.isArray(data) ? data : [], postsList, "feed");
   } catch (error) {
     console.error(error);
-    tasksList.innerHTML = `
+    postsList.innerHTML = `
       <div class="empty">
         Не удалось загрузить заказы.<br>
         <small>${escapeHTML(error.message || "")}</small>
@@ -325,19 +325,19 @@ async function loadTasks() {
   }
 }
 
-async function loadMyTasks() {
+async function loadMyposts() {
   if (!sessionToken) return;
-  myTasksList.innerHTML = `<div class="loading">Загрузка заказов...</div>`;
+  mypostsList.innerHTML = `<div class="loading">Загрузка заказов...</div>`;
 
   try {
-    const { data, error } = await supabaseClient.rpc("get_my_tasks", {
+    const { data, error } = await supabaseClient.rpc("get_my_post", {
       p_token: sessionToken
     });
     if (error) throw error;
-    renderTasks(Array.isArray(data) ? data : [], myTasksList, "mine");
+    renderposts(Array.isArray(data) ? data : [], mypostsList, "mine");
   } catch (error) {
     console.error(error);
-    myTasksList.innerHTML = `
+    mypostsList.innerHTML = `
       <div class="empty">
         Не удалось загрузить заказы.<br>
         <small>${escapeHTML(error.message || "")}</small>
@@ -346,8 +346,8 @@ async function loadMyTasks() {
   }
 }
 
-function renderTasks(tasks, container, mode) {
-  if (!tasks.length) {
+function renderposts(posts, container, mode) {
+  if (!posts.length) {
     container.innerHTML = `
       <div class="empty">
         ${mode === "feed" ? "📭 Сейчас нет доступных заказов." : "📦 У тебя пока нет заказов."}
@@ -356,42 +356,27 @@ function renderTasks(tasks, container, mode) {
     return;
   }
 
-  container.innerHTML = tasks.map(task => {
-    const status = task.status || "open";
-    const ownerId = task.owner_id;
-    const assignedTo = task.assigned_to;
+  container.innerHTML = posts.map(post => {
+    const status = post.status || "open";
+    const ownerId = post.owner_id;
+    const assignedTo = post.assigned_to;
     const currentId = currentUser?.id || currentUser?.user_id || currentUser?.auth_user_id;
 
     let action = "";
 
-    if (mode === "feed" && status === "open" && ownerId !== currentId) {
-      action = `
-        <button class="task-btn take-btn" onclick="takeTask('${escapeJS(task.id)}')">
-          ✋ Взять заказ
-        </button>
-      `;
-    }
 
-    if (mode === "mine" && assignedTo === currentId && status === "taken") {
-      action = `
-        <button class="task-btn complete-btn" onclick="completeTask('${escapeJS(task.id)}')">
-          ✅ Завершить
-        </button>
-      `;
-    }
 
     return `
-      <div class="task-card">
-        <div class="task-top">
-          <div class="task-title">${escapeHTML(task.title)}</div>
-          <div class="task-price">${formatMoney(task.price)}</div>
+      <div class="post-card">
+        <div class="post-top">
+          <div class="post-title">${escapeHTML(post.title)}</div>
         </div>
-        <div class="task-description">${escapeHTML(task.description || "Описание отсутствует.")}</div>
-        <div class="task-meta">
-          <span class="task-tag">📂 ${escapeHTML(task.category || "other")}</span>
-          <span class="task-tag">📌 ${escapeHTML(getStatusName(status))}</span>
+        <div class="post-description">${escapeHTML(post.description || "Описание отсутствует.")}</div>
+        <div class="post-meta">
+          <span class="post-tag">📂 ${escapeHTML(post.category || "other")}</span>
+          <span class="post-tag">📌 ${escapeHTML(getStatusName(status))}</span>
         </div>
-        ${action ? `<div class="task-actions">${action}</div>` : ""}
+        ${action ? `<div class="post-actions">${action}</div>` : ""}
       </div>
     `;
   }).join("");
@@ -400,28 +385,26 @@ function renderTasks(tasks, container, mode) {
 function getStatusName(status) {
   switch (status) {
     case "open":
-      return "Доступен";
+      return "Доходяга:3";
     case "taken":
-      return "Выполняется";
+      return "Доходяга:3";
     case "done":
-      return "Завершён";
+      return "Доходяга:3";
     case "cancelled":
-      return "Отменён";
+      return "Доходяга:3";
     default:
       return status;
   }
 }
 
 /* =====================================================
-   CREATE TASK
+   CREATE post
 ===================================================== */
 
-document.getElementById("createTaskBtn").addEventListener("click", async () => {
+document.getElementById("createPostBtn").addEventListener("click", async () => {
   const title = document.getElementById("newOrderTitle").value.trim();
   const description = document.getElementById("newOrderDescription").value.trim();
-  const price = Number(document.getElementById("newOrderPrice").value);
-  const category = document.getElementById("newOrderCategory").value;
-  const button = document.getElementById("createTaskBtn");
+  const button = document.getElementById("createPostBtn");
 
   if (!title) {
     showToast("Введите название заказа.");
@@ -431,20 +414,14 @@ document.getElementById("createTaskBtn").addEventListener("click", async () => {
     showToast("Введите описание заказа.");
     return;
   }
-  if (!Number.isFinite(price) || price <= 0) {
-    showToast("Введите нормальную стоимость.");
-    return;
-  }
 
   setLoading(button, true, "Создать заказ");
 
   try {
-    const { data, error } = await supabaseClient.rpc("create_task", {
+    const { data, error } = await supabaseClient.rpc("create_post", {
       p_token: sessionToken,
       p_title: title,
       p_description: description,
-      p_price: price,
-      p_category: category
     });
 
     if (error) throw error;
@@ -452,11 +429,10 @@ document.getElementById("createTaskBtn").addEventListener("click", async () => {
 
     document.getElementById("newOrderTitle").value = "";
     document.getElementById("newOrderDescription").value = "";
-    document.getElementById("newOrderPrice").value = "";
     showToast("Заказ создан.");
 
-    await loadTasks();
-    await loadMyTasks();
+    await loadposts();
+    await loadMyposts();
     document.querySelector('[data-section="orders"]').click();
 
   } catch (error) {
@@ -468,24 +444,24 @@ document.getElementById("createTaskBtn").addEventListener("click", async () => {
 });
 
 /* =====================================================
-   TAKE TASK
+   TAKE post
 ===================================================== */
 
-async function takeTask(taskId) {
+async function takepost(postId) {
   if (!sessionToken) return;
 
   try {
-    const { data, error } = await supabaseClient.rpc("take_task", {
+    const { data, error } = await supabaseClient.rpc("take_post", {
       p_token: sessionToken,
-      p_task_id: taskId
+      p_post_id: postId
     });
 
     if (error) throw error;
     if (!data) throw new Error("Не удалось взять заказ.");
 
     showToast("Заказ взят.");
-    await loadTasks();
-    await loadMyTasks();
+    await loadposts();
+    await loadMyposts();
 
   } catch (error) {
     console.error(error);
@@ -494,25 +470,25 @@ async function takeTask(taskId) {
 }
 
 /* =====================================================
-   COMPLETE TASK
+   COMPLETE post
 ===================================================== */
 
-async function completeTask(taskId) {
+async function completepost(postId) {
   if (!sessionToken) return;
   if (!confirm("Ты точно выполнил этот заказ?")) return;
 
   try {
-    const { data, error } = await supabaseClient.rpc("complete_task", {
+    const { data, error } = await supabaseClient.rpc("complete_post", {
       p_token: sessionToken,
-      p_task_id: taskId
+      p_post_id: postId
     });
 
     if (error) throw error;
     if (!data) throw new Error("Не удалось завершить заказ.");
 
     showToast("Заказ завершён.");
-    await loadTasks();
-    await loadMyTasks();
+    await loadposts();
+    await loadMyposts();
     await checkSession();
 
   } catch (error) {
@@ -738,8 +714,8 @@ document.querySelectorAll(".nav-btn").forEach(button => {
     const target = document.getElementById("section-" + section);
     if (target) target.classList.add("active");
 
-    if (section === "feed") await loadTasks();
-    if (section === "orders") await loadMyTasks();
+    if (section === "feed") await loadposts();
+    if (section === "orders") await loadMyposts();
     if (section === "money") await loadMoneyRequests();
   });
 });
@@ -748,8 +724,8 @@ document.querySelectorAll(".nav-btn").forEach(button => {
    REFRESH
 ===================================================== */
 
-document.getElementById("refreshTasksBtn").addEventListener("click", loadTasks);
-document.getElementById("refreshMyTasksBtn").addEventListener("click", loadMyTasks);
+document.getElementById("refreshpostsBtn").addEventListener("click", loadposts);
+document.getElementById("refreshMypostsBtn").addEventListener("click", loadMyposts);
 
 /* =====================================================
    LOGOUT
