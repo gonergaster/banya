@@ -1,957 +1,1332 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>SchoolNet 67</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-</script>
-
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-
-:root{
-  --bg:#070b0d;
-  --panel:#101719;
-  --panel2:#151e20;
-  --border:#263336;
-  --text:#f2f7f7;
-  --muted:#8b9b9d;
-  --cyan:#00ffcc;
-  --green:#39e58c;
-  --orange:#ffaa00;
-  --red:#ff4d5a;
-}
-
-body{
-  font-family:Arial,Helvetica,sans-serif;
-  background:
-    radial-gradient(circle at top,rgba(0,255,204,.08),transparent 35%),
-    var(--bg);
-  color:var(--text);
-  min-height:100vh;
-}
-
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
-.screen{min-height:100vh}
-
-#authScreen{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-}
-
-.auth-box{
-  width:100%;
-  max-width:460px;
-  background:rgba(16,23,25,.97);
-  border:1px solid var(--border);
-  border-radius:24px;
-  padding:30px;
-  box-shadow:0 20px 80px rgba(0,0,0,.45);
-}
-
-.logo{
-  text-align:center;
-  font-size:34px;
-  font-weight:900;
-  color:var(--cyan);
-  margin-bottom:8px;
-}
-
-.subtitle{
-  text-align:center;
-  color:var(--muted);
-  margin-bottom:25px;
-}
-
-.auth-tabs{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-bottom:20px;
-}
-
-.auth-tab{
-  background:var(--panel2);
-  color:var(--muted);
-  border:1px solid var(--border);
-  padding:12px;
-  border-radius:12px;
-}
-
-.auth-tab.active{
-  color:#001a16;
-  background:var(--cyan);
-  border-color:var(--cyan);
-  font-weight:800;
-}
-
-.field{margin-bottom:15px}
-
-.field label{
-  display:block;
-  color:#b9c6c7;
-  margin-bottom:7px;
-  font-size:14px;
-}
-
-.field input,
-.field select,
-.field textarea{
-  width:100%;
-  padding:13px 14px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  outline:none;
-  background:#0b1113;
-  color:white;
-}
-
-.field textarea{
-  resize:vertical;
-  min-height:120px;
-}
-
-.field input:focus,
-.field select:focus,
-.field textarea:focus{
-  border-color:var(--cyan);
-}
-
-.main-btn{
-  width:100%;
-  padding:14px;
-  border:0;
-  border-radius:13px;
-  background:var(--cyan);
-  color:#001511;
-  font-weight:900;
-  margin-top:5px;
-}
-
-.main-btn:disabled{
-  opacity:.6;
-  cursor:wait;
-}
-
-.error,.success{
-  padding:11px;
-  border-radius:10px;
-  margin-bottom:15px;
-  font-size:14px;
-}
-
-.error{
-  color:#ff7882;
-  background:rgba(255,77,90,.1);
-  border:1px solid rgba(255,77,90,.3);
-}
-
-.success{
-  color:var(--green);
-  background:rgba(57,229,140,.08);
-  border:1px solid rgba(57,229,140,.25);
-}
-
-header{
-  position:sticky;
-  top:0;
-  z-index:20;
-  background:rgba(7,11,13,.94);
-  backdrop-filter:blur(15px);
-  border-bottom:1px solid var(--border);
-}
-
-.header-inner{
-  max-width:1250px;
-  margin:auto;
-  padding:14px 18px;
-  display:flex;
-  align-items:center;
-  gap:15px;
-}
-
-.brand{
-  color:var(--cyan);
-  font-weight:900;
-  font-size:21px;
-}
-
-.balance{
-  color:var(--green);
-  font-weight:900;
-  margin-left:auto;
-}
-
-.logout-btn{
-  background:transparent;
-  color:var(--muted);
-  border:1px solid var(--border);
-  padding:8px 12px;
-  border-radius:10px;
-}
-
-.banner{
-  max-width:1250px;
-  margin:18px auto 0;
-  padding:0 18px;
-}
-
-.banner-box{
-  min-height:100px;
-  border:1px solid var(--border);
-  border-radius:18px;
-  background:
-    linear-gradient(135deg,rgba(0,255,204,.08),rgba(255,170,0,.04)),
-    var(--panel);
-  display:flex;
-  align-items:center;
-  padding:22px;
-}
-
-.banner-box h2{
-  color:var(--cyan);
-  margin-bottom:6px;
-}
-
-.banner-box p{color:var(--muted)}
-
-.container{
-  max-width:1250px;
-  margin:auto;
-  padding:18px;
-}
-
-.user-card,
-.panel{
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:20px;
-  margin-bottom:18px;
-}
-
-.nickname{
-  font-size:24px;
-  font-weight:900;
-}
-
-.username{
-  color:var(--muted);
-  margin-top:4px;
-}
-
-.role{
-  display:inline-block;
-  margin-top:9px;
-  padding:5px 9px;
-  border-radius:8px;
-  background:rgba(0,255,204,.1);
-  border:1px solid rgba(0,255,204,.25);
-  color:var(--cyan);
-  font-size:12px;
-  font-weight:800;
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-  margin-top:18px;
-}
-
-.stat{
-  background:var(--panel2);
-  border:1px solid var(--border);
-  padding:14px;
-  border-radius:13px;
-}
-
-.stat-title{
-  color:var(--muted);
-  font-size:12px;
-}
-
-.stat-value{
-  font-size:20px;
-  font-weight:900;
-  margin-top:5px;
-}
-
-nav{
-  display:flex;
-  gap:8px;
-  overflow-x:auto;
-  padding-bottom:5px;
-  margin-bottom:18px;
-}
-
-nav button{
-  white-space:nowrap;
-  background:var(--panel);
-  border:1px solid var(--border);
-  color:var(--muted);
-  padding:11px 15px;
-  border-radius:11px;
-}
-
-nav button.active{
-  color:#001511;
-  background:var(--cyan);
-  border-color:var(--cyan);
-  font-weight:900;
-}
-
-.section{display:none}
-.section.active{display:block}
-
-.panel h2{margin-bottom:14px}
-.muted{color:var(--muted)}
-
-.tasks-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  margin-bottom:15px;
-}
-
-.refresh-btn{
-  background:var(--panel2);
-  color:var(--cyan);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:9px 13px;
-}
-
-.tasks-list{
-  display:grid;
-  gap:12px;
-}
-
-.task-card{
-  background:var(--panel2);
-  border:1px solid var(--border);
-  border-radius:15px;
-  padding:17px;
-}
-
-.task-top{
-  display:flex;
-  justify-content:space-between;
-  gap:15px;
-  align-items:flex-start;
-}
-
-.task-title{
-  font-size:18px;
-  font-weight:900;
-}
-
-.task-price{
-  color:var(--green);
-  font-size:19px;
-  font-weight:900;
-  white-space:nowrap;
-}
-
-.task-description{
-  color:#bac5c6;
-  margin-top:9px;
-  line-height:1.5;
-  white-space:pre-wrap;
-}
-
-.task-meta{
-  display:flex;
-  flex-wrap:wrap;
-  gap:7px;
-  margin-top:13px;
-}
-
-.task-tag{
-  display:inline-block;
-  padding:5px 8px;
-  border-radius:8px;
-  background:rgba(0,255,204,.07);
-  border:1px solid rgba(0,255,204,.16);
-  color:var(--muted);
-  font-size:12px;
-}
-
-.task-actions{
-  margin-top:14px;
-  display:flex;
-  gap:8px;
-}
-
-.task-btn{
-  border:0;
-  border-radius:10px;
-  padding:10px 14px;
-  font-weight:800;
-}
-
-.take-btn{
-  background:var(--cyan);
-  color:#001511;
-}
-
-.complete-btn{
-  background:var(--green);
-  color:#001511;
-}
-
-.danger-btn{
-  background:rgba(255,77,90,.1);
-  border:1px solid rgba(255,77,90,.3);
-  color:#ff7882;
-}
-
-.empty,.loading{
-  text-align:center;
-  padding:35px 15px;
-  color:var(--muted);
-}
-
-.location-box{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.location-item{
-  background:var(--panel2);
-  padding:15px;
-  border-radius:12px;
-  border:1px solid var(--border);
-}
-
-.location-label{
-  color:var(--muted);
-  font-size:12px;
-  margin-bottom:5px;
-}
-
-.money-card{
-  background:
-    linear-gradient(135deg,rgba(57,229,140,.09),rgba(0,255,204,.05)),
-    var(--panel2);
-  border:1px solid rgba(57,229,140,.2);
-  border-radius:16px;
-  padding:20px;
-  margin-bottom:15px;
-}
-
-.money-value{
-  font-size:32px;
-  color:var(--green);
-  font-weight:900;
-  margin:8px 0;
-}
-
-.money-actions{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
-
-.money-btn{
-  border:1px solid var(--border);
-  background:var(--panel2);
-  color:white;
-  border-radius:12px;
-  padding:13px;
-  font-weight:800;
-}
-
-.money-btn:hover{
-  border-color:var(--cyan);
-}
-
-.request-card{
-  background:var(--panel2);
-  border:1px solid var(--border);
-  border-radius:13px;
-  padding:14px;
-  margin-top:10px;
-}
-
-.request-status{
-  display:inline-block;
-  padding:4px 8px;
-  border-radius:7px;
-  font-size:12px;
-  background:rgba(255,170,0,.1);
-  color:var(--orange);
-}
-
-.admin-panel{
-  border-color:rgba(255,170,0,.35);
-}
-
-.admin-title{
-  color:var(--orange);
-}
-
-#toast{
-  position:fixed;
-  left:50%;
-  bottom:25px;
-  transform:translateX(-50%) translateY(100px);
-  opacity:0;
-  pointer-events:none;
-  z-index:100;
-  background:#172123;
-  border:1px solid var(--border);
-  padding:13px 17px;
-  border-radius:12px;
-  transition:.25s;
-  box-shadow:0 15px 40px rgba(0,0,0,.4);
-}
-
-#toast.show{
-  transform:translateX(-50%) translateY(0);
-  opacity:1;
-}
-
-@media(max-width:700px){
-  .auth-box{padding:22px}
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .location-box{grid-template-columns:1fr}
-  .money-actions{grid-template-columns:1fr}
-  .header-inner{flex-wrap:wrap}
-  .balance{
-    order:3;
-    width:100%;
-  }
-  .task-top{flex-direction:column}
-  .task-actions{flex-direction:column}
-  .task-btn{width:100%}
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SchoolNet</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        :root {
+            --bg: #070b0d;
+            --panel: #101719;
+            --panel2: #151e20;
+            --border: #263336;
+            --text: #f2f7f7;
+            --muted: #8b9b9d;
+            --cyan: #00ffcc;
+            --green: #39e58c;
+            --orange: #ffaa00;
+            --red: #ff4d5a;
+            --blue: #4da3ff;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: radial-gradient(circle at top, rgba(0, 255, 204, .08), transparent 35%), var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+        }
+        button {
+            cursor: pointer;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .screen {
+            min-height: 100vh;
+        }
+
+        #authScreen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .auth-box {
+            width: 100%;
+            max-width: 460px;
+            background: rgba(16, 23, 25, .97);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, .45);
+        }
+        .logo {
+            text-align: center;
+            font-size: 34px;
+            font-weight: 900;
+            color: var(--cyan);
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 25px;
+        }
+        .auth-tabs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .auth-tab {
+            background: var(--panel2);
+            color: var(--muted);
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 12px;
+        }
+        .auth-tab.active {
+            color: #001a16;
+            background: var(--cyan);
+            border-color: var(--cyan);
+            font-weight: 800;
+        }
+        .field {
+            margin-bottom: 15px;
+        }
+        .field label {
+            display: block;
+            color: #b9c6c7;
+            margin-bottom: 7px;
+            font-size: 14px;
+        }
+        .field input,
+        .field select,
+        .field textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            outline: none;
+            background: #0b1113;
+            color: white;
+        }
+        .field textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            border-color: var(--cyan);
+        }
+        .main-btn {
+            width: 100%;
+            padding: 14px;
+            border: 0;
+            border-radius: 13px;
+            background: var(--cyan);
+            color: #001511;
+            font-weight: 900;
+            margin-top: 5px;
+        }
+        .main-btn:disabled {
+            opacity: .6;
+            cursor: wait;
+        }
+        .error,
+        .success {
+            padding: 11px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .error {
+            color: #ff7882;
+            background: rgba(255, 77, 90, .1);
+            border: 1px solid rgba(255, 77, 90, .3);
+        }
+        .success {
+            color: var(--green);
+            background: rgba(57, 229, 140, .08);
+            border: 1px solid rgba(57, 229, 140, .25);
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: rgba(7, 11, 13, .94);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--border);
+        }
+        .header-inner {
+            max-width: 1400px;
+            margin: auto;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .brand {
+            color: var(--cyan);
+            font-weight: 900;
+            font-size: 21px;
+        }
+        .rules-btn {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: .2s;
+        }
+        .rules-btn:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+        .balance {
+            color: var(--green);
+            font-weight: 900;
+            margin-left: auto;
+        }
+        .logout-btn {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        .icon-btn {
+            background: var(--panel2);
+            color: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 11px;
+            position: relative;
+            cursor: pointer;
+        }
+        .badge-count {
+            position: absolute;
+            top: -7px;
+            right: -7px;
+            background: var(--red);
+            color: white;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+        }
+
+        .banner {
+            max-width: 1400px;
+            margin: 18px auto 0;
+            padding: 0 18px;
+        }
+        .banner-box {
+            min-height: 120px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(0, 255, 204, .08), rgba(255, 170, 0, .04)), var(--panel);
+            display: flex;
+            align-items: center;
+            padding: 22px;
+            background-size: cover;
+            background-position: center;
+            transition: .3s;
+            cursor: pointer;
+        }
+        .banner-box h2 {
+            color: var(--cyan);
+            margin-bottom: 6px;
+        }
+        .banner-box p {
+            color: var(--muted);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+            padding: 18px;
+        }
+        .user-card,
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 18px;
+        }
+        .nickname {
+            font-size: 24px;
+            font-weight: 900;
+        }
+        .username {
+            color: var(--muted);
+            margin-top: 4px;
+        }
+        .role {
+            display: inline-block;
+            margin-top: 9px;
+            padding: 5px 9px;
+            border-radius: 8px;
+            background: rgba(0, 255, 204, .1);
+            border: 1px solid rgba(0, 255, 204, .25);
+            color: var(--cyan);
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .verified {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #1da1f2;
+            font-weight: 900;
+            margin-left: 4px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 18px;
+        }
+        .stat {
+            background: var(--panel2);
+            border: 1px solid var(--border);
+            padding: 14px;
+            border-radius: 13px;
+        }
+        .stat-title {
+            color: var(--muted);
+            font-size: 12px;
+        }
+        .stat-value {
+            font-size: 20px;
+            font-weight: 900;
+            margin-top: 5px;
+        }
+
+        nav {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            margin-bottom: 18px;
+        }
+        nav button {
+            white-space: nowrap;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 11px 15px;
+            border-radius: 11px;
+        }
+        nav button.active {
+            color: #001511;
+            background: var(--cyan);
+            border-color: var(--cyan);
+            font-weight: 900;
+        }
+
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .panel h2 {
+            margin-bottom: 14px;
+        }
+        .muted {
+            color: var(--muted);
+        }
+
+        .tasks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .refresh-btn,
+        .secondary-btn {
+            background: var(--panel2);
+            color: var(--cyan);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 9px 13px;
+            cursor: pointer;
+        }
+        .tasks-list {
+            display: grid;
+            gap: 12px;
+        }
+        .task-card {
+            background: var(--panel2);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 17px;
+            position: relative;
+        }
+        .task-card.urgent {
+            border-color: rgba(255, 170, 0, .55);
+        }
+        .task-card.pinned {
+            border-color: rgba(0, 255, 204, .45);
+        }
+        .task-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .task-title {
+            font-size: 18px;
+            font-weight: 900;
+        }
+        .task-price {
+            color: var(--green);
+            font-size: 19px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+        .task-description {
+            color: #bac5c6;
+            margin-top: 9px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        .task-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 13px;
+        }
+        .task-tag {
+            display: inline-block;
+            padding: 5px 8px;
+            border-radius: 8px;
+            background: rgba(0, 255, 204, .07);
+            border: 1px solid rgba(0, 255, 204, .16);
+            color: var(--muted);
+            font-size: 12px;
+        }
+        .task-tag.study {
+            background: rgba(77, 163, 255, .15);
+            border-color: rgba(77, 163, 255, .3);
+            color: #4da3ff;
+        }
+        .task-tag.shopping {
+            background: rgba(255, 170, 0, .15);
+            border-color: rgba(255, 170, 0, .3);
+            color: #ffaa00;
+        }
+        .task-tag.help {
+            background: rgba(57, 229, 140, .15);
+            border-color: rgba(57, 229, 140, .3);
+            color: #39e58c;
+        }
+        .task-tag.games {
+            background: rgba(255, 77, 90, .15);
+            border-color: rgba(255, 77, 90, .3);
+            color: #ff4d5a;
+        }
+        .task-tag.sport {
+            background: rgba(255, 204, 102, .15);
+            border-color: rgba(255, 204, 102, .3);
+            color: #ffcc66;
+        }
+        .task-tag.other {
+            background: rgba(139, 155, 157, .15);
+            border-color: rgba(139, 155, 157, .3);
+            color: #8b9b9d;
+        }
+        .task-tag.urgent {
+            color: var(--orange);
+            border-color: rgba(255, 170, 0, .3);
+        }
+        .task-tag.timer {
+            color: #ffcc66;
+        }
+        .task-actions {
+            margin-top: 14px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .task-btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .take-btn {
+            background: var(--cyan);
+            color: #001511;
+        }
+        .complete-btn {
+            background: var(--green);
+            color: #001511;
+        }
+        .danger-btn {
+            background: rgba(255, 77, 90, .1);
+            border: 1px solid rgba(255, 77, 90, .3);
+            color: #ff7882;
+        }
+        .empty,
+        .loading {
+            text-align: center;
+            padding: 35px 15px;
+            color: var(--muted);
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        .category-btn {
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--panel2);
+            color: var(--muted);
+            font-weight: 800;
+            transition: .2s;
+            cursor: pointer;
+        }
+        .category-btn:hover {
+            border-color: var(--cyan);
+        }
+        .category-btn.active {
+            background: var(--cyan);
+            color: #001511;
+            border-color: var(--cyan);
+        }
+
+        .money-card {
+            background: linear-gradient(135deg, rgba(57, 229, 140, .09), rgba(0, 255, 204, .05)), var(--panel2);
+            border: 1px solid rgba(57, 229, 140, .2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        .money-value {
+            font-size: 32px;
+            color: var(--green);
+            font-weight: 900;
+            margin: 8px 0;
+        }
+        .money-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .money-btn {
+            border: 1px solid var(--border);
+            background: var(--panel2);
+            color: white;
+            border-radius: 12px;
+            padding: 13px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .money-btn:hover {
+            border-color: var(--cyan);
+        }
+
+        .request-card {
+            background: var(--panel2);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 14px;
+            margin-top: 10px;
+        }
+        .request-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 7px;
+            font-size: 12px;
+            background: rgba(255, 170, 0, .1);
+            color: var(--orange);
+        }
+
+        .search-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .search-row input {
+            width: 100%;
+            padding: 12px 12px 12px 38px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: #0b1113;
+            color: white;
+            outline: none;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            pointer-events: none;
+        }
+
+        .social-grid {
+            display: grid;
+            grid-template-columns: 1.4fr .6fr;
+            gap: 15px;
+        }
+        .post-card {
+            background: var(--panel2);
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            padding: 17px;
+            margin-bottom: 12px;
+        }
+        .post-head {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 255, 204, .1);
+            border: 1px solid var(--border);
+            font-weight: 900;
+            color: var(--cyan);
+        }
+        .post-author {
+            font-weight: 900;
+        }
+        .post-date {
+            font-size: 12px;
+            color: var(--muted);
+        }
+        .post-body {
+            margin: 13px 0;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        .post-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .post-actions button {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 7px 10px;
+            cursor: pointer;
+        }
+        .post-actions button:hover {
+            border-color: var(--cyan);
+            color: var(--text);
+        }
+
+        .comments-box {
+            margin-top: 12px;
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+        .comment-item {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .comment-item strong {
+            font-weight: 700;
+        }
+        .comment-item span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .comment-input-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .comment-input-row input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: #0b1113;
+            color: white;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, .7);
+            backdrop-filter: blur(6px);
+            animation: fadeIn .25s;
+        }
+        .modal.hidden {
+            display: none;
+        }
+        .modal-content {
+            background: #101719;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 30px;
+            max-width: 640px;
+            width: 94%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-content h2 {
+            color: var(--cyan);
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+        .modal-content h3 {
+            color: var(--green);
+            margin: 20px 0 10px;
+            font-size: 18px;
+        }
+        .modal-content p {
+            color: #bac5c6;
+            line-height: 1.6;
+        }
+        .modal-content ul {
+            color: #bac5c6;
+            list-style: none;
+            padding: 0;
+        }
+        .modal-content ul li {
+            padding: 6px 0 6px 20px;
+            position: relative;
+        }
+        .modal-content ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--cyan);
+        }
+        .modal-content .close-btn {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            border: 0;
+            border-radius: 12px;
+            background: var(--cyan);
+            color: #001511;
+            font-weight: 900;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .admin-panel {
+            border-color: rgba(255, 170, 0, .35);
+        }
+        .admin-title {
+            color: var(--orange);
+        }
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .admin-stat {
+            padding: 15px;
+            border-radius: 13px;
+            background: var(--panel2);
+            border: 1px solid var(--border);
+        }
+        .admin-stat strong {
+            display: block;
+            font-size: 22px;
+            margin-top: 5px;
+        }
+
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .achievement {
+            padding: 15px;
+            border: 1px solid var(--border);
+            background: var(--panel2);
+            border-radius: 13px;
+        }
+        .achievement.done {
+            border-color: rgba(57, 229, 140, .4);
+        }
+        .achievement-icon {
+            font-size: 28px;
+        }
+        .achievement-name {
+            font-weight: 900;
+            margin-top: 6px;
+        }
+        .achievement-desc {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            background: #0b1113;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 15px;
+        }
+        .message {
+            margin-bottom: 10px;
+            max-width: 80%;
+        }
+        .message.mine {
+            margin-left: auto;
+            text-align: right;
+        }
+        .message-bubble {
+            display: inline-block;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: var(--panel2);
+            border: 1px solid var(--border);
+        }
+        .message.mine .message-bubble {
+            background: rgba(0, 255, 204, .1);
+            border-color: rgba(0, 255, 204, .2);
+        }
+        .chat-input {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .chat-input input {
+            padding: 12px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: #0b1113;
+            color: white;
+        }
+
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: 25px;
+            transform: translateX(-50%) translateY(100px);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+            background: #172123;
+            border: 1px solid var(--border);
+            padding: 13px 17px;
+            border-radius: 12px;
+            transition: .25s;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, .4);
+        }
+        #toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        @media (max-width: 850px) {
+            .social-grid {
+                grid-template-columns: 1fr;
+            }
+            .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 700px) {
+            .auth-box {
+                padding: 22px;
+            }
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .header-inner {
+                flex-wrap: wrap;
+            }
+            .balance {
+                order: 3;
+                width: 100%;
+            }
+            .task-top {
+                flex-direction: column;
+            }
+            .task-actions {
+                flex-direction: column;
+            }
+            .task-btn {
+                width: 100%;
+            }
+            .category-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .achievement-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
 </head>
-
 <body>
 
-<!-- ================= AUTH ================= -->
-
-<div id="authScreen" class="screen">
-  <div class="auth-box">
-
-    <div class="logo">🏫 SchoolNet</div>
-    <div class="subtitle">Школьная платформа заданий</div>
-
-    <div class="auth-tabs">
-      <button id="loginTab" class="auth-tab active">Вход</button>
-      <button id="registerTab" class="auth-tab">Регистрация</button>
+    <!-- ===== AUTH ===== -->
+    <div id="authScreen" class="screen">
+        <div class="auth-box">
+            <div class="logo">🏫 SchoolNet</div>
+            <div class="subtitle">Школьная платформа заданий</div>
+            <div class="auth-tabs">
+                <button id="loginTab" class="auth-tab active">Вход</button>
+                <button id="registerTab" class="auth-tab">Регистрация</button>
+            </div>
+            <div id="authMessage"></div>
+            <form id="loginForm">
+                <div class="field">
+                    <label>Логин</label>
+                    <input id="loginUsername" type="text" autocomplete="username" required>
+                </div>
+                <div class="field">
+                    <label>Пароль</label>
+                    <input id="loginPassword" type="password" autocomplete="current-password" required>
+                </div>
+                <button class="main-btn" type="submit">Войти</button>
+            </form>
+            <form id="registerForm" class="hidden">
+                <div class="field">
+                    <label>Логин</label>
+                    <input id="registerUsername" type="text" minlength="3" required>
+                </div>
+                <div class="field">
+                    <label>Пароль</label>
+                    <input id="registerPassword" type="password" minlength="6" required>
+                </div>
+                <div class="field">
+                    <label>Никнейм</label>
+                    <input id="registerNickname" type="text" required>
+                </div>
+                <div class="field">
+                    <label>Город</label>
+                    <select id="registerCity" required></select>
+                </div>
+                <div class="field">
+                    <label>Школа</label>
+                    <select id="registerSchool" required></select>
+                </div>
+                <button class="main-btn" type="submit">Создать аккаунт</button>
+            </form>
+        </div>
     </div>
 
-    <div id="authMessage"></div>
+    <!-- ===== APP ===== -->
+    <div id="appScreen" class="screen hidden">
+        <header>
+            <div class="header-inner">
+                <div class="brand">🏫 SchoolNet</div>
+                <button class="rules-btn" onclick="document.getElementById('rulesModal').classList.remove('hidden')">📋 Правила</button>
+                <button class="icon-btn" id="notificationsBtn" title="Уведомления">
+                    🔔
+                    <span id="notificationCount" class="badge-count">0</span>
+                </button>
+                <div id="headerBalance" class="balance">Баланс: 0 SNK</div>
+                <button id="logoutBtn" class="logout-btn">Выйти</button>
+            </div>
+        </header>
 
-    <form id="loginForm">
+        <!-- Баннер -->
+        <div class="banner">
+            <div class="banner-box" id="mainBanner">
+                <div>
+                    <h2 id="bannerTitle">Добро пожаловать в SchoolNet!</h2>
+                    <p id="bannerDesc">Создавай задания, выполняй задания других пользователей и общайся.</p>
+                </div>
+            </div>
+        </div>
 
-      <div class="field">
-        <label>Логин</label>
-        <input id="loginUsername"
-               type="text"
-               autocomplete="username"
-               required
-               placeholder="Введите логин">
-      </div>
+        <main class="container">
+            <!-- Профиль -->
+            <div class="user-card">
+                <div>
+                    <span class="nickname" id="profileNickname">—</span>
+                    <span class="verified" id="verifiedBadge" style="display:none;">✓</span>
+                </div>
+                <div class="username" id="profileUsername">@—</div>
+                <div class="role" id="profileRole">👤 Пользователь</div>
+                <div class="stats">
+                    <div class="stat"><div class="stat-title">Баланс</div><div id="statBalance" class="stat-value">0 SNK</div></div>
+                    <div class="stat"><div class="stat-title">Выполнено</div><div id="statCompleted" class="stat-value">0</div></div>
+                    <div class="stat"><div class="stat-title">Рейтинг</div><div id="statRating" class="stat-value">0</div></div>
+                    <div class="stat"><div class="stat-title">Нарушения</div><div id="statViolations" class="stat-value">0</div></div>
+                </div>
+            </div>
 
-      <div class="field">
-        <label>Пароль</label>
-        <input id="loginPassword"
-               type="password"
-               autocomplete="current-password"
-               required
-               placeholder="Введите пароль">
-      </div>
+            <!-- Навигация -->
+            <nav>
+                <button class="nav-btn active" data-section="feed">📋 Заказы</button>
+                <button class="nav-btn" data-section="orders">📦 Мои заказы</button>
+                <button class="nav-btn" data-section="create">➕ Создать</button>
+                <button class="nav-btn" data-section="social">🌐 Лента</button>
+                <button class="nav-btn" data-section="saved">🔖 Избранное</button>
+                <button class="nav-btn" data-section="money">💰 SNKoin</button>
+                <button class="nav-btn" data-section="profile">👤 Профиль</button>
+                <button class="nav-btn" data-section="achievements">🏆 Достижения</button>
+                <button id="adminNav" class="nav-btn hidden" data-section="admin">🛡️ Управление</button>
+            </nav>
 
-      <button class="main-btn" type="submit">
-        Войти
-      </button>
+            <!-- FEED -->
+            <section id="section-feed" class="section active">
+                <div class="panel">
+                    <div class="tasks-header">
+                        <h2>📋 Доступные заказы</h2>
+                        <button id="refreshTasksBtn" class="refresh-btn">🔄 Обновить</button>
+                    </div>
+                    <div class="search-row">
+                        <span class="search-icon">🔍</span>
+                        <input id="taskSearch" placeholder="Поиск заказов...">
+                        <select id="taskFilter">
+                            <option value="all">📋 Все</option>
+                            <option value="study">📚 Учёба</option>
+                            <option value="shopping">🛒 Покупки</option>
+                            <option value="help">🤝 Помощь</option>
+                            <option value="games">🎮 Игры</option>
+                            <option value="sport">⚽ Спорт</option>
+                            <option value="other">📌 Другое</option>
+                        </select>
+                    </div>
+                    <div id="tasksList" class="tasks-list"><div class="loading">Загрузка заказов...</div></div>
+                </div>
+            </section>
 
-    </form>
+            <!-- ORDERS -->
+            <section id="section-orders" class="section">
+                <div class="panel">
+                    <div class="tasks-header">
+                        <h2>📦 Мои заказы</h2>
+                        <button id="refreshMyTasksBtn" class="refresh-btn">🔄 Обновить</button>
+                    </div>
+                    <div id="myTasksList" class="tasks-list"><div class="loading">Загрузка...</div></div>
+                </div>
+                <div id="chatPanel" class="panel hidden">
+                    <h2>💬 Чат заказа</h2>
+                    <div class="chat-box">
+                        <div id="chatMessages" class="chat-messages"><div class="empty">Выбери заказ для открытия чата.</div></div>
+                        <div class="chat-input">
+                            <input id="chatInput" placeholder="Напиши сообщение...">
+                            <button id="sendChatBtn" class="main-btn" style="width:auto;margin:0;">Отправить</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-    <form id="registerForm" class="hidden">
+            <!-- CREATE -->
+            <section id="section-create" class="section">
+                <div class="panel">
+                    <h2>➕ Создать заказ</h2>
+                    <p class="muted" style="margin-bottom:18px;">Минимальная стоимость заказа — <strong>15 SNK</strong>.</p>
+                    <div class="field">
+                        <label>Название</label>
+                        <input id="newOrderTitle" maxlength="120" placeholder="Например: Купить тетрадь">
+                    </div>
+                    <div class="field">
+                        <label>Описание</label>
+                        <textarea id="newOrderDescription" maxlength="2000"></textarea>
+                    </div>
+                    <div class="field">
+                        <label>Стоимость, SNK</label>
+                        <input id="newOrderPrice" type="text" inputmode="decimal" autocomplete="off" placeholder="15">
+                    </div>
+                    <div class="field">
+                        <label>Категория</label>
+                        <div class="category-grid" id="categoryGrid">
+                            <button class="category-btn active" data-category="study" onclick="selectCategory('study')">📚 Учёба</button>
+                            <button class="category-btn" data-category="shopping" onclick="selectCategory('shopping')">🛒 Покупки</button>
+                            <button class="category-btn" data-category="help" onclick="selectCategory('help')">🤝 Помощь</button>
+                            <button class="category-btn" data-category="games" onclick="selectCategory('games')">🎮 Игры</button>
+                            <button class="category-btn" data-category="sport" onclick="selectCategory('sport')">⚽ Спорт</button>
+                            <button class="category-btn" data-category="other" onclick="selectCategory('other')">📌 Другое</button>
+                        </div>
+                        <input type="hidden" id="selectedCategory" value="study">
+                    </div>
+                    <div class="field">
+                        <label>Срок выполнения</label>
+                        <select id="newOrderDeadline">
+                            <option value="1">1 час</option>
+                            <option value="3">3 часа</option>
+                            <option value="6">6 часов</option>
+                            <option value="12">12 часов</option>
+                            <option value="24">24 часа</option>
+                            <option value="48">48 часов</option>
+                        </select>
+                    </div>
+                    <label style="display:flex;gap:10px;align-items:center;margin:15px 0;color:#ddd;">
+                        <input id="urgentOrder" type="checkbox"> 🔥 Срочно <span class="muted">(+3 SNK)</span>
+                    </label>
+                    <label style="display:flex;gap:10px;align-items:center;margin:15px 0;color:#ddd;">
+                        <input id="pinnedOrder" type="checkbox"> 📌 Закрепить <span class="muted">(+12 SNK)</span>
+                    </label>
+                    <div class="panel" style="margin-top:15px;background:#0b1113;">
+                        <div class="muted">Итого будет списано:</div>
+                        <strong id="createTotalPreview" style="font-size:22px;color:var(--green);">15 SNK</strong>
+                    </div>
+                    <button id="createTaskBtn" class="main-btn">Создать заказ</button>
+                </div>
+            </section>
 
-      <div class="field">
-        <label>Логин</label>
-        <input id="registerUsername"
-               type="text"
-               minlength="3"
-               required
-               placeholder="Минимум 3 символа">
-      </div>
+            <!-- SOCIAL -->
+            <section id="section-social" class="section">
+                <div class="social-grid">
+                    <div class="panel">
+                        <h2>🌐 Лента</h2>
+                        <div id="socialFeed"><div class="empty">Лента пуста. Будь первым!</div></div>
+                        <div style="margin-top:15px;">
+                            <textarea id="postInput" maxlength="1000" placeholder="Что нового?" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border);background:#0b1113;color:white;resize:vertical;min-height:80px;"></textarea>
+                            <button id="publishPostBtn" class="main-btn" style="margin-top:10px;">Опубликовать</button>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="panel">
+                            <h2>🔎 Поиск</h2>
+                            <div class="field">
+                                <input id="globalSearch" placeholder="Пользователь или пост...">
+                            </div>
+                            <div id="searchResults" class="muted">Начни вводить запрос.</div>
+                        </div>
+                        <div class="panel">
+                            <h2>🔔 Уведомления</h2>
+                            <div id="notificationList"><div class="empty">Уведомлений нет.</div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-      <div class="field">
-        <label>Пароль</label>
-        <input id="registerPassword"
-               type="password"
-               minlength="6"
-               required
-               placeholder="Минимум 6 символов">
-      </div>
+            <!-- SAVED -->
+            <section id="section-saved" class="section">
+                <div class="panel">
+                    <h2>🔖 Избранное</h2>
+                    <div id="savedPostsList"><div class="loading">Загрузка...</div></div>
+                </div>
+            </section>
 
-      <div class="field">
-        <label>Никнейм</label>
-        <input id="registerNickname"
-               type="text"
-               required
-               placeholder="Твой никнейм">
-      </div>
+            <!-- MONEY -->
+            <section id="section-money" class="section">
+                <div class="panel">
+                    <h2>💰 SNKoin</h2>
+                    <div class="money-card">
+                        <div class="muted">Текущий баланс</div>
+                        <div id="moneyBalance" class="money-value">0 SNK</div>
+                        <div class="muted">внутренняя валюта SchoolNet</div>
+                    </div>
+                    <div class="money-actions">
+                        <button class="money-btn" onclick="showDepositForm()">⭐ Пополнить</button>
+                        <button class="money-btn" onclick="showWithdrawalForm()">🎁 Вывести</button>
+                    </div>
+                </div>
+                <div id="moneyFormPanel" class="panel hidden"></div>
+                <div class="panel">
+                    <h2>📜 История заявок</h2>
+                    <div id="moneyRequests"><div class="loading">Загрузка...</div></div>
+                </div>
+            </section>
 
-      <div class="field">
-        <label>Город</label>
-        <select id="registerCity" required>
-          <option value="Одинцово">Одинцово</option>
-        </select>
-      </div>
+            <!-- PROFILE -->
+            <section id="section-profile" class="section">
+                <div class="panel">
+                    <h2>👤 Профиль</h2>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div class="location-item" style="background:var(--panel2);padding:15px;border-radius:12px;border:1px solid var(--border);">
+                            <div class="location-label">Логин</div>
+                            <strong id="profileLogin">—</strong>
+                        </div>
+                        <div class="location-item" style="background:var(--panel2);padding:15px;border-radius:12px;border:1px solid var(--border);">
+                            <div class="location-label">Никнейм</div>
+                            <strong id="profileNick">—</strong>
+                        </div>
+                        <div class="location-item" style="background:var(--panel2);padding:15px;border-radius:12px;border:1px solid var(--border);">
+                            <div class="location-label">Город</div>
+                            <strong id="profileCity">—</strong>
+                        </div>
+                        <div class="location-item" style="background:var(--panel2);padding:15px;border-radius:12px;border:1px solid var(--border);">
+                            <div class="location-label">Школа</div>
+                            <strong id="profileSchool">—</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel">
+                    <h2>⭐ Репутация</h2>
+                    <div style="font-size:30px;font-weight:900;" id="profileRatingBig">0 ⭐</div>
+                    <div class="stats">
+                        <div class="stat"><div class="stat-title">Надёжность</div><div class="stat-value" id="reputationReliability">—</div></div>
+                        <div class="stat"><div class="stat-title">Качество</div><div class="stat-value" id="reputationQuality">—</div></div>
+                        <div class="stat"><div class="stat-title">Скорость</div><div class="stat-value" id="reputationSpeed">—</div></div>
+                        <div class="stat"><div class="stat-title">Заказов</div><div class="stat-value" id="reputationOrders">0</div></div>
+                    </div>
+                </div>
+            </section>
 
-      <div class="field">
-        <label>Школа</label>
-        <select id="registerSchool" required>
-          <option value="Лицей №2">Лицей №2</option>
-        </select>
-      </div>
+            <!-- ACHIEVEMENTS -->
+            <section id="section-achievements" class="section">
+                <div class="panel">
+                    <h2>🏆 Достижения</h2>
+                    <p class="muted" style="margin-bottom:15px;">Достижения не дают наград — это просто коллекция.</p>
+                    <div id="achievementGrid" class="achievement-grid"></div>
+                </div>
+            </section>
 
-      <button class="main-btn" type="submit">
-        Создать аккаунт
-      </button>
-
-    </form>
-
-  </div>
-</div>
-
-<!-- ================= APP ================= -->
-
-<div id="appScreen" class="screen hidden">
-
-<header>
-  <div class="header-inner">
-
-    <div class="brand">🏫 SchoolNet</div>
-
-    <div id="headerBalance" class="balance">
-      Баланс: 0 SNK
+            <!-- ADMIN -->
+            <section id="section-admin" class="section">
+                <div class="panel admin-panel">
+                    <h2 class="admin-title" id="adminPanelTitle">🛡️ Управление</h2>
+                    <div id="adminContent"><div class="muted">Загрузка...</div></div>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <button id="logoutBtn" class="logout-btn">
-      Выйти
-    </button>
-
-  </div>
-</header>
-
-<div class="banner">
-  <div class="banner-box">
-    <div>
-      <h2>Добро пожаловать в SchoolNet!</h2>
-      <p>Создавай задания или выполняй задания других пользователей.</p>
-    </div>
-  </div>
-</div>
-
-<main class="container">
-
-<div class="user-card">
-
-  <div class="nickname" id="profileNickname">—</div>
-  <div class="username" id="profileUsername">@—</div>
-  <div class="role" id="profileRole">👤 Пользователь</div>
-
-  <div class="stats">
-
-    <div class="stat">
-      <div class="stat-title">Баланс</div>
-      <div id="statBalance" class="stat-value">0 SNK</div>
-    </div>
-
-    <div class="stat">
-      <div class="stat-title">Выполнено</div>
-      <div id="statCompleted" class="stat-value">0</div>
-    </div>
-
-    <div class="stat">
-      <div class="stat-title">Рейтинг</div>
-      <div id="statRating" class="stat-value">0</div>
-    </div>
-
-    <div class="stat">
-      <div class="stat-title">Нарушения</div>
-      <div id="statViolations" class="stat-value">0</div>
-    </div>
-
-  </div>
-</div>
-
-<nav>
-
-  <button class="nav-btn active" data-section="feed">
-    📋 Заказы
-  </button>
-
-  <button class="nav-btn" data-section="orders">
-    📦 Мои заказы
-  </button>
-
-  <button class="nav-btn" data-section="create">
-    ➕ Создать
-  </button>
-
-  <button class="nav-btn" data-section="money">
-    💰 SNKoin
-  </button>
-
-  <button class="nav-btn" data-section="profile">
-    👤 Профиль
-  </button>
-
-  <button id="adminNav"
-          class="nav-btn hidden"
-          data-section="admin">
-    🛡️ Управление
-  </button>
-
-</nav>
-
-<!-- ================= FEED ================= -->
-
-<section id="section-feed" class="section active">
-
-  <div class="panel">
-
-    <div class="tasks-header">
-      <h2>📋 Доступные заказы</h2>
-
-      <button id="refreshTasksBtn"
-              class="refresh-btn">
-        🔄 Обновить
-      </button>
+    <!-- ===== RULES MODAL ===== -->
+    <div id="rulesModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>📋 Правила SchoolNet</h2>
+            <h3>1. Общие правила</h3>
+            <ul>
+                <li>Запрещены оскорбления, угрозы, буллинг.</li>
+                <li>Запрещена реклама сторонних ресурсов.</li>
+                <li>Запрещены заказы на незаконные услуги.</li>
+                <li>Запрещено разглашать личную информацию других пользователей.</li>
+            </ul>
+            <h3>2. Правила для исполнителей</h3>
+            <ul>
+                <li>Заказ должен быть выполнен качественно и в срок.</li>
+                <li>Нельзя требовать предоплату вне системы.</li>
+                <li>Нельзя передавать заказ третьим лицам.</li>
+            </ul>
+            <h3>3. Правила для заказчиков</h3>
+            <ul>
+                <li>Оплата только через SNKoin внутри системы.</li>
+                <li>Принимать работу или запросить доработку в течение 24 часов.</li>
+                <li>Нельзя требовать выполнение незаконных действий.</li>
+            </ul>
+            <h3>4. Правила для модераторов и администраторов</h3>
+            <ul>
+                <li>Запрещено использовать полномочия в личных целях.</li>
+                <li>Запрещено банить без причины.</li>
+                <li>Запрещено удалять заказы без объяснения причин.</li>
+                <li>Запрещено сливать данные пользователей.</li>
+                <li>При входе — включать запись экрана (система безопасности).</li>
+            </ul>
+            <h3>5. Безопасность</h3>
+            <ul>
+                <li><strong style="color: #ffaa00;">Модератор или администратор НИКОГДА не попросит ваш пароль.</strong></li>
+                <li>Если кто-то просит пароль — <strong style="color: #ff4d5a;">это мошенник</strong>.</li>
+                <li>Немедленно сообщите через форму жалобы.</li>
+            </ul>
+            <h3>6. Санкции</h3>
+            <ul>
+                <li><strong>Предупреждение</strong> — за мелкие нарушения.</li>
+                <li><strong>Штраф</strong> (списание SNK) — за нарушение финансовых правил.</li>
+                <li><strong>Временная блокировка</strong> — за повторные нарушения.</li>
+                <li><strong>Бан</strong> — за грубые нарушения (оскорбления, угрозы, мошенничество).</li>
+            </ul>
+            <button class="close-btn" onclick="document.getElementById('rulesModal').classList.add('hidden')">✅ Понятно</button>
+        </div>
     </div>
 
-    <div id="tasksList" class="tasks-list">
-      <div class="loading">Загрузка заказов...</div>
+    <!-- ===== ADMIN CHECK MODAL ===== -->
+    <div id="adminCheckModal" class="modal hidden">
+        <div class="modal-content">
+            <div style="text-align:center;margin-bottom:20px;">
+                <div style="font-size:48px;">🛡️</div>
+                <h2 style="color:var(--cyan);margin:8px 0 4px;">Добро пожаловать, коллега</h2>
+                <p style="color:var(--muted);font-size:14px;">Перед входом в панель выполните 3 простых шага</p>
+            </div>
+            <div id="adminCheckCard1" style="background:var(--panel2);border:2px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:12px;transition:all .25s;">
+                <div style="display:flex;align-items:flex-start;gap:14px;">
+                    <span style="font-size:28px;">📹</span>
+                    <div style="flex:1;">
+                        <label style="display:flex;align-items:center;gap:12px;color:var(--text);font-weight:700;font-size:15px;cursor:pointer;">
+                            <input type="checkbox" id="adminCheckRecording" style="width:20px;height:20px;accent-color:var(--cyan);cursor:pointer;">
+                            Включите запись экрана
+                        </label>
+                        <p style="color:var(--muted);font-size:13px;margin:4px 0 0 32px;">
+                            После работы отправьте запись в бота <strong style="color:var(--cyan);">@cazicgusabot</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div id="adminCheckCard2" style="background:var(--panel2);border:2px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:12px;transition:all .25s;">
+                <div style="display:flex;align-items:flex-start;gap:14px;">
+                    <span style="font-size:28px;">📋</span>
+                    <div style="flex:1;">
+                        <label style="display:flex;align-items:center;gap:12px;color:var(--text);font-weight:700;font-size:15px;cursor:pointer;">
+                            <input type="checkbox" id="adminCheckRules" style="width:20px;height:20px;accent-color:var(--cyan);cursor:pointer;">
+                            Перечитайте правила SchoolNet
+                        </label>
+                        <p style="color:var(--muted);font-size:13px;margin:4px 0 0 32px;">
+                            <button onclick="document.getElementById('rulesModal').classList.remove('hidden')" style="background:transparent;color:var(--cyan);border:0;text-decoration:underline;cursor:pointer;padding:0;font-size:13px;">📖 Открыть правила</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div id="adminCheckCard3" style="background:var(--panel2);border:2px solid var(--border);border-radius:16px;padding:16px 18px;margin-bottom:12px;transition:all .25s;">
+                <div style="display:flex;align-items:flex-start;gap:14px;">
+                    <span style="font-size:28px;">🔐</span>
+                    <div style="flex:1;">
+                        <label style="display:flex;align-items:center;gap:12px;color:var(--text);font-weight:700;font-size:15px;cursor:pointer;">
+                            <input type="checkbox" id="adminCheckCredentials" style="width:20px;height:20px;accent-color:var(--cyan);cursor:pointer;">
+                            Подтвердите, что работаете под своим аккаунтом
+                        </label>
+                        <p style="color:var(--muted);font-size:13px;margin:4px 0 0 32px;">
+                            Система не запрашивает пароль повторно.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:16px;padding:14px 18px;background:rgba(255,170,0,.08);border:1px solid rgba(255,170,0,.25);border-radius:12px;">
+                <p style="color:var(--orange);font-weight:800;margin:0 0 4px;font-size:14px;">🔒 Безопасность превыше всего</p>
+                <p style="color:var(--muted);font-size:13px;margin:0;">Администратор или модератор <strong>НИКОГДА</strong> не попросит ваш пароль. Если кто-то просит — <strong style="color:var(--red);">это мошенник</strong>.</p>
+            </div>
+            <button id="adminStartBtn" class="main-btn" style="margin-top:22px;opacity:0.4;cursor:not-allowed;transition:all .25s;" disabled>⏳ Подтвердите все пункты</button>
+        </div>
     </div>
 
-  </div>
+    <div id="toast"></div>
 
-</section>
-
-<!-- ================= MY ORDERS ================= -->
-
-<section id="section-orders" class="section">
-
-  <div class="panel">
-
-    <div class="tasks-header">
-      <h2>📦 Мои заказы</h2>
-
-      <button id="refreshMyTasksBtn"
-              class="refresh-btn">
-        🔄 Обновить
-      </button>
-    </div>
-
-    <div id="myTasksList" class="tasks-list">
-      <div class="loading">Загрузка...</div>
-    </div>
-
-  </div>
-
-</section>
-
-<!-- ================= CREATE ================= -->
-
-<section id="section-create" class="section">
-
-  <div class="panel">
-
-    <h2>➕ Создать заказ</h2>
-
-    <p class="muted" style="margin-bottom:18px">
-      Опиши задание, которое должен выполнить другой школьник.
-    </p>
-
-    <div class="field">
-      <label>Название</label>
-      <input id="newOrderTitle"
-             maxlength="120"
-             placeholder="Например: Купить тетрадь">
-    </div>
-
-    <div class="field">
-      <label>Описание</label>
-      <textarea id="newOrderDescription"
-                maxlength="2000"
-                placeholder="Подробно опиши, что нужно сделать">
-      </textarea>
-    </div>
-
-    <div class="field">
-      <label>Стоимость, SNKoin</label>
-      <input id="newOrderPrice"
-             type="number"
-             min="1"
-             max="100000"
-             step="1"
-             placeholder="100">
-    </div>
-
-    <div class="field">
-      <label>Категория</label>
-
-      <select id="newOrderCategory">
-        <option value="study">📚 Учёба</option>
-        <option value="shopping">🛒 Покупки</option>
-        <option value="help">🤝 Помощь</option>
-        <option value="games">🎮 Игры</option>
-        <option value="sport">⚽ Спорт</option>
-        <option value="other">📌 Другое</option>
-      </select>
-    </div>
-
-    <button id="createTaskBtn"
-            class="main-btn"
-            type="button">
-      Создать заказ
-    </button>
-
-  </div>
-
-</section>
-
-<!-- ================= MONEY ================= -->
-
-<section id="section-money" class="section">
-
-  <div class="panel">
-
-    <h2>💰 SNKoin</h2>
-
-    <div class="money-card">
-
-      <div class="muted">Текущий баланс</div>
-
-      <div id="moneyBalance"
-           class="money-value">
-        0 SNK
-      </div>
-
-      <div class="muted">
-        внутренняя валюта SchoolNet
-      </div>
-
-    </div>
-
-    <div class="money-actions">
-
-      <button class="money-btn"
-              onclick="showDepositForm()">
-        ⭐ Пополнить
-      </button>
-
-      <button class="money-btn"
-              onclick="showWithdrawalForm()">
-        🎁 Вывести
-      </button>
-
-    </div>
-
-  </div>
-
-  <div id="moneyFormPanel" class="panel hidden"></div>
-
-  <div class="panel">
-
-    <h2>📜 Мои заявки</h2>
-
-    <div id="moneyRequests">
-      <div class="loading">
-        Загрузка...
-      </div>
-    </div>
-
-  </div>
-
-</section>
-
-<!-- ================= PROFILE ================= -->
-
-<section id="section-profile" class="section">
-
-  <div class="panel">
-
-    <h2>👤 Профиль</h2>
-
-    <div class="location-box">
-
-      <div class="location-item">
-        <div class="location-label">Логин</div>
-        <strong id="profileLogin">—</strong>
-      </div>
-
-      <div class="location-item">
-        <div class="location-label">Никнейм</div>
-        <strong id="profileNick">—</strong>
-      </div>
-
-      <div class="location-item">
-        <div class="location-label">Город</div>
-        <strong id="profileCity">—</strong>
-      </div>
-
-      <div class="location-item">
-        <div class="location-label">Школа</div>
-        <strong id="profileSchool">—</strong>
-      </div>
-
-    </div>
-
-  </div>
-
-</section>
-
-<!-- ================= ADMIN ================= -->
-
-<section id="section-admin" class="section">
-
-  <div class="panel admin-panel">
-
-    <h2 class="admin-title">🛡️ Управление</h2>
-
-    <p class="muted">
-      Панель администратора SchoolNet.
-    </p>
-
-  </div>
-
-  <div id="superAdminPanel"
-       class="panel admin-panel hidden">
-
-    <h2 class="admin-title">👑 Superadmin</h2>
-
-    <p class="muted">
-      Расширенное управление SchoolNet.
-    </p>
-
-  </div>
-
-</section>
-
-</main>
-</div>
-
-<div id="toast"></div>
-
-<script src="scripts/maingasterlol.js"></script>
+    <script src="scripts/maingasterlol.js"></script>
 </body>
 </html>
